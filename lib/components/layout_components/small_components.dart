@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
 buildCustomBackButton(BuildContext context) {
@@ -12,25 +13,24 @@ Widget buildCustomRadioButtons({
   required String selectedOption,
   required Function(String) onChanged,
 }) {
+  print("all radio buttons were rebuild");
   return Row(
     mainAxisSize: MainAxisSize.min,
-    // mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Distributes items evenly
-    children: options.map((option) {
-      return Row(
+    children: List.generate(options.length, (index){
+      return  Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Radio(
-
             activeColor: AppThemeClass.primary,
-            value: option,
+            value: options[index],
             groupValue: selectedOption,
             onChanged: (String? value) {
               onChanged(value!);
             },
           ),
-          Text(option), // Label next to radio button
+          Text(options[index]), // Label next to radio button
         ],
       );
-    }).toList(),
+    }),
   );
 }

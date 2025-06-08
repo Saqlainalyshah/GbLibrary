@@ -3,29 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../components/button.dart';
+import '../../components/drop_down.dart';
 import '../../components/layout_components/small_components.dart';
 import '../../components/text_widget.dart';
 import '../../components/textfield.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
-class _SubjectNotifier extends StateNotifier<List<String>>{
-  _SubjectNotifier():super([]);
-  addItem(String value){
-    if(state.contains(value)){
-      state.remove(value);
-      state=[...state];
-      return;
-    }
-    state = [...state, value];
-  }
-  void removeItem(String value) {
-    state = state.where((item) => item != value).toList();
-  }
-}
-final _subjectProvider = StateNotifierProvider<_SubjectNotifier, List<String>>((ref) {
-  return _SubjectNotifier();
-});
-
+final _subjectsList=StateProvider.autoDispose<List<String>>((ref)=>[]);
+final _item=StateProvider<String>((ref)=>'');
 class CreatePost extends StatelessWidget {
   CreatePost({super.key});
   final TextEditingController controller=TextEditingController();
@@ -47,14 +32,12 @@ class CreatePost extends StatelessWidget {
     "Other"
   ];
   //final List<String> type = ["Exchange", "Sell", "Donate"];
-  final _category = StateProvider.autoDispose<String>((ref) {
-    final List<String> list = ["Exchange", "Sell", "Donate"];
-    return list.first; // Safe access to first element
-  });
+  final _category = StateProvider.autoDispose<String>((ref)=>'' );
+
 
   @override
   Widget build(BuildContext context) {
-    print("build");
+    print("Create Post Rebuilds.....");
     return  SafeArea(
         top: false,
         child: Scaffold(
@@ -67,24 +50,22 @@ class CreatePost extends StatelessWidget {
                 spacing: 5,
                 children: [
                   CustomText(text: "Select one option",isBold: true,),
+                  SwitchListTile(value: true, onChanged: (bool? val){},title: Text("option"),),
                   Consumer(
-                    builder:(context,ref,child)=> Column(
-                      children: [
-                        buildCustomRadioButtons(
-                          options: ["Exchange", "Donate"],
-                          selectedOption: ref.watch(_category),
-                          onChanged: (newValue) {
-                            ref.read(_category.notifier).state=newValue;
-                          },
-                        ),
-                        if(ref.watch(_category)=="Sell")Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomText(text: "Price",isBold: true,),
-                            CustomTextField(controller: controller,hintText: "200",textInputType: TextInputType.number,maxLength: 5,counterText: '',),
-                          ],)
-                      ],
-                    ),
+                    builder:(context,ref,child){
+                      print("Consumer");
+                      return Column(
+                        children: [
+                          buildCustomRadioButtons(
+                            options: ["Exchange", "Donate"],
+                            selectedOption: ref.watch(_category),
+                            onChanged: (newValue) {
+                              ref.read(_category.notifier).state=newValue;
+                            },
+                          ),
+                        ],
+                      );
+                    },
                   ),
                   CustomText(text: "Select Picture",isBold: true,),
                   Container(
@@ -106,14 +87,14 @@ class CreatePost extends StatelessWidget {
                     ],
                   ),
                   CustomText(text: "Select Class",isBold: true,),
-                  customDropdownField(value: nameOfClassList[0], itemsList: nameOfClassList, onChanged: (String? val ) {
+                  CustomDropDown(value: nameOfClassList[0], list: nameOfClassList, onChanged: (String? val ) {
                   }),
                   CustomText(text: "Location",isBold: true,),
                   CustomTextField(controller: controller,hintText: "Noor Colony,Jutial Gilgit",),
                   CustomText(text: "Description",isBold: true,),
                  buildTextField(controller, "I want to exchange my books.....", 4),
                   CustomText(text: "Select Institutional Board",isBold: true,),
-                  customDropdownField(value: list[0], itemsList: list, onChanged: (String? val ) {
+                  CustomDropDown(value: list[0], list: list, onChanged: (String? val ) {
                   }),
                   CustomText(text: "Select Subjects",isBold: true,),
                   Container(
@@ -128,30 +109,12 @@ class CreatePost extends StatelessWidget {
                     ),
                     child: Wrap(
                       spacing: 5.0,
-                      children: subjects.map((buttonText) {
-                        return Consumer(
-                            builder:(context,ref,child) {
-                              final subjects = ref.watch(_subjectProvider); // Watching state changes
-                              final subjectNotifier = ref.read(_subjectProvider.notifier);
-                              return OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  backgroundColor: subjects.contains(buttonText)?AppThemeClass.primary:null,
-                                  side: BorderSide(
-                                      width:  1,
-                                      color: AppThemeClass.primary
-                                  ),
-                                ),
-                                onPressed: () {
-                                  subjectNotifier.addItem(buttonText);
-                                },
-                                child: CustomText(text:
-                                buttonText,
-                                  color: subjects.contains(buttonText)?AppThemeClass.whiteText:AppThemeClass.darkText,
-                                ),
-                              );
-                            }
+                      children: List.generate(subjects.length, (index){
+                        return ProviderScope(
+                          overrides: [_item.overrideWith((it)=>subjects[index])],
+                         child: const ButtonSubjects(),
                         );
-                      }).toList(),
+                      }),
                     ),
                   ),
                   SizedBox(height: 10,),
@@ -164,44 +127,7 @@ class CreatePost extends StatelessWidget {
   }
 }
 
-Widget customDropdownField({
-  required String? value,
-  required List<String> itemsList,
-  required void Function(String?) onChanged,
-  String hintText = "Select an option",
-}) {
-  return DropdownButtonFormField<String>(
-    isExpanded: true,
-    icon: Icon(Icons.keyboard_arrow_down, color: AppThemeClass.primary),
-    value: value,
-    onChanged: onChanged,
-    items: itemsList.map((String item) {
-      return DropdownMenuItem<String>(
-        value: item,
-        child: CustomText(
-          text: item,
-        ),
-      );
-    }).toList(),
-    decoration: InputDecoration(
-      hintStyle: GoogleFonts.robotoSerif(
-        color: AppThemeClass.darkTextOptional,
-        fontSize: 13,
-      ),
-      hintText: hintText,
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: AppThemeClass.primary),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(
-          color: AppThemeClass.primary,
-          width: 2.0,
-        ),
-      ),
-    ),
-  );
-}
+
 buildTextField( TextEditingController controller,String hintText,int maxLines){
   return TextFormField(
     controller: controller,
@@ -230,4 +156,34 @@ buildTextField( TextEditingController controller,String hintText,int maxLines){
       ),
     ),
   );
+}
+class ButtonSubjects extends ConsumerWidget {
+  const ButtonSubjects({super.key});
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final item=ref.watch(_item);
+    final isSelected = ref.watch(
+      _subjectsList.select((list) => list.contains(item)),
+    );
+    print("Only $item was rebuilt");
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        backgroundColor: isSelected ? AppThemeClass.primary : null,
+        side: BorderSide(width: 1, color: AppThemeClass.primary),
+      ),
+      onPressed: () {
+        final list = [...ref.read(_subjectsList)];
+        if (isSelected) {
+          list.remove(item);
+        } else {
+          list.add(item);
+        }
+        ref.read(_subjectsList.notifier).state = list;
+      },
+      child: CustomText(
+        text: item,
+        color: isSelected ? AppThemeClass.whiteText : AppThemeClass.darkText,
+      ),
+    );
+  }
 }
