@@ -33,62 +33,66 @@ final _gender=StateProvider.autoDispose<String>((ref)=>"Male");
     final addressField=CustomTextField(controller: address,hintText: address.text.isEmpty?"Noor Colony Jutial":address.text,);
     final whatsappField=CustomTextField(textInputType: TextInputType.number,controller: whatsappNumber,hintText: whatsappNumber.text.isEmpty?"03134457244":whatsappNumber.text,);
     print("Profile Rebuilds");
-    return Scaffold(
-      backgroundColor: AppThemeClass.whiteText,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        leading: buildCustomBackButton(context),
-        title: CustomText(text: "Profile",isBold: true,fontSize: 20,),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            spacing: 10,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                    ),
-                    IconButton(onPressed: (){}, icon: Icon(Icons.add_circle,size: 35,color: AppThemeClass.primary,))
-                  ],
-                )
-              ),
-              CustomText(text: "Name"),
-              nameField,
-              CustomText(text: "Gender"),
-              Row(
-                children: List.generate(2, (index) {
-                  final List<String> list=["Male","Female"];
-                  final option = list[index];
-                  return Expanded(
-                    child: Consumer(
-                      builder: (context, ref, child) {
-                        return RadioListTile<String>(
-                          activeColor: AppThemeClass.primary,
-                          value: list[index],
-                          groupValue: ref.watch(_gender.select((index)=>index)),
-                          onChanged: (val) {
-                            ref.read(_gender.notifier).state = val!;
-                          },
-                          title: CustomText(text: option),
-                        );
-                      },
-                    ),
-                  );
-                }),
-              ),
-              CustomText(text: "Address"),
-              addressField,
-              CustomText(text: "WhatsApp Number"),
-              whatsappField,
-              CustomButton(onPress: (){},title: "Update",)
-            ],
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: AppThemeClass.whiteText,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.transparent,
+          leading: buildCustomBackButton(context),
+          title: CustomText(text: "Profile",isBold: true,fontSize: 20,),
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              spacing: 10,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      CircleAvatar(
+                        radius: 100,
+                        backgroundColor: AppThemeClass.secondary,
+                      ),
+                      IconButton(onPressed: (){}, icon: Icon(Icons.add_circle,size: 50,color: AppThemeClass.primary,))
+                    ],
+                  )
+                ),
+                CustomText(text: "Name"),
+                nameField,
+                CustomText(text: "Gender"),
+                Row(
+                  children: List.generate(2, (index) {
+                    final List<String> list=["Male","Female"];
+                    final option = list[index];
+                    return Expanded(
+                      child: Consumer(
+                        builder: (context, ref, child) {
+                          return RadioListTile<String>(
+                            activeColor: AppThemeClass.primary,
+                            value: list[index],
+                            groupValue: ref.watch(_gender.select((index)=>index)),
+                            onChanged: (val) {
+                              ref.read(_gender.notifier).state = val!;
+                            },
+                            title: CustomText(text: option),
+                          );
+                        },
+                      ),
+                    );
+                  }),
+                ),
+                CustomText(text: "Address"),
+                addressField,
+                CustomText(text: "WhatsApp Number"),
+                whatsappField,
+                CustomButton(onPress: (){},title: "Update",)
+              ],
+            ),
           ),
         ),
       ),

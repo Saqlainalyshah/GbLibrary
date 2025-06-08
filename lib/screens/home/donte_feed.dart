@@ -1,3 +1,4 @@
+import 'package:booksexchange/components/layout_components/small_components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -36,74 +37,73 @@ class Donate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print("build");
-    return  SafeArea(
+    return SafeArea(
         top: false,
         child: Scaffold(
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
           backgroundColor: AppThemeClass.whiteText,
-          appBar: AppBar(
-            backgroundColor: AppThemeClass.whiteText,
-            title: CustomText(text: "Let's Donate",isBold: true,fontSize: 20,),
-          ),
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 5,
-                children: [
-                  CustomText(text: "Select size",isBold: true,),
-                  Consumer(
-                      builder:(context,ref,child)=>  buildRadioButtons(
-                        options: ["S", "M","L","XL"],
-                        selectedOption: ref.watch(_category),
-                        onChanged: (newValue) {
-                          ref.read(_category.notifier).state=newValue;
-                        },
-                      )
-                  ),
-                  CustomText(text: "Description",isBold: true,),
-                  buildTextField(controller, "I want to exchange my books.....", 4),
-                  CustomText(text: "Location",isBold: true,),
-                  CustomTextField(controller: controller,hintText: "Noor Colony,Jutial Gilgit",),
+      appBar: AppBar(
+        surfaceTintColor: AppThemeClass.whiteText,
+        backgroundColor: Colors.transparent,
+        title: CustomText(text: "Post Item",isBold: true,fontSize: 20,),
+        leading: buildCustomBackButton(context),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 5,
+            children: [
+              CustomText(text: "Select size",isBold: true,),
+              Consumer(
+                  builder:(context,ref,child)=>  buildRadioButtons(
+                    options: ["S", "M","L","XL"],
+                    selectedOption: ref.watch(_category),
+                    onChanged: (newValue) {
+                      ref.read(_category.notifier).state=newValue;
+                    },
+                  )
+              ),
+              CustomText(text: "Description",isBold: true,),
+              buildTextField(controller, "I want to exchange my books.....", 4),
+              CustomText(text: "Location",isBold: true,),
+              CustomTextField(controller: controller,hintText: "Noor Colony,Jutial Gilgit",),
 
-                  CustomText(text: "Is this school uniform?",isBold: true,),
-                  Consumer(
-                    builder:(context,ref,child)=> buildRadioButtons(
-                      options: ["Yes","No"],
-                      selectedOption: ref.watch(_category),
-                      onChanged: (newValue) {
-                        ref.read(_category.notifier).state=newValue;
-                      },
-                    ),
-                  ),
-                  /*  CustomText(text: "Select Institutional Board",isBold: true,),
+              CustomText(text: "Is this school uniform?",isBold: true,),
+              Consumer(
+                builder:(context,ref,child)=> buildRadioButtons(
+                  options: ["Yes","No"],
+                  selectedOption: ref.watch(_category),
+                  onChanged: (newValue) {
+                    ref.read(_category.notifier).state=newValue;
+                  },
+                ),
+              ),
+              /*  CustomText(text: "Select Institutional Board",isBold: true,),
                   customDropdownField(value: list[0], itemsList: list, onChanged: (String? val ) {
                   }),*/
-                  CustomText(text: "Select Picture",isBold: true,),
-                  Container(
-                    clipBehavior: Clip.antiAlias,
-                    height: 100,
-                    width: 200,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        border:Border.all(
-                            color: AppThemeClass.primary,
-                            width: 1.0
-                        )
-                    ),
-                    child: Center(child: Text("Upload Image")),
-                  ),
-                  CustomText(text: "Only one image can be upload",fontSize: 10,),
-
-                  SizedBox(height: 10,),
-                  CustomButton(onPress: (){},title: "Post",fontSize: 20,),
-                ],
+              CustomText(text: "Select Picture",isBold: true,),
+              Container(
+                clipBehavior: Clip.antiAlias,
+                height: 100,
+                width: 200,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border:Border.all(
+                        color: AppThemeClass.primary,
+                        width: 1.0
+                    )
+                ),
+                child: Center(child: CustomText(text: "Upload Image",color: AppThemeClass.primary,)),
               ),
-            ),
+              CustomText(text: "Only one image can be upload",fontSize: 10,),
+              SizedBox(height: 10,),
+              CustomButton(onPress: (){},title: "Post",fontSize: 20,),
+            ],
           ),
-
-        ));
+        ),
+      ),
+    ));
   }
 }
 

@@ -21,7 +21,6 @@ class AccountSecurity extends StatelessWidget {
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: ListTile(
-
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
               side: BorderSide(

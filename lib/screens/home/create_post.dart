@@ -42,6 +42,12 @@ class CreatePost extends StatelessWidget {
         top: false,
         child: Scaffold(
           backgroundColor: AppThemeClass.whiteText,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+            title: CustomText(text: "Post Item",fontSize: 20,isBold: true,),
+            leading: buildCustomBackButton(context),
+          ),
           body: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -70,25 +76,6 @@ class CreatePost extends StatelessWidget {
                         ),
                       );
                     }),
-                  ),
-                  CustomText(text: "Select Picture",isBold: true,),
-                  Container(
-                    clipBehavior: Clip.antiAlias,
-                    height: 50,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        border:Border.all(
-                            color: AppThemeClass.primary,
-                            width: 1.0
-                        )
-                    ),
-                    child: Center(child: Text("Upload Image")),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      CustomText(text: "Only one image can be upload",fontSize: 10,)
-                    ],
                   ),
                   CustomText(text: "Select Class",isBold: true,),
                   CustomDropDown(value: nameOfClassList[0], list: nameOfClassList, onChanged: (String? val ) {
@@ -121,6 +108,23 @@ class CreatePost extends StatelessWidget {
                       }),
                     ),
                   ),
+                  SizedBox(height: 10,),
+                  CustomText(text: "Select Picture",isBold: true,),
+                  Container(
+                    clipBehavior: Clip.antiAlias,
+                    height: 100,
+                    width: 200,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border:Border.all(
+                            color: AppThemeClass.primary,
+                            width: 1.0
+                        )
+                    ),
+                    child: Center(child: CustomText(text: "Upload Image",color: AppThemeClass.primary,)),
+                  ),
+                  CustomText(text: "Only one image can be upload",fontSize: 10,),
+
                   SizedBox(height: 10,),
                   CustomButton(onPress: (){},title: "Post",fontSize: 20,),
                 ],

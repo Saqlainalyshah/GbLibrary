@@ -1,26 +1,23 @@
-import 'package:booksexchange/components/button.dart';
-import 'package:booksexchange/components/text_widget.dart';
-import 'package:booksexchange/drawer/account_security/account_security.dart';
-import 'package:booksexchange/screens/help_support/privacy_policy.dart';
-import 'package:booksexchange/screens/help_support/terms_services.dart';
-import 'package:booksexchange/screens/postview/my_posts.dart';
 import 'package:booksexchange/screens/profile/profile.dart';
-import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
-import 'package:booksexchange/utils/fontsize/responsive_text.dart';
 import 'package:flutter/material.dart';
-import '../screens/help_support/faq.dart';
-import 'listtile_component.dart';
-import 'logout.dart';
+import '../../components/text_widget.dart';
+import '../../drawer/account_security/account_security.dart';
+import '../../drawer/listtile_component.dart';
+import '../../drawer/logout.dart';
+import '../help_support/faq.dart';
+import '../help_support/privacy_policy.dart';
+import '../help_support/terms_services.dart';
+import '../postview/my_posts.dart';
 
-class DrawerWidget extends StatelessWidget {
-  const DrawerWidget({super.key});
+class Account extends StatelessWidget {
+  const Account({super.key});
 
   @override
   Widget build(BuildContext context) {
-    print("Drawer Rebuilds");
-    return Drawer(
-      backgroundColor: AppThemeClass.whiteText,
-      child: SingleChildScrollView(
+    return SafeArea(
+        top: false,
+        child: Scaffold(
+      body:  SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -38,10 +35,10 @@ class DrawerWidget extends StatelessWidget {
                     ),
                   ),
                   CustomText(text:
-                    "GBLibrary",
-                      fontSize: 15,
-                      isBold: true,
-                      //color: Colors.black
+                  "GBLibrary",
+                    fontSize: 15,
+                    isBold: true,
+                    //color: Colors.black
 
                   )
                 ],
@@ -103,22 +100,22 @@ class DrawerWidget extends StatelessWidget {
                 title: list1[index],
                 leadingIcon:
                 index == 0?Icons.person_pin:
-                     index == 1
+                index == 1
                     ? Icons.post_add
                     : index == 2
                     ? Icons.lock_clock:
-                     index==3?
-                     Icons.question_answer_outlined:
-                         index==4?Icons.privacy_tip:
-                             index==5?Icons.help:
-                                 index==6?Icons.share:
-                         Icons.logout
+                index==3?
+                Icons.question_answer_outlined:
+                index==4?Icons.privacy_tip:
+                index==5?Icons.help:
+                index==6?Icons.share:
+                Icons.logout
                 ,
               );
             }),
           ],
         ),
       ),
-    );
+    ));
   }
 }
