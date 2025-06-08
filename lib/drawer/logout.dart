@@ -1,6 +1,4 @@
-import 'package:booksexchange/components/button.dart';
 import 'package:flutter/material.dart';
-
 import '../components/text_widget.dart';
 import '../utils/fontsize/app_theme/theme.dart';
 
@@ -10,7 +8,6 @@ void showLogout(BuildContext context) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-
         backgroundColor: AppThemeClass.whiteText,
         surfaceTintColor: AppThemeClass.whiteText,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),

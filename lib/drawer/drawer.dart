@@ -7,7 +7,6 @@ import 'package:booksexchange/screens/profile/profile.dart';
 import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
 import 'package:flutter/material.dart';
 import '../screens/help_support/faq.dart';
-import '../screens/help_support/help_support.dart';
 import 'listtile_component.dart';
 import 'logout.dart';
 

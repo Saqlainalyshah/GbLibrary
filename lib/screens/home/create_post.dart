@@ -32,7 +32,7 @@ class CreatePost extends StatelessWidget {
     "Other"
   ];
   //final List<String> type = ["Exchange", "Sell", "Donate"];
-  final _category = StateProvider.autoDispose<String>((ref)=>'' );
+  final _category = StateProvider.autoDispose<String>((ref)=>'Exchange');
 
 
   @override
@@ -50,22 +50,26 @@ class CreatePost extends StatelessWidget {
                 spacing: 5,
                 children: [
                   CustomText(text: "Select one option",isBold: true,),
-                  SwitchListTile(value: true, onChanged: (bool? val){},title: Text("option"),),
-                  Consumer(
-                    builder:(context,ref,child){
-                      print("Consumer");
-                      return Column(
-                        children: [
-                          buildCustomRadioButtons(
-                            options: ["Exchange", "Donate"],
-                            selectedOption: ref.watch(_category),
-                            onChanged: (newValue) {
-                              ref.read(_category.notifier).state=newValue;
-                            },
-                          ),
-                        ],
+                  Row(
+                    children: List.generate(2, (index) {
+                      List<String> list = ["Exchange", "Donate"];
+                      final option = list[index];
+                      return Expanded(
+                        child: Consumer(
+                          builder: (context, ref, child) {
+                            return RadioListTile<String>(
+                              activeColor: AppThemeClass.primary,
+                              value: list[index],
+                              groupValue: ref.watch(_category.select((index)=>index)),
+                              onChanged: (val) {
+                                ref.read(_category.notifier).state = val!;
+                              },
+                              title: CustomText(text: option),
+                            );
+                          },
+                        ),
                       );
-                    },
+                    }),
                   ),
                   CustomText(text: "Select Picture",isBold: true,),
                   Container(

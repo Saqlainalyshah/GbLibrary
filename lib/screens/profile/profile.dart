@@ -26,13 +26,12 @@ final TextEditingController name=TextEditingController();
     address.dispose();
     whatsappNumber.dispose();
   }
-  final List<String> list=["Male","Female"];
 final _gender=StateProvider.autoDispose<String>((ref)=>"Male");
   @override
   Widget build(BuildContext context) {
     final nameField=CustomTextField(controller: name,hintText: name.text.isEmpty?"Name":name.text,);
     final addressField=CustomTextField(controller: address,hintText: address.text.isEmpty?"Noor Colony Jutial":address.text,);
-    final whatsappField=CustomTextField(controller: whatsappNumber,hintText: whatsappNumber.text.isEmpty?"03134457244":whatsappNumber.text,);
+    final whatsappField=CustomTextField(textInputType: TextInputType.number,controller: whatsappNumber,hintText: whatsappNumber.text.isEmpty?"03134457244":whatsappNumber.text,);
     print("Profile Rebuilds");
     return Scaffold(
       backgroundColor: AppThemeClass.whiteText,
@@ -63,13 +62,27 @@ final _gender=StateProvider.autoDispose<String>((ref)=>"Male");
               CustomText(text: "Name"),
               nameField,
               CustomText(text: "Gender"),
-             Consumer(builder: (context,ref,child)=> buildCustomRadioButtons(
-               options: list,
-               selectedOption: ref.watch(_gender),
-               onChanged: (newValue) {
-                 ref.read(_gender.notifier).state=newValue;
-               },
-             ),),
+              Row(
+                children: List.generate(2, (index) {
+                  final List<String> list=["Male","Female"];
+                  final option = list[index];
+                  return Expanded(
+                    child: Consumer(
+                      builder: (context, ref, child) {
+                        return RadioListTile<String>(
+                          activeColor: AppThemeClass.primary,
+                          value: list[index],
+                          groupValue: ref.watch(_gender.select((index)=>index)),
+                          onChanged: (val) {
+                            ref.read(_gender.notifier).state = val!;
+                          },
+                          title: CustomText(text: option),
+                        );
+                      },
+                    ),
+                  );
+                }),
+              ),
               CustomText(text: "Address"),
               addressField,
               CustomText(text: "WhatsApp Number"),
