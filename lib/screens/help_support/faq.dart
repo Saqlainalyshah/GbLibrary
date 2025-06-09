@@ -10,6 +10,7 @@ class FAQScreen extends StatelessWidget {
   final TextEditingController controller=TextEditingController();
   final _selectedIndex=StateProvider.autoDispose<int>((ref)=>0);
   final List<String> _categoriesList = ["General", "Account", "Services","Safety"];
+  final _isEmpty=StateProvider.autoDispose<bool>((ref)=>true);
   @override
   Widget build(BuildContext context) {
     print("build FAQ");
@@ -30,12 +31,19 @@ class FAQScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Consumer(
-                builder:(context,ref,child)=> CustomTextField(controller: controller,
+                builder:(context,ref,child)=> CustomTextField(
+                  controller: controller,
                   onChanged: (value){
                     ref.read(faqProvider.notifier).search(value);
                   },
                   leadingIcon: Icons.search,
                   hintText: "Search",
+                  trailingIcon: Icons.close,
+                  trailingFn: (){
+                   FocusScope.of(context).unfocus();
+                    controller.clear();
+                   ref.read(faqProvider.notifier).filterListByCategory(_categoriesList[ref.watch(_selectedIndex)]);
+                  },
                 ),
               ),
             ),
@@ -47,7 +55,7 @@ class FAQScreen extends StatelessWidget {
                 physics: BouncingScrollPhysics(),
                 itemCount: _categoriesList.length,
                 itemBuilder: (context, index) {
-                  print(index);
+                 // print(index);
                   return Consumer(
                     builder: (context, ref, _) {
                       final isSelected=ref.watch(_selectedIndex.select((item)=>item==index));
@@ -60,7 +68,7 @@ class FAQScreen extends StatelessWidget {
                         ),
                         onPressed: () {
                           ref.read(_selectedIndex.notifier).state = index;
-                          ref.read(faqProvider.notifier).filterList(_categoriesList[index]);
+                          ref.read(faqProvider.notifier).filterListByCategory(_categoriesList[index]);
                         },
                         child: CustomText(
                           text: _categoriesList[index],
@@ -75,48 +83,58 @@ class FAQScreen extends StatelessWidget {
             ),
             Expanded(
               child: Consumer(
-                builder:(context,ref,child)=> ListView.separated(
-                  shrinkWrap: true,
-                  physics: BouncingScrollPhysics(),
-                  itemCount: ref.watch(faqProvider).filteredItems.length,
-                  padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
-                  itemBuilder: (context,index){
-                    print("Nested Item $index rebuild");
-                    return Consumer(builder: (context,ref,child){
-                     final item= ref.read(faqProvider).filteredItems[index];
-                     return GestureDetector(
-                       onTap: (){
-                         ref.read(faqProvider.notifier).toggleIsReadByFilteredIndex(index);
-                       },
-                       child: Container(
-                         padding: EdgeInsets.all(10),
-                         decoration: BoxDecoration(
-                           color: AppThemeClass.whiteText,
-                           //   borderRadius: BorderRadius.circular(10)
-                           borderRadius: BorderRadius.circular(10), // Rounded corners
-                           border: Border.all(color: AppThemeClass.secondary, width: 1.0),
-                         ),
-                         child: Column(
-                           spacing: 10,
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                           children: <Widget>[
-                             Row(
-                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                               children: [
-                                 Flexible(child: CustomText(text: item.question,isBold: true,)),
-                                 Icon(item.isRead? Icons.keyboard_arrow_down_outlined: Icons.keyboard_arrow_up,color: Colors.grey.shade700,)
-                               ],
-                             ),
-                             if(item.isRead)Divider(),
-                             if(item.isRead)CustomText(text: item.answer,)
-                           ],
-                         ),
-                       ),
-                     );
-                   });
-                  }, separatorBuilder: (BuildContext context, int index) {
-                  return Padding(padding: EdgeInsets.all(10));
-                },),
+                builder:(context,ref,child){
+                  final len= ref.watch(faqProvider.select((p)=>p.filteredItems));
+                  final len2= ref.watch(faqProvider.select((p)=>p.searchedList));
+                  print("outer");
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    itemCount:controller.text.isNotEmpty?
+                   len2.length:
+                    len.length,
+                    padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
+                    itemBuilder: (context,index){
+                      print("Nested Item $index rebuild");
+                      return Consumer(builder: (context,ref,child){
+                        print("rebuild $index");
+                       // final isRead = ref.watch(readStatusProvider(index));
+                        final item= ref.read(faqProvider.select((itemVal)=>itemVal.filteredItems[index]));
+                        return GestureDetector(
+                          key: ValueKey(index),
+                          onTap: (){
+                            ref.read(faqProvider.notifier).toggleIsReadByFilteredIndex(item,index);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppThemeClass.whiteText,
+                              //   borderRadius: BorderRadius.circular(10)
+                              borderRadius: BorderRadius.circular(10), // Rounded corners
+                              border: Border.all(color: AppThemeClass.secondary, width: 1.0),
+                            ),
+                            child: Column(
+                              spacing: 10,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(child: CustomText(text: item.question,isBold: true,)),
+                                    Icon(item.isRead? Icons.keyboard_arrow_down_outlined: Icons.keyboard_arrow_up,color: Colors.grey.shade700,)
+                                  ],
+                                ),
+                                if(item.isRead)Divider(),
+                                if(item.isRead)CustomText(text: item.answer,)
+                              ],
+                            ),
+                          ),
+                        );
+                      });
+                    }, separatorBuilder: (BuildContext context, int index) {
+                    return Padding(padding: EdgeInsets.all(10));
+                  },);
+                },
               ),
             )
           ],
@@ -160,11 +178,13 @@ class FAQ {
 class FilterList {
   final List<FAQ> allItems;
   final List<FAQ> filteredItems;
+  final List<FAQ> searchedList;
   final String search;
 
   FilterList({
     required this.allItems,
     required this.filteredItems,
+    required this.searchedList,
     required this.search,
   });
 
@@ -174,6 +194,7 @@ class FilterList {
     return FilterList(
       allItems: items,
       filteredItems: filtered,
+      searchedList: [],
       search: "General",
     );
   }
@@ -181,11 +202,13 @@ class FilterList {
   FilterList copyWith({
     List<FAQ>? allItems,
     List<FAQ>? filteredItems,
+    List<FAQ>? searchedList,
     String? search,
   }) {
     return FilterList(
       allItems: allItems ?? this.allItems,
       filteredItems: filteredItems ?? this.filteredItems,
+      searchedList: searchedList??this.searchedList,
       search: search ?? this.search,
     );
   }
@@ -197,15 +220,8 @@ class FAQNotifier extends StateNotifier<FilterList> {
 
   static final List<FAQ> _initialItems = faqList;
 
- /* void addItem(FAQ item) {
-    final updatedList = [...state.allItems, item];
-    state = state.copyWith(
-      allItems: updatedList,
-      filteredItems: _filterItems(updatedList, state.search),
-    );
-  }*/
   void search(String search){
-    state=state.copyWith(filteredItems: searchTemp(state.allItems, search,));
+    state=state.copyWith(searchedList: searchTemp(state.filteredItems, search,));
   }
 
   List<FAQ> searchTemp(List<FAQ> items,String search,){
@@ -215,28 +231,15 @@ class FAQNotifier extends StateNotifier<FilterList> {
     return items.where((item)=>item.question.toLowerCase().contains(search.toLowerCase())).toList();
   }
 
-  void toggleIsReadByFilteredIndex(int index) {
-    final filteredItem = state.filteredItems[index];
-
-    // Update the item in allItems by finding the matching one
-    final updatedAll = state.allItems.map((faq) {
-      if (faq.question == filteredItem.question && faq.questionType == filteredItem.questionType) {
-        return faq.copyWith(isRead: !faq.isRead); // toggle isRead
-      }
-      return faq;
-    }).toList();
-
-    // Refresh filtered list with updated items
-    final updatedFiltered = _filterItems(updatedAll, state.search);
-
-    // Update the state
-    state = state.copyWith(
-      allItems: updatedAll,
-      filteredItems: updatedFiltered,
-    );
+  void toggleIsReadByFilteredIndex(FAQ item, int index) {
+    final updatedItem = item.copyWith(isRead: !item.isRead);
+    final updatedList = [...state.filteredItems];
+    updatedList[index] = updatedItem;
+    state = state.copyWith(filteredItems: updatedList);
   }
 
-  void filterList(String type) {
+
+  void filterListByCategory(String type) {
     state = state.copyWith(
       search: type,
       filteredItems: _filterItems(state.allItems, type),
@@ -253,6 +256,12 @@ final faqProvider = StateNotifierProvider<FAQNotifier, FilterList>((ref) {
   return FAQNotifier();
 });
 
+/*
+final readStatusProvider = Provider.family<bool, int>((ref, index) {
+  final filtered = ref.watch(faqProvider.select((s) => s.filteredItems));
+  return filtered[index].isRead;
+});
+*/
 
 
 List<FAQ> faqList=[
