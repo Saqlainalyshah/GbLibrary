@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../components/text_widget.dart';
-import '../utils/fontsize/app_theme/theme.dart';
+import '../../../components/text_widget.dart';
+import '../../../utils/fontsize/app_theme/theme.dart';
 
-/// Alert dialogue to check verification process
+/// Alert dialogue to user logout action
 void showLogout(BuildContext context) {
   showDialog(
     context: context,

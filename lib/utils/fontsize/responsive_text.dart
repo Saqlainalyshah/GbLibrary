@@ -11,8 +11,8 @@ class ResponsiveText {
     double scaleFactor = screenWidth / baseWidth;
 
     // Minimum and maximum text sizes for different devices
-    double minSize = screenWidth < 600 ? 12: screenWidth < 1200 ? 16 : 22;
-    double maxSize = screenWidth < 600 ? 20 : screenWidth < 1200 ? 35 : 32;
+    double minSize = screenWidth < 600 ? 12: screenWidth < 1200 ? 20 : 28;
+    double maxSize = screenWidth < 600 ? 22 : screenWidth < 1200 ? 30 : 40;
 
     return (size * scaleFactor).clamp(minSize, maxSize);
   }}
@@ -30,8 +30,8 @@ class ResponsiveBox {
     double scaleFactor = screenWidth / baseWidth;
 
     // Minimum and maximum box sizes for different devices
-    double minSize = screenWidth < 600 ? 10 : screenWidth < 1200 ? 20 : 40;
-    double maxSize = screenWidth < 600 ? 500 : screenWidth < 1200 ? 400 : 600;
+    double minSize = screenWidth < 600 ? 10 : screenWidth < 1200 ? 30 : 70;
+    double maxSize = screenWidth < 600 ? 600 : screenWidth < 1200 ? 1200 : 1800;
 
     return (size * scaleFactor).clamp(minSize, maxSize);
   }

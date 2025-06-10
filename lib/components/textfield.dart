@@ -1,7 +1,7 @@
 
+import 'package:booksexchange/components/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../utils/fontsize/app_theme/theme.dart';
 
 /// Text Field Widget
@@ -16,7 +16,7 @@ class CustomTextField extends StatelessWidget {
     this.fillColor =  Colors.white,
     this.textInputType = TextInputType.text,
     this.secure = false,
-    this.radius = 10,
+    this.radius = 5,
     this.isPhone=false,
     this.hintText = " ",
     this.isBorder = false,
@@ -24,7 +24,7 @@ class CustomTextField extends StatelessWidget {
     this.counterText,
     this.trailingFn,
     this.maxLength,
-    //this.maxLines,
+    this.maxLines,
     this.validator, // Added validator function
   });
 
@@ -43,7 +43,7 @@ class CustomTextField extends StatelessWidget {
   final void Function(String)? onChanged;
   final Function? trailingFn;
   final String? Function(String?)? validator;
- // final int? maxLines;
+  final int? maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +53,16 @@ class CustomTextField extends StatelessWidget {
       obscureText: secure,
       controller: controller,
       onChanged: onChanged,
-     // maxLines:maxLines,
+      maxLines: maxLines,
+      style: GoogleFonts.robotoSerif(
+       // color: color,
+        //fontSize: ResponsiveText.getSize(context, fontSize),
+        //fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+      ),// maxLines:maxLines,
       validator: validator, // Pass the function as an argument
       cursorColor: AppThemeClass.primary,
       decoration: InputDecoration(
+        contentPadding: EdgeInsets.symmetric(horizontal: 5),
         counterText: counterText,
        // labelText: labelText,
         enabledBorder: OutlineInputBorder(
@@ -74,6 +80,7 @@ class CustomTextField extends StatelessWidget {
         ),
         filled: true,
         fillColor: fillColor,
+
         prefixIcon: leadingIcon == null
             ? null
             : Icon(leadingIcon, color: AppThemeClass.primary, size: 25.0),
@@ -87,6 +94,7 @@ class CustomTextField extends StatelessWidget {
           child: Icon(trailingIcon, color: AppThemeClass.primary, size: 25.0),
         ) : null,
         hintText: hintText,
+
         hintStyle:GoogleFonts.robotoSerif(color: AppThemeClass.darkTextOptional,fontSize: 13),
       ),
     );

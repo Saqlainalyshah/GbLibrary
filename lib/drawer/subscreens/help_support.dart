@@ -1,6 +1,6 @@
 import 'package:booksexchange/components/text_widget.dart';
-import 'package:booksexchange/screens/help_support/privacy_policy.dart';
-import 'package:booksexchange/screens/help_support/terms_services.dart';
+import 'package:booksexchange/drawer/subscreens/privacy_policy.dart';
+import 'package:booksexchange/drawer/subscreens/terms_services.dart';
 import 'package:flutter/material.dart';
 
 import 'contact_support.dart';

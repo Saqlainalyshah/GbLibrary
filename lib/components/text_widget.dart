@@ -11,12 +11,14 @@ class CustomText extends StatelessWidget {
   final bool isBold;
   final int? maxLines;
   final TextAlign? textAlign;
+  final bool isGoogleFont;
   const CustomText({
     super.key,
     required this.text,
-    this.textAlign=TextAlign.start,
-    this.maxLines=300,
-    this.fontSize=13,
+    this.isGoogleFont = true,
+    this.textAlign = TextAlign.start,
+    this.maxLines = 300,
+    this.fontSize = 13,
     this.color = Colors.black,
     this.isBold = false,
   });
@@ -27,13 +29,21 @@ class CustomText extends StatelessWidget {
       text,
       overflow: TextOverflow.ellipsis,
       softWrap: true,
-      maxLines:maxLines,
+      maxLines: maxLines,
       textAlign: textAlign,
-      style: TextStyle(letterSpacing: 0,
-        color: color,
-        fontSize: ResponsiveText.getSize(context, fontSize),
-        fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-      ),
+      style: isGoogleFont
+          ? GoogleFonts.robotoSerif(
+              color: color,
+             // letterSpacing: isBold?1:0,
+              fontSize: ResponsiveText.getSize(context, fontSize),
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            )
+          : TextStyle(
+              letterSpacing: 0,
+              color: color,
+              fontSize: ResponsiveText.getSize(context, fontSize),
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            ),
     );
   }
 }

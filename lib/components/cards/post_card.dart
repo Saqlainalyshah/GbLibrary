@@ -1,4 +1,4 @@
-import 'package:booksexchange/screens/postview/view_details.dart';
+import 'package:booksexchange/screens/home/view_details.dart';
 import 'package:booksexchange/utils/fontsize/responsive_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,6 +6,7 @@ import '../../utils/fontsize/app_theme/theme.dart';
 import '../button.dart';
 import '../text_widget.dart';
 
+/// card to display posts
 class PostCard extends StatelessWidget {
   const PostCard({
     super.key,
@@ -14,7 +15,7 @@ class PostCard extends StatelessWidget {
     required this.time,
     required this.description,
     required this.location,
-    required this.numberOfBooks,
+    required this.type,
     required this.imageUrl,
   });
   final String title;
@@ -22,99 +23,92 @@ class PostCard extends StatelessWidget {
   final String time;
   final String description;
   final String location;
-  final int numberOfBooks;
+  final String type;
   final String imageUrl;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(5),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 5,
-            children: [
-              Flexible(
-                flex: 1,
-                child: buildContainerImage(context, imageUrl, 160, true),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      //mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+
+        Row(
+         crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 5,
+          children: [
+            Flexible(child:    buildContainerImage(context, imageUrl, 175,true),),
+            Flexible(
+              flex: 2,
+              child: BuildPostColumn(
+                title:
+                title,
+                board:
+                board,
+                type:type,
+                description:
+                description,
               ),
-              Flexible(
-                flex: 2,
-                child: buildPostColumn(
-                  context,
-                  title,
-                  board,
-                  numberOfBooks,
-                  description,
-                ),
-              ),
-            ],
-          ),
-          Flexible(child: buildBottomRow(context, location, time)),
-        ],
-      ),
+            )
+          ],
+        ),
+        Flexible(child: _buildBottomRow(context, location, time)),
+      ],
     );
   }
 }
-
-buildPostColumn(
-  BuildContext context,
-  String title,
-  String board,
-  int noOfBooks,
-  String description,
-) {
-  return Column(
-    // mainAxisAlignment: MainAxisAlignment.start,
-    crossAxisAlignment: CrossAxisAlignment.start,
-    mainAxisSize: MainAxisSize.min,
-    spacing: 10,
-    children: [
-      RichText(
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        textAlign: TextAlign.center,
-        text: TextSpan(
-          style: TextStyle(fontSize: ResponsiveText.getSize(context, 18)),
-          children: [
-            TextSpan(
-              text: "I want to Exchange ",
-              style: GoogleFonts.asapCondensed(
-                fontWeight: FontWeight.bold,
-                color: AppThemeClass.darkText,
-              ),
-            ),
-            TextSpan(
-              text: "$title class Books",
-              style: GoogleFonts.asapCondensed(
-                fontWeight: FontWeight.bold,
-                color: Color(0xff00a67e),
-              ),
-            ),
-          ],
+///Right side portion of card like title, board and dcription
+class BuildPostColumn extends StatelessWidget {
+  const BuildPostColumn({
+    super.key,
+    required this.type,
+    required this.title,
+    required this.board,
+    required this.description
+  });
+      final String type;
+      final String title;
+      final String board;
+      final String description;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      // mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      spacing: 5,
+      children: [
+        CustomText(
+          text: "I want to Exchange 1th class books",
+          isBold: true,
+          //overflow: TextOverflow.ellipsis,s
+          fontSize: ResponsiveText.getSize(context, 15),
+          maxLines: 5,
         ),
-      ),
-      buildIconTextRow(context, Icons.school, board),
 
-      CustomText(
-        text: description,
-        //overflow: TextOverflow.ellipsis,s
-        fontSize: ResponsiveText.getSize(context, 13),
-        maxLines: 5,
-      ),
-    ],
-  );
+        buildIconTextRow(context, Icons.school, board),
+        CustomText(
+          text: description,
+          //overflow: TextOverflow.ellipsis,s
+          fontSize: ResponsiveText.getSize(context, 13),
+          maxLines: 5,
+        ),
+      ],
+    );
+  }
 }
-
-buildBottomRow(BuildContext context, String location, String time) {
+///bottom row of card which contains location, time and view details button
+_buildBottomRow(BuildContext context, String location, String time) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    spacing: 5,
     //mainAxisSize: MainAxisSize.min,
     children: [
-      buildIconTextRow(context, Icons.location_on, location),
+      Flexible(child: buildIconTextRow(context, Icons.location_on, location)),
       buildIconTextRow(context, Icons.access_time, time),
       CustomButton(
+       // isBorder: false,
+        radius: 5,
         onPress: () {
           Navigator.push(
             context,
@@ -122,13 +116,15 @@ buildBottomRow(BuildContext context, String location, String time) {
           );
         },
         title: 'View Details',
-        width: ResponsiveBox.getSize(context, 130),
-        height: ResponsiveBox.getSize(context, 50),
+        width: ResponsiveBox.getSize(context, 120),
+        height: ResponsiveBox.getSize(context, 40),
       ),
     ],
   );
 }
 
+
+///Container to show image with border or without border
 buildContainerImage(
   BuildContext context,
   String imageUrl,
@@ -136,21 +132,19 @@ buildContainerImage(
   bool isBorder,
 ) {
   return Container(
-    height: ResponsiveBox.getSize(context, size),
+    padding: EdgeInsets.all(2),
+    height: ResponsiveBox.getSize(context,size ),
     decoration: BoxDecoration(
-      // color: Colors.grey,
       borderRadius: BorderRadius.circular(5),
       border: isBorder
-          ? Border.all(color: AppThemeClass.primary, width: 1.0)
+          ? Border.all(color: AppThemeClass.primary, width: .5)
           : null,
-      image: DecorationImage(
-        image: AssetImage("assets/splash/splash.png"),
-        fit: BoxFit.cover,
-      ),
     ),
+    
+    child: Image.asset("assets/images/book.jpg",fit: BoxFit.cover,),
   );
 }
-
+///row widget wrapped in a container with a app secondary color which contains icon and text
 buildIconTextRow(BuildContext context, IconData icon, String text) {
   return Container(
    // width: double.infinity,
@@ -168,10 +162,12 @@ buildIconTextRow(BuildContext context, IconData icon, String text) {
           color: AppThemeClass.primary,
           size: ResponsiveBox.getSize(context, 18),
         ),
-        CustomText(
-          text: text,
-          maxLines: 1,
-          fontSize: ResponsiveText.getSize(context, 12),
+        Flexible(
+          child: CustomText(
+            text: text,
+            maxLines: 1,
+            fontSize: ResponsiveText.getSize(context, 12),
+          ),
         ),
       ],
     ),

@@ -22,17 +22,17 @@ class AccountSecurity extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: ListTile(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              side: BorderSide(
-                color: AppThemeClass.secondary
-              )
+                borderRadius: BorderRadius.circular(10.0),
+                side: BorderSide(
+                    color: AppThemeClass.secondary
+                )
             ),
             onTap: (){
               print("Account deleted");
             },
             title: CustomText(text: "Delete Account",isBold: true,fontSize: 16,),
             subtitle: CustomText(text: "Once you delete your account all your data will be deleted permanently"),
-            trailing: Icon(Icons.delete,color: Colors.red,),
+            trailing: Icon(Icons.delete,color: Colors.red,size: 30,),
           ),
         ),
       ),

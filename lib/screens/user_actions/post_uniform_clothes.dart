@@ -2,14 +2,13 @@ import 'package:booksexchange/components/layout_components/small_components.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../components/button.dart';
 import '../../components/text_widget.dart';
 import '../../components/textfield.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
-class Donate extends StatelessWidget {
-  Donate({super.key});
+class UniformClothes extends StatelessWidget {
+  UniformClothes({super.key});
   final TextEditingController controller=TextEditingController();
 
 
@@ -44,7 +43,7 @@ class Donate extends StatelessWidget {
       appBar: AppBar(
         surfaceTintColor: AppThemeClass.whiteText,
         backgroundColor: Colors.transparent,
-        title: CustomText(text: "Post Item",isBold: true,fontSize: 20,),
+        title: CustomText(text: "Post Uniform & Clothes",isBold: true,fontSize: 20,),
         leading: buildCustomBackButton(context),
       ),
       body: SingleChildScrollView(
@@ -54,9 +53,9 @@ class Donate extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 5,
             children: [
-              CustomText(text: "Select size",isBold: true,),
+              CustomText(text: "Select size",isGoogleFont: true,),
               Consumer(
-                  builder:(context,ref,child)=>  buildRadioButtons(
+                  builder:(context,ref,child)=>  _buildRadioButtons(
                     options: ["S", "M","L","XL"],
                     selectedOption: ref.watch(_category),
                     onChanged: (newValue) {
@@ -64,14 +63,14 @@ class Donate extends StatelessWidget {
                     },
                   )
               ),
-              CustomText(text: "Description",isBold: true,),
-              buildTextField(controller, "I want to exchange my books.....", 4),
-              CustomText(text: "Location",isBold: true,),
+              CustomText(text: "Description",isGoogleFont: true,),
+              CustomTextField(controller: controller,hintText:  "I want to exchange my books.....",maxLines:  4),
+              CustomText(text: "Location",isGoogleFont: true,),
               CustomTextField(controller: controller,hintText: "Noor Colony,Jutial Gilgit",),
 
-              CustomText(text: "Is this school uniform?",isBold: true,),
+              CustomText(text: "Is this school uniform?",isGoogleFont: true,),
               Consumer(
-                builder:(context,ref,child)=> buildRadioButtons(
+                builder:(context,ref,child)=> _buildRadioButtons(
                   options: ["Yes","No"],
                   selectedOption: ref.watch(_category),
                   onChanged: (newValue) {
@@ -82,7 +81,7 @@ class Donate extends StatelessWidget {
               /*  CustomText(text: "Select Institutional Board",isBold: true,),
                   customDropdownField(value: list[0], itemsList: list, onChanged: (String? val ) {
                   }),*/
-              CustomText(text: "Select Picture",isBold: true,),
+              CustomText(text: "Select Picture",isGoogleFont: true,),
               Container(
                 clipBehavior: Clip.antiAlias,
                 height: 100,
@@ -96,7 +95,7 @@ class Donate extends StatelessWidget {
                 ),
                 child: Center(child: CustomText(text: "Upload Image",color: AppThemeClass.primary,)),
               ),
-              CustomText(text: "Only one image can be upload",fontSize: 10,),
+              CustomText(text: "Only one image can be upload",isGoogleFont:true,fontSize: 10,),
               SizedBox(height: 10,),
               CustomButton(onPress: (){},title: "Post",fontSize: 20,),
             ],
@@ -107,7 +106,7 @@ class Donate extends StatelessWidget {
   }
 }
 
-Widget buildRadioButtons({
+Widget _buildRadioButtons({
   required List<String> options,
   required String selectedOption,
   required Function(String) onChanged,
@@ -126,76 +125,9 @@ Widget buildRadioButtons({
               onChanged(value!);
             },
           ),
-          Text(option), // Label next to radio button
+          CustomText(text: option), // Label next to radio button
         ],
       );
     }).toList(),
-  );
-}
-Widget customDropdownField({
-  required String? value,
-  required List<String> itemsList,
-  required void Function(String?) onChanged,
-  String hintText = "Select an option",
-}) {
-  return DropdownButtonFormField<String>(
-    isExpanded: true,
-    icon: Icon(Icons.keyboard_arrow_down, color: AppThemeClass.primary),
-    value: value,
-    onChanged: onChanged,
-    items: itemsList.map((String item) {
-      return DropdownMenuItem<String>(
-        value: item,
-        child: CustomText(
-          text: item,
-        ),
-      );
-    }).toList(),
-    decoration: InputDecoration(
-      hintStyle: GoogleFonts.robotoSerif(
-        color: AppThemeClass.darkTextOptional,
-        fontSize: 13,
-      ),
-      hintText: hintText,
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: AppThemeClass.primary),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(
-          color: AppThemeClass.primary,
-          width: 2.0,
-        ),
-      ),
-    ),
-  );
-}
-buildTextField( TextEditingController controller,String hintText,int maxLines){
-  return TextFormField(
-    controller: controller,
-    onChanged: (String text) {},
-    maxLines: maxLines,
-    cursorColor: AppThemeClass.primary,
-    decoration: InputDecoration(
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(
-          color: AppThemeClass.primary,
-        ),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(
-          color: AppThemeClass.primary,
-          width: 2.0,
-        ),
-      ),
-      filled: true,
-      fillColor: AppThemeClass.whiteText,
-      hintText: hintText,
-      hintStyle: GoogleFonts.robotoSerif(
-        color: AppThemeClass.darkTextOptional,
-        fontSize: 13,
-      ),
-    ),
   );
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../components/button.dart';
 import '../../components/drop_down.dart';
 import '../../components/layout_components/small_components.dart';
@@ -11,10 +10,14 @@ import '../../utils/fontsize/app_theme/theme.dart';
 
 final _subjectsList=StateProvider.autoDispose<List<String>>((ref)=>[]);
 final _item=StateProvider<String>((ref)=>'');
-class CreatePost extends StatelessWidget {
-  CreatePost({super.key});
-  final TextEditingController controller=TextEditingController();
 
+
+
+class PostBooks extends StatelessWidget {
+   PostBooks({super.key, required this.isEdit});
+  final bool isEdit;
+   final TextEditingController location=TextEditingController();
+   final TextEditingController description=TextEditingController();
 
   final List<String> list=['KIU Examination Board','AKU-EB Aga Khan University Examination Board ','FBISE-Federal Board of Intermediate and Secondary Education'];
   final List<String> nameOfClassList=['1th Class','2th Class','3th Class','4th Class','5th Class','6th Class','7th Class','8th Class','9th Class','10th Class','11th Class','12th Class'];
@@ -45,7 +48,7 @@ class CreatePost extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             surfaceTintColor: Colors.transparent,
-            title: CustomText(text: "Post Item",fontSize: 20,isBold: true,),
+            title: CustomText(text: "Post Books",fontSize: 20,isBold: true,),
             leading: buildCustomBackButton(context),
           ),
           body: SingleChildScrollView(
@@ -55,7 +58,7 @@ class CreatePost extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 5,
                 children: [
-                  CustomText(text: "Select one option",isBold: true,),
+                  CustomText(text: "Select one option",isGoogleFont: true,),
                   Row(
                     children: List.generate(2, (index) {
                       List<String> list = ["Exchange", "Donate"];
@@ -77,17 +80,17 @@ class CreatePost extends StatelessWidget {
                       );
                     }),
                   ),
-                  CustomText(text: "Select Class",isBold: true,),
+                  CustomText(text: "Select Class",isGoogleFont: true,),
                   CustomDropDown(value: nameOfClassList[0], list: nameOfClassList, onChanged: (String? val ) {
                   }),
-                  CustomText(text: "Location",isBold: true,),
-                  CustomTextField(controller: controller,hintText: "Noor Colony,Jutial Gilgit",),
-                  CustomText(text: "Description",isBold: true,),
-                 buildTextField(controller, "I want to exchange my books.....", 4),
-                  CustomText(text: "Select Institutional Board",isBold: true,),
+                  CustomText(text: "Location",isGoogleFont: true,),
+                  CustomTextField(controller: location,hintText: "Noor Colony,Jutial Gilgit",),
+                  CustomText(text: "Description",isGoogleFont: true,),
+                 CustomTextField(controller: description,hintText:  "I want to exchange my books.....",maxLines:  6),
+                  CustomText(text: "Select Institutional Board",isGoogleFont: true,),
                   CustomDropDown(value: list[0], list: list, onChanged: (String? val ) {
                   }),
-                  CustomText(text: "Select Subjects",isBold: true,),
+                  CustomText(text: "Select Subjects",isGoogleFont: true,),
                   Container(
                     width: double.infinity,
                     padding: EdgeInsets.all(10),
@@ -109,7 +112,7 @@ class CreatePost extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 10,),
-                  CustomText(text: "Select Picture",isBold: true,),
+                  CustomText(text: "Select Picture",isGoogleFont: true,),
                   Container(
                     clipBehavior: Clip.antiAlias,
                     height: 100,
@@ -123,10 +126,15 @@ class CreatePost extends StatelessWidget {
                     ),
                     child: Center(child: CustomText(text: "Upload Image",color: AppThemeClass.primary,)),
                   ),
-                  CustomText(text: "Only one image can be upload",fontSize: 10,),
-
+                  CustomText(text: "Only one image can be upload",isGoogleFont: true,fontSize: 9,),
                   SizedBox(height: 10,),
-                  CustomButton(onPress: (){},title: "Post",fontSize: 20,),
+                 isEdit==true? Row(
+                   spacing: 20,
+                   children: [
+                     Flexible(child:CustomButton(onPress: (){},title: "Update",fontSize: 15,isBold: true,)),
+                     Flexible(child: CustomButton(onPress: (){},title: "Delete",fontSize: 15,isBold: true,))
+                   ],
+                 ):CustomButton(onPress: (){},title: "Post",fontSize: 15,isBold: true,),
                 ],
               ),
             ),
@@ -135,36 +143,6 @@ class CreatePost extends StatelessWidget {
   }
 }
 
-
-buildTextField( TextEditingController controller,String hintText,int maxLines){
-  return TextFormField(
-    controller: controller,
-    onChanged: (String text) {},
-    maxLines: maxLines,
-    cursorColor: AppThemeClass.primary,
-    decoration: InputDecoration(
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(
-          color: AppThemeClass.primary,
-        ),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(
-          color: AppThemeClass.primary,
-          width: 2.0,
-        ),
-      ),
-      filled: true,
-      fillColor: AppThemeClass.whiteText,
-      hintText: hintText,
-      hintStyle: GoogleFonts.robotoSerif(
-        color: AppThemeClass.darkTextOptional,
-        fontSize: 13,
-      ),
-    ),
-  );
-}
 class ButtonSubjects extends ConsumerWidget {
   const ButtonSubjects({super.key});
   @override

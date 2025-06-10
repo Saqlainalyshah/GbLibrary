@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../components/textfield.dart';
 import '../../components/text_widget.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
-import '../home/create_post.dart';
+import '../user_actions/post_books.dart';
 
 class MessageRoom extends StatelessWidget {
   MessageRoom({super.key});
@@ -28,7 +28,7 @@ class MessageRoom extends StatelessWidget {
           ),
           title: ListTile(
             leading: CircleAvatar(),
-            title: CustomText(text: "Saqlain Ali Shah", isBold: true, fontSize: 16),
+            title: CustomText(text: "Saqlain Ali Shah hfhfhgfhgfhgfhfhgfhgfh", isBold: true, maxLines: 2,),
           ),
           actions: [
             IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
@@ -92,7 +92,7 @@ class MessageRoom extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Expanded(child: buildTextField(controller, "Type something....", 2)),
+                  Expanded(child: CustomTextField(controller: controller, hintText: "Type something....",maxLines:  4)),
                   IconButton(
                     onPressed: () {},
                     icon: Icon(Icons.send, color: AppThemeClass.primary, size: 40),

@@ -7,31 +7,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/layout_components/small_components.dart';
 
 ///Update User Profile
-class Profile extends StatefulWidget {
-   const Profile({super.key});
+class Profile extends StatelessWidget {
+    Profile({super.key});
 
-  @override
-  State<Profile> createState() => _ProfileState();
-}
-
-class _ProfileState extends State<Profile> {
 final TextEditingController name=TextEditingController();
-   final TextEditingController address=TextEditingController();
-   final TextEditingController whatsappNumber=TextEditingController();
-@override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    name.dispose();
-    address.dispose();
-    whatsappNumber.dispose();
-  }
+final TextEditingController address=TextEditingController();
+final TextEditingController whatsappNumber=TextEditingController();
+
 final _gender=StateProvider.autoDispose<String>((ref)=>"Male");
   @override
   Widget build(BuildContext context) {
-    final nameField=CustomTextField(controller: name,hintText: name.text.isEmpty?"Name":name.text,);
+    final nameField=CustomTextField(controller: name,hintText: name.text.isEmpty?"Saqlain Ali Shah":name.text,);
     final addressField=CustomTextField(controller: address,hintText: address.text.isEmpty?"Noor Colony Jutial":address.text,);
-    final whatsappField=CustomTextField(textInputType: TextInputType.number,controller: whatsappNumber,hintText: whatsappNumber.text.isEmpty?"03134457244":whatsappNumber.text,);
+    final whatsappField=CustomTextField(maxLength: 11,textInputType: TextInputType.number,controller: whatsappNumber,counterText: "",hintText: "03134457244");
     print("Profile Rebuilds");
     return SafeArea(
       top: false,
@@ -40,6 +28,7 @@ final _gender=StateProvider.autoDispose<String>((ref)=>"Male");
         appBar: AppBar(
           automaticallyImplyLeading: false,
           backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
           leading: buildCustomBackButton(context),
           title: CustomText(text: "Profile",isBold: true,fontSize: 20,),
         ),
@@ -62,9 +51,9 @@ final _gender=StateProvider.autoDispose<String>((ref)=>"Male");
                     ],
                   )
                 ),
-                CustomText(text: "Name"),
+                CustomText(text: "Name",isGoogleFont: true,),
                 nameField,
-                CustomText(text: "Gender"),
+                CustomText(text: "Gender",isGoogleFont: true,),
                 Row(
                   children: List.generate(2, (index) {
                     final List<String> list=["Male","Female"];
@@ -86,9 +75,9 @@ final _gender=StateProvider.autoDispose<String>((ref)=>"Male");
                     );
                   }),
                 ),
-                CustomText(text: "Address"),
+                CustomText(text: "Address",isGoogleFont: true,),
                 addressField,
-                CustomText(text: "WhatsApp Number"),
+                CustomText(text: "WhatsApp Number",isGoogleFont: true,),
                 whatsappField,
                 CustomButton(onPress: (){},title: "Update",)
               ],

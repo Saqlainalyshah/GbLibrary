@@ -1,3 +1,4 @@
+import 'package:booksexchange/components/text_widget.dart';
 import 'package:flutter/material.dart';
 
 class CustomListTile extends StatelessWidget {
@@ -53,13 +54,12 @@ class CustomListTile extends StatelessWidget {
         ),
       )
           : leadingWidget,
-      title: Text(
+      title: CustomText(text:
         title,
-        style: TextStyle(
-            color:  titleColor,
-            fontSize: 15,
-            fontWeight: FontWeight.w600
-        ),
+            //color:  ?titleColor,
+            //fontSize: 13,
+            //fontWeight: FontWeight.w600
+
       ),
       trailing: Icon(
         trailingIcon,

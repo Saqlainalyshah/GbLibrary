@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../components/cards/post_card.dart';
-import '../../components/textfield.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
-class ExchangeFeed extends StatelessWidget {
-   ExchangeFeed({super.key});
+class FeedPortion extends StatelessWidget {
+   FeedPortion({super.key});
   final TextEditingController searchController=TextEditingController();
 
   final List<String> bookExchangeMessages = [
@@ -51,7 +50,7 @@ class ExchangeFeed extends StatelessWidget {
             padding: EdgeInsets.all(5),
             itemBuilder: (context,index){
               print("index");
-              return PostCard(title: '${index+1}th' , board: 'Kiu Board', time: ' 2 minutes ago', description: bookExchangeMessages[index], location: 'Jutial,Gilgit', numberOfBooks: 8, imageUrl: 'Nope',);
+              return PostCard(title: '${index+1}th' , board: 'Kiu Board', time: ' 2 minutes ago', description: bookExchangeMessages[index], location: 'Jutial,Gilgit', type: "Exchange", imageUrl: 'Nope',);
             }, separatorBuilder: (BuildContext context, int index) {
             return Divider(color: AppThemeClass.primary,);
           },),
