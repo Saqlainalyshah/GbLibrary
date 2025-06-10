@@ -88,7 +88,6 @@ class ViewDetails extends StatelessWidget {
                   ),
                   buildIconTextRow(context, Icons.house_outlined, 'KIU Board'),
                   buildIconTextRow(context, Icons.location_on, 'Jutial, Gilgit'),
-
                 ],
               ),
             )),

@@ -15,7 +15,7 @@ class CustomText extends StatelessWidget {
   const CustomText({
     super.key,
     required this.text,
-    this.isGoogleFont = true,
+    this.isGoogleFont = false,
     this.textAlign = TextAlign.start,
     this.maxLines = 300,
     this.fontSize = 13,
@@ -32,7 +32,7 @@ class CustomText extends StatelessWidget {
       maxLines: maxLines,
       textAlign: textAlign,
       style: isGoogleFont
-          ? GoogleFonts.robotoSerif(
+          ? GoogleFonts.roboto(
               color: color,
              // letterSpacing: isBold?1:0,
               fontSize: ResponsiveText.getSize(context, fontSize),

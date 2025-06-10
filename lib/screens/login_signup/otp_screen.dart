@@ -1,3 +1,4 @@
+import 'package:booksexchange/components/layout_components/small_components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,13 +14,15 @@ class OTPScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("rebuilds");
     return SafeArea(
         top: false,
         child: Scaffold(
           backgroundColor: AppThemeClass.whiteText,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-            leading: IconButton(onPressed: (){Navigator.pop(context);}, icon: Icon(Icons.arrow_back_ios) ,style: IconButton.styleFrom(backgroundColor: AppThemeClass.secondary),),
+            surfaceTintColor: Colors.transparent,
+            leading: buildCustomBackButton(context),
           ),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0,vertical: 50),
@@ -88,7 +91,6 @@ void showCustomAlertDialog(BuildContext context) {
             CircularProgressIndicator(
               color: AppThemeClass.primary,
             ),
-
           ],
         ),
       );

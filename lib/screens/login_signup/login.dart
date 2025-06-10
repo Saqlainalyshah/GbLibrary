@@ -1,9 +1,13 @@
+import 'package:booksexchange/controller/authentication/providers.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../../components/button.dart';
 import '../../components/text_widget.dart';
 import '../../components/textfield.dart';
+import '../../controller/authentication/auth_repository.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 import 'otp_screen.dart';
 
@@ -17,6 +21,7 @@ class Login extends ConsumerWidget {
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdtpg4IsItbaNk0GxMyoz8f0fpVMIsFeNYCQ&s",
     "https://1000logos.net/wp-content/uploads/2017/02/Facebook-Logosu.png",
   ];
+  final FirebaseAuth _auth=FirebaseAuth.instance;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     print("build");
@@ -61,6 +66,7 @@ class Login extends ConsumerWidget {
                     builder:(context,ref,child){
                       final value= ref.watch(_checkLength);
                       return CustomTextField(controller: phone,textInputType: TextInputType.number,
+                          maxLength: 11,counterText: '',
                           onChanged: (String value){
                             if(value.length==11){
                               ref.read(_checkLength.notifier).state=true;
@@ -89,25 +95,33 @@ class Login extends ConsumerWidget {
                 ),
                 ...List.generate(2, (index){
                   List<String> list=["Continue with Google","Continue with Facebook"];
-                  return   CustomButton(onPress: (){},
-                    isBorder: true,
-                    color: AppThemeClass.whiteText,
-                    widget: Row(
-                      spacing: 60,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.all(10),
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: NetworkImage(socialMediaNetworkImages[index],),)
+                  return   Consumer(
+                    builder:(context,ref,child)=> CustomButton(onPress: ()async{
+
+                      if(index==0){
+                        final a=await ref.read(loginControllerProvider.notifier).continueWithGoogle();
+                        print(a);
+                      }
+                    },
+                      isBorder: true,
+                      color: AppThemeClass.whiteText,
+                      widget: Row(
+                        spacing: 60,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.all(10),
+                            height: 50,
+                            width: 50,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(socialMediaNetworkImages[index],),)
+                            ),
                           ),
-                        ),
-                        CustomText(text: list[index],isBold: true,)
-                      ],
+                          CustomText(text: list[index],isBold: true,)
+                        ],
+                      ),
                     ),
                   );
                 }),
