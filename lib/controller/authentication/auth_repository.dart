@@ -36,6 +36,7 @@ class AuthRepository {
         final exists=doc.exists;
         if (!exists) {
           final userdata = UserProfile(
+            uid: user.uid,
             profilePicUrl: user.photoURL ?? '',
             name: user.displayName ?? '',
             email: user.email ?? '',
@@ -66,6 +67,49 @@ class AuthRepository {
       throw AuthException("Failed to sign out: $e");
     }
   }
+
+  Future<bool> deleteAccount() async {
+    FirebaseAuth.instance.currentUser;
+    try {
+      if ( FirebaseAuth.instance.currentUser == null) return false;
+      try {
+        // Attempt to delete directly
+
+        await  FirebaseAuth.instance.currentUser!.delete().then((onValue){
+           _fireStore.collection('users').doc( FirebaseAuth.instance.currentUser?.uid).delete();
+        });
+        return true;
+      } on FirebaseAuthException catch (e) {
+        // Handle requires-recent-login error
+        if (e.code == 'requires-recent-login') {
+          // Reauthenticate using Google
+          final googleUser = await GoogleSignIn().signIn();
+          if (googleUser == null) return false; // User canceled re-login
+
+          final googleAuth = await googleUser.authentication;
+          final credential = GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          );
+
+          // Reauthenticate and retry deletion
+          await  FirebaseAuth.instance.currentUser?.reauthenticateWithCredential(credential);
+          await  FirebaseAuth.instance.currentUser?.delete().then((onValue){
+            _fireStore.collection('users').doc( FirebaseAuth.instance.currentUser?.uid).delete();
+          });
+          return true;
+        } else {
+          print("Delete account error (auth): $e");
+          return false;
+        }
+      }
+    } catch (e) {
+      print("Delete account error: $e");
+      return false;
+    }
+  }
+
+
 }
 
 class AuthException implements Exception {

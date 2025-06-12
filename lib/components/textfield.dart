@@ -18,6 +18,7 @@ class CustomTextField extends StatelessWidget {
     this.secure = false,
     this.radius = 5,
     this.isPhone=false,
+    this.isRead=false,
     this.hintText = " ",
     this.isBorder = false,
     this.onChanged,
@@ -31,6 +32,7 @@ class CustomTextField extends StatelessWidget {
   final bool secure;
   final int? maxLength;
   final String? counterText;
+  final bool isRead;
   final bool isBorder;
   final bool isPhone;
   final String hintText;
@@ -52,6 +54,7 @@ class CustomTextField extends StatelessWidget {
       keyboardType: textInputType,
       obscureText: secure,
       controller: controller,
+      readOnly: isRead,
       onChanged: onChanged,
       maxLines: maxLines,
       style: GoogleFonts.robotoSerif(

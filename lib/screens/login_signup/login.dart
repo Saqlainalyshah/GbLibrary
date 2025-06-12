@@ -106,11 +106,7 @@ class Login extends ConsumerWidget {
                         if(index==0){
                          final result= await ref.watch(loginControllerProvider).signInWithGoogle();
                         if(context.mounted){
-                          if(result){
-                            if(context.mounted){
-                              UiEventHandler.snackBarWidget(context, "Successfully logged!", );
-                            }
-                          }else{
+                          if(result==false){
                             if(context.mounted){
                               UiEventHandler.snackBarWidget(context, "Failed! Try again", );
                             }

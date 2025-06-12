@@ -6,6 +6,7 @@ part 'user_profile.g.dart';
 @freezed
 abstract class UserProfile with _$UserProfile {
   const factory UserProfile({
+    required String uid,
     @Default('') String profilePicUrl,
     required String name,
     @Default('') String gender,

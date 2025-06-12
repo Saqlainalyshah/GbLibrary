@@ -1,7 +1,14 @@
+import 'package:booksexchange/components/layout_components/alert_dialogue.dart';
 import 'package:booksexchange/components/layout_components/small_components.dart';
 import 'package:booksexchange/components/text_widget.dart';
+import 'package:booksexchange/controller/authentication/auth_checker.dart';
 import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:booksexchange/controller/authentication/auth_providers.dart';
+
+import '../../controller/authentication/auth_providers.dart';
 
 class AccountSecurity extends StatelessWidget {
   const AccountSecurity({super.key});
@@ -28,7 +35,7 @@ class AccountSecurity extends StatelessWidget {
                 )
             ),
             onTap: (){
-              print("Account deleted");
+              _showLogout(context);
             },
             title: CustomText(text: "Delete Account",isBold: true,fontSize: 16,),
             subtitle: CustomText(text: "Once you delete your account all your data will be deleted permanently"),
@@ -38,4 +45,62 @@ class AccountSecurity extends StatelessWidget {
       ),
     );
   }
+}
+
+
+/// Alert dialogue to user logout action
+void _showLogout(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: AppThemeClass.whiteText,
+        surfaceTintColor: AppThemeClass.whiteText,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+        elevation: 10,
+        // content: Text("Please wait verification is in process"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 10,
+          children: [
+            CustomText(text: "Permanent Delete " ,fontSize: 20,isBold: true,),
+            CustomText(text: "Are you sure you want to delete your account?" ,fontSize: 15,),
+            Row(
+              spacing: 25,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Consumer(
+                  builder:(context,ref,child)=>InkWell(
+                      onTap: ()async{
+                        //final result=
+
+                       await ref.read(loginControllerProvider).deleteAccount();
+                      
+                        if(context.mounted){
+                          Navigator.pop(context);
+                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (builder)=>AuthChecker()), (route)=>route.isFirst);
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: CustomText(text: "Delete",isBold: true,fontSize: 15,color: AppThemeClass.primary,),
+                      )),
+                ),
+                InkWell(
+                    onTap: (){
+                      Navigator.pop(context);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: CustomText(text: "Cancel",isBold: true,fontSize: 15,color: AppThemeClass.primary,),
+                    )),
+              ],
+            )
+
+          ],
+        ),
+      );
+    },
+  );
 }

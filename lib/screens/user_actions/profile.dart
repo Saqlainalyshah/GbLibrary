@@ -12,8 +12,8 @@ import '../../controller/firebase_crud_operations/user_profile_crud.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
 final isLoading=StateProvider.autoDispose<bool>((ref)=>false);
-
-final gender = StateProvider.autoDispose<String>((ref) => '');
+final _isReadOnly=StateProvider.autoDispose<bool>((ref)=>true);
+final gender = StateProvider<String>((ref) => '');
 class Profile extends ConsumerStatefulWidget {
   const Profile({super.key,required this.userProfile});
   final UserProfile userProfile;
@@ -33,6 +33,7 @@ class _ProfileState extends ConsumerState<Profile> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    print(widget.userProfile.gender);
     name.text=widget.userProfile.name;
     address.text=widget.userProfile.address;
     whatsappNumber.text=widget.userProfile.number;
@@ -52,15 +53,19 @@ class _ProfileState extends ConsumerState<Profile> {
   Widget build(BuildContext context) {
 
 
-    final nameField=CustomTextField(controller: name,hintText: name.text.isEmpty?"Saqlain Ali Shah":name.text, validator: (value) => value!.isEmpty ? "Name is required" : null, // Validation
+    final nameField=Consumer(
+      builder:(context,ref,child)=> CustomTextField(isRead: ref.watch(_isReadOnly),controller: name,hintText: name.text.isEmpty?"Saqlain Ali Shah":name.text, validator: (value) => value!.isEmpty ? "Name is required" : null, // Validation
+      ),
     );
-    final addressField=CustomTextField(controller: address,hintText: address.text.isEmpty?"Noor Colony Jutial":address.text,validator: (value) => value!.isEmpty ? "Address is required" : null,);
-    final whatsappField=CustomTextField(maxLength: 11,textInputType: TextInputType.number,controller: whatsappNumber,counterText: "",hintText: "03134457244",
-      validator: (value) {
-        if (value!.isEmpty) return "Phone number is required";
-        if (value.length < 11) return "Enter a valid 11-digit phone number";
-        return null;
-      },
+    final addressField=Consumer(builder:(context,ref,child)=> CustomTextField(isRead: ref.watch(_isReadOnly),controller: address,hintText: address.text.isEmpty?"Noor Colony Jutial":address.text,validator: (value) => value!.isEmpty ? "Address is required" : null,));
+    final whatsappField=Consumer(
+      builder:(context,ref,child)=> CustomTextField(isRead: ref.watch(_isReadOnly),maxLength: 11,textInputType: TextInputType.number,controller: whatsappNumber,counterText: "",hintText: "03134457244",
+        validator: (value) {
+          if (value!.isEmpty) return "Phone number is required";
+          if (value.length < 11) return "Enter a valid 11-digit phone number";
+          return null;
+        },
+      ),
     );
     print(widget.userProfile.profilePicUrl);
     print("rebuilds");
@@ -74,6 +79,20 @@ class _ProfileState extends ConsumerState<Profile> {
           surfaceTintColor: Colors.transparent,
           leading: buildCustomBackButton(context),
           title: CustomText(text: "Profile", isBold: true, fontSize: 20),
+          actions: [
+            Container(
+              margin: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppThemeClass.primary
+                ),
+                child: Consumer(
+                  builder:(context,ref,child)=> ref.watch(_isReadOnly)!? IconButton(onPressed: (){
+                    ref.read(_isReadOnly.notifier).state=false;
+                  }, icon: Icon(Icons.edit_rounded,color: AppThemeClass.whiteText,)):IconButton(onPressed: (){
+                    ref.read(_isReadOnly.notifier).state=true;
+                  }, icon: Icon(Icons.cancel,color: AppThemeClass.whiteText,)),
+                ))],
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -115,7 +134,10 @@ class _ProfileState extends ConsumerState<Profile> {
                               value: list[index],
                               groupValue: ref.watch(gender.select((index) => index)),
                               onChanged: (val) {
-                                ref.read(gender.notifier).state = val!;
+                              if (ref.watch(_isReadOnly)){
+                                 }else{
+                                   ref.read(gender.notifier).state = val!;
+                                   }
                               },
                               title: CustomText(text: option),
                             );
@@ -129,22 +151,30 @@ class _ProfileState extends ConsumerState<Profile> {
                   CustomText(text: "Phone Number", isGoogleFont: true),
                   whatsappField,
                   Consumer(
-                    builder:(context,ref,child)=> CustomButton(
+                    builder:(context,ref,child)=>ref.watch(_isReadOnly)!?SizedBox.shrink(): CustomButton(
                       isLoading: ref.watch(isLoading),
                       onPress: () async {
                         ref.read(isLoading.notifier).state=true;
+                        print(widget.userProfile.profilePicUrl);
+                        widget.userProfile.copyWith(profilePicUrl: "Hello");
+
+                        print(widget.userProfile.profilePicUrl);
                         UserProfile user=UserProfile(
-                          profilePicUrl: ref.watch(userUIDProvider)?.photoURL??'',
-                          name: ref.watch(userUIDProvider)?.displayName??name.text.toString(),
+                          //profilePicUrl: widget.userProfile.profilePicUrl??'',
+                          uid: widget.userProfile.uid,
+                          name:name.text.toString(),
                           gender: ref.watch(gender),
                           address: address.text.toString(),
-                          number: ref.watch(userUIDProvider)?.phoneNumber?? whatsappNumber.text.toString(),
-                          email: ref.watch(userUIDProvider)?.email??'',
+                          number:  whatsappNumber.text.toString(),
+                          email: widget.userProfile.email,
                         );
-                        // print(user);
+                        //user.copyWith(n)
                         if (_formKey.currentState!.validate() ) {
-                          await ref.read(firebaseCRUDProvider).updateDocument('users', ref.watch(userUIDProvider)!.uid, user.toJson());
-                          // Proceed with updating user data
+                          await ref.read(firebaseCRUDProvider).updateDocument('users',widget.userProfile.uid.toString(), user.toJson());
+                          ref.read(_isReadOnly.notifier).state=true;
+                          if(context.mounted){
+                            UiEventHandler.snackBarWidget(context, "Successfully updated");
+                          }
                         } else {
                           UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
                         }
@@ -163,120 +193,3 @@ class _ProfileState extends ConsumerState<Profile> {
   }
 }
 
-/*
-class Profile extends StatelessWidget {
-  Profile({super.key,required this.userProfile});
-final UserProfile userProfile;
-  final TextEditingController name = TextEditingController();
-  final TextEditingController address = TextEditingController();
-  final TextEditingController whatsappNumber = TextEditingController();
-  final _gender = StateProvider.autoDispose<String>((ref) => "Male");
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Added key
-
-
-  @override
-  Widget build(BuildContext context) {
-
-
-    final nameField=CustomTextField(controller: name,hintText: name.text.isEmpty?"Saqlain Ali Shah":name.text, validator: (value) => value!.isEmpty ? "Name is required" : null, // Validation
-    );
-    final addressField=CustomTextField(controller: address,hintText: address.text.isEmpty?"Noor Colony Jutial":address.text,validator: (value) => value!.isEmpty ? "Address is required" : null,);
-    final whatsappField=CustomTextField(maxLength: 11,textInputType: TextInputType.number,controller: whatsappNumber,counterText: "",hintText: "03134457244",
-      validator: (value) {
-        if (value!.isEmpty) return "Phone number is required";
-        if (value.length < 11) return "Enter a valid 11-digit phone number";
-        return null;
-      },
-    );
-    return SafeArea(
-      top: false,
-      child: Scaffold(
-        backgroundColor: AppThemeClass.whiteText,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.transparent,
-          surfaceTintColor: Colors.transparent,
-          leading: buildCustomBackButton(context),
-          title: CustomText(text: "Profile", isBold: true, fontSize: 20),
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Form(
-              key: _formKey, // Assign form key
-              child: Column(
-                spacing: 10,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                      child:   Consumer(
-                        builder:(context,ref,child)=> CircleAvatar(
-                          radius: 100,
-                          backgroundColor: AppThemeClass.secondary,
-                          backgroundImage: NetworkImage(ref.watch(userUIDProvider)!.photoURL.toString(),),
-                        ),
-                      ),
-                  ),
-                  CustomText(text: "Name", isGoogleFont: true),
-                  nameField,
-                  CustomText(text: "Gender", isGoogleFont: true),
-                  Row(
-                    children: List.generate(2, (index) {
-                      final List<String> list = ["Male", "Female"];
-                      final option = list[index];
-                      return Expanded(
-                        child: Consumer(
-                          builder: (context, ref, child) {
-                            return RadioListTile<String>(
-                              activeColor: AppThemeClass.primary,
-                              value: list[index],
-                              groupValue: ref.watch(_gender.select((index) => index)),
-                              onChanged: (val) {
-                                ref.read(_gender.notifier).state = val!;
-                              },
-                              title: CustomText(text: option),
-                            );
-                          },
-                        ),
-                      );
-                    }),
-                  ),
-                  CustomText(text: "Address", isGoogleFont: true),
-                  addressField,
-                  CustomText(text: "Phone Number", isGoogleFont: true),
-                  whatsappField,
-                  Consumer(
-                    builder:(context,ref,child)=> CustomButton(
-                      isLoading: ref.watch(isLoading),
-                      onPress: () async {
-                        ref.read(isLoading.notifier).state=true;
-                        UserProfile user=UserProfile(
-                            profilePicUrl: ref.watch(userUIDProvider)?.photoURL??'',
-                            name: ref.watch(userUIDProvider)?.displayName??name.text.toString(),
-                            gender: ref.watch(_gender),
-                            address: address.text.toString(),
-                            number: ref.watch(userUIDProvider)?.phoneNumber?? whatsappNumber.text.toString(),
-                          email: ref.watch(userUIDProvider)?.email??'',
-                        );
-                       // print(user);
-                        if (_formKey.currentState!.validate() ) {
-                          await ref.read(firebaseCRUDProvider).updateDocument('users', ref.watch(userUIDProvider)!.uid, user.toJson());
-                          // Proceed with updating user data
-                        } else {
-                          UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
-                        }
-                        ref.read(isLoading.notifier).state=false;
-                      },
-                      title: "Update",
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-*/

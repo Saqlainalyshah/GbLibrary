@@ -17,16 +17,6 @@ final currentUserProvider = StreamProvider<User?>((ref) async* {
 
 final userUIDProvider=Provider<User?>((ref)=> FirebaseAuth.instance.currentUser);
 
-final userProfileDataProvider = StreamProvider.family<UserProfile, String>((ref, uid) async* {
-  UserProfile userProfile = UserProfile(name: '', email: '');
-  final result = await ref.watch(firebaseCRUDProvider).getDoc('users', uid);
-  if (result != null && result.exists) {
-    final doc = result.data();
-    yield UserProfile.fromJson(doc!);
-  } else {
-    yield userProfile; // Yield the default profile instead of returning it
-  }
-});
 
 final userProfileProvider = FutureProvider.family<UserProfile?, String>((ref, uid) async {
   DocumentSnapshot<Map<String, dynamic>> documentSnapshot =

@@ -1,3 +1,4 @@
+import 'package:booksexchange/components/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,7 +24,30 @@ class AuthChecker extends ConsumerWidget {
               return userProfile.when(
                 data: (profile) {
                   print("user ${DateTime.now()}");
-                  return profile != null ? MainScreen(userProfile: profile) : Login();
+                  if(profile!=null){
+                    print("inside profile");
+                    return MainScreen(userProfile: profile);
+                  }else{
+                    print("inside profile else");
+                    // Trigger refresh after build
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      ref.invalidate(userProfileProvider(user.uid));
+                    });
+
+                    return Scaffold(
+                      backgroundColor: AppThemeClass.whiteText,
+                      body: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CustomText(text: "Loading...",fontSize: 15,isGoogleFont: true,),
+                            CircularProgressIndicator(color: AppThemeClass.primary,)
+                          ],
+                        ),
+                      ),
+                    );
+                  }
                 },
                 loading: () => Scaffold(
                   body: Center(child: CircularProgressIndicator(color: AppThemeClass.primary)),
