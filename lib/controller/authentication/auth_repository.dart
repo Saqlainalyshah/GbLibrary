@@ -1,82 +1,59 @@
+import 'package:booksexchange/controller/firebase_crud_operations/user_profile_crud.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+import '../../model/user_profile.dart';
+import 'auth_providers.dart';
+
 
 class AuthRepository {
   AuthRepository(this._auth);
   final FirebaseAuth _auth;
+  final _fireStore = FirebaseFirestore.instance;
   Stream<User?> get authStateChange => _auth.authStateChanges();
 
-
-  /// Send OTP to Phone Number
-  Future<void> sendOtpOnNumber(BuildContext context, String phoneNumber) async {
-    try {
-      await _auth.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          await _auth.signInWithCredential(credential);
-          if(context.mounted){
-          //  Navigator.of(context).pushReplacement( MaterialPageRoute(builder: (_) => HomeScreen()));
-          }
-        },
-        verificationFailed: (FirebaseAuthException ex) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Verification failed: ${ex.message}')),
-          );
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          /* Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => OtpReceivedScreen(verificationId: verificationId, phoneNumber: phoneNumber),
-            ),
-          );*/
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {
-          print("Auto retrieval timeout for verification ID: $verificationId");
-        },
-      );
-    } catch (e) {
-      throw AuthException("Failed to send OTP: $e");
-    }
-  }
-
-  /// ✅ Verify OTP Code
-  Future<void> verifyingOtpCode(BuildContext context, String verificationId, String code) async {
-    try {
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: code,
-      );
-      await _auth.signInWithCredential(credential);
-      if(context.mounted){
-        //Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
-      }
-    } catch (e) {
-     if(context.mounted){
-       ScaffoldMessenger.of(context).showSnackBar(
-         const SnackBar(content: Text('Incorrect OTP. Please try again.')),
-       );
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => SignInScreen()));
-     }
-    }
-  }
-
   /// Sign in with Google
-  Future<UserCredential?> signInWithGoogle() async {
+  Future<bool> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        throw AuthException("Google sign-in was canceled.");
-      }
+      if (googleUser == null) return false; // User canceled sign-in
+
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      return await _auth.signInWithCredential(credential);
+
+      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final User? user = userCredential.user;
+
+      if (user != null) {
+        final doc = await _fireStore.collection('users').doc(user.uid).get();
+        final exists=doc.exists;
+        if (!exists) {
+          final userdata = UserProfile(
+            profilePicUrl: user.photoURL ?? '',
+            name: user.displayName ?? '',
+            email: user.email ?? '',
+            gender: '',
+            address: '',
+            number: user.phoneNumber ?? '',
+          );
+
+          await _fireStore.collection('users').doc(user.uid).set(userdata.toJson());
+        }
+
+        return true; // Sign-in succeeded
+      }
+
+      return false; // Something went wrong, user is null
     } catch (e) {
-      throw AuthException("Failed to sign in with Google: $e");
+      print("Google Sign-In error: $e");
+      return false; // Sign-in failed
     }
   }
 

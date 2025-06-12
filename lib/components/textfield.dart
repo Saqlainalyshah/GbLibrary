@@ -78,6 +78,15 @@ class CustomTextField extends StatelessWidget {
                 width: 2.0
           )
         ),
+        errorBorder: OutlineInputBorder( // Add error border
+          borderSide: BorderSide(color: AppThemeClass.primary, width: 1.0),
+          borderRadius: BorderRadius.circular(radius),
+        ),
+        focusedErrorBorder: OutlineInputBorder( // Add focused error border
+          borderSide: BorderSide(color: AppThemeClass.primary, width: 1.0),
+          borderRadius: BorderRadius.circular(radius),
+        ),
+
         filled: true,
         fillColor: fillColor,
 

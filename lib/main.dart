@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'components/button.dart';
 import 'components/textfield.dart';
+import 'controller/authentication/auth_checker.dart';
 
 void main()async {
   /*await Firebase.initializeApp(
@@ -14,12 +15,13 @@ void main()async {
   );*/
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
   runApp(
       ProviderScope(
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
      // home:  Login(),
-      home: Login(),
+      home: AuthChecker(),
     ),
   ));
 }

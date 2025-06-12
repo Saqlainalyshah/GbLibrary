@@ -17,6 +17,7 @@ class CustomButton extends StatelessWidget {
     this.radius = 10.0,
     this.width = double.infinity,
     this.height = 60.0,
+    this.loadingColor=AppThemeClass.whiteText,
     this.color = const Color(0xff00a67e),
     this.titleColor = Colors.white,
     required this.onPress,
@@ -30,6 +31,7 @@ class CustomButton extends StatelessWidget {
   final double height;
   final double width;
   final Color titleColor;
+  final Color loadingColor;
   final double radius;
   final Color color;
   final Function onPress;
@@ -53,7 +55,7 @@ class CustomButton extends StatelessWidget {
         child: Center(
             child: isLoading
                 ? CircularProgressIndicator(
-              color: AppThemeClass.whiteText,
+              color: loadingColor,
             )
                 : title != null? CustomText(
               text: title.toString(),

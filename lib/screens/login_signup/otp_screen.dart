@@ -1,3 +1,4 @@
+import 'package:booksexchange/components/layout_components/alert_dialogue.dart';
 import 'package:booksexchange/components/layout_components/small_components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,10 +60,10 @@ class OTPScreen extends StatelessWidget {
                   ),
                 ),
                 CustomButton( title: 'Verify Number', onPress: (){
-                  showCustomAlertDialog(context);
+                  UiEventHandler.customAlertDialog(context, "Please wait! We're verifying your number", CircularProgressIndicator(color: AppThemeClass.primary,));
                   Future.delayed(Duration(seconds: 2),(){
                     Navigator.pop(context);
-                    Navigator.push(context, MaterialPageRoute(builder: (builder)=>MainScreen()));
+                   // Navigator.push(context, MaterialPageRoute(builder: (builder)=>MainScreen()));
                   });
                 },),
 
@@ -73,27 +74,4 @@ class OTPScreen extends StatelessWidget {
   }
 }
 
-/// Alert dialogue to check verification process
-void showCustomAlertDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        surfaceTintColor: AppThemeClass.whiteText,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-        elevation: 10,
-        // content: Text("Please wait verification is in process"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 20,
-          children: [
-            CustomText(text: "Please wait! We're verifying your number",fontSize: 14,),
-            CircularProgressIndicator(
-              color: AppThemeClass.primary,
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
+

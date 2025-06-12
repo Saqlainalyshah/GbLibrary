@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../components/text_widget.dart';
 import '../../../utils/fontsize/app_theme/theme.dart';
+import '../../controller/authentication/auth_providers.dart';
 
 /// Alert dialogue to user logout action
 void showLogout(BuildContext context) {
@@ -24,14 +26,21 @@ void showLogout(BuildContext context) {
              spacing: 25,
              mainAxisAlignment: MainAxisAlignment.end,
              children: [
-               InkWell(
-                   onTap: (){
-                     Navigator.pop(context);
-                   },
-                   child: Padding(
-                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                     child: CustomText(text: "Logout",isBold: true,fontSize: 15,color: AppThemeClass.primary,),
-                   )),
+               Consumer(
+                 builder:(context,ref,child)=>InkWell(
+                     onTap: ()async{
+                       //final result=
+                       await ref.read(loginControllerProvider).signOut();
+
+                      if(context.mounted){
+                        Navigator.pop(context);
+                      }
+                     },
+                     child: Padding(
+                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                       child: CustomText(text: "Logout",isBold: true,fontSize: 15,color: AppThemeClass.primary,),
+                     )),
+               ),
                InkWell(
                    onTap: (){
                      Navigator.pop(context);

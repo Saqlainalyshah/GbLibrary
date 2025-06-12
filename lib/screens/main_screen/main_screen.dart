@@ -1,4 +1,5 @@
 import 'package:booksexchange/components/text_widget.dart';
+import 'package:booksexchange/model/user_profile.dart';
 import 'package:booksexchange/screens/home/feed_portion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +10,9 @@ import '../user_actions/post_books.dart';
 import '../user_actions/post_uniform_clothes.dart';
 
 class MainScreen extends ConsumerWidget {
-   MainScreen({super.key});
+   MainScreen({super.key, required this.userProfile});
+
+   final UserProfile userProfile;
   final _bottomNavigationIndex=StateProvider.autoDispose<int>((ref)=>0);
 
   final List<Widget> screens=[
@@ -37,7 +40,7 @@ class MainScreen extends ConsumerWidget {
             IconButton(onPressed: (){}, icon: Icon(Icons.sort,size: 30,))
           ],
         ),
-        drawer: DrawerWidget(),
+        drawer: DrawerWidget(userProfile: userProfile,),
         body: screens[ref.watch(_bottomNavigationIndex)],
         bottomNavigationBar: Theme(
           data: Theme.of(context).copyWith(
