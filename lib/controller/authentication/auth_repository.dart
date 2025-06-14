@@ -18,7 +18,10 @@ class AuthRepository {
   /// Sign in with Google
   Future<bool> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final google= GoogleSignIn();
+     // google.forceCodeForRefreshToken;
+      //await google.disconnect();
+      final GoogleSignInAccount? googleUser = await google.signIn();
       if (googleUser == null) return false; // User canceled sign-in
 
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
@@ -62,7 +65,10 @@ class AuthRepository {
   Future<void> signOut() async {
     try {
       await _auth.signOut();
-      await GoogleSignIn().signOut();
+
+      final googleSignIn = GoogleSignIn();
+      await googleSignIn.disconnect(); // Fully disconnects and clears session
+      await googleSignIn.signOut();    // Optional, but good practice
     } catch (e) {
       throw AuthException("Failed to sign out: $e");
     }
@@ -74,34 +80,16 @@ class AuthRepository {
       if ( FirebaseAuth.instance.currentUser == null) return false;
       try {
         // Attempt to delete directly
-
         await  FirebaseAuth.instance.currentUser!.delete().then((onValue){
+          print("insude");
            _fireStore.collection('users').doc( FirebaseAuth.instance.currentUser?.uid).delete();
+          final google= GoogleSignIn();
+           google.disconnect(); // Fully disconnects and clears session
         });
         return true;
       } on FirebaseAuthException catch (e) {
-        // Handle requires-recent-login error
-        if (e.code == 'requires-recent-login') {
-          // Reauthenticate using Google
-          final googleUser = await GoogleSignIn().signIn();
-          if (googleUser == null) return false; // User canceled re-login
-
-          final googleAuth = await googleUser.authentication;
-          final credential = GoogleAuthProvider.credential(
-            accessToken: googleAuth.accessToken,
-            idToken: googleAuth.idToken,
-          );
-
-          // Reauthenticate and retry deletion
-          await  FirebaseAuth.instance.currentUser?.reauthenticateWithCredential(credential);
-          await  FirebaseAuth.instance.currentUser?.delete().then((onValue){
-            _fireStore.collection('users').doc( FirebaseAuth.instance.currentUser?.uid).delete();
-          });
-          return true;
-        } else {
-          print("Delete account error (auth): $e");
-          return false;
-        }
+        print(e);
+        return false;
       }
     } catch (e) {
       print("Delete account error: $e");
