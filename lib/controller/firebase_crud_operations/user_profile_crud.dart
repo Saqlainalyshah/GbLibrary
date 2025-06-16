@@ -51,7 +51,11 @@ class FirebaseService {
   Future<DocumentSnapshot<Map<String,dynamic>>?> getDoc(String collectionPath, String docId)async{
     try{
       DocumentSnapshot<Map<String,dynamic>>? documentSnapshot= await _fireStore.collection(collectionPath).doc(docId).get();
+    if(documentSnapshot.exists){
       return documentSnapshot;
+    }else{
+      return null;
+    }
     }catch (e){
       return null;
     }
@@ -66,6 +70,14 @@ class FirebaseService {
   Future<bool> createDocumentWithId(String collectionPath, String id, dynamic data) async {
     try {
       await _fireStore.collection(collectionPath).doc(id).set(data);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  Future<bool> createDocument(String collectionPath, dynamic data) async {
+    try {
+      await _fireStore.collection(collectionPath).doc().set(data);
       return true;
     } catch (e) {
       return false;

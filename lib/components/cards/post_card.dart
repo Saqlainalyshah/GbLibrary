@@ -10,21 +10,25 @@ import '../text_widget.dart';
 class PostCard extends StatelessWidget {
   const PostCard({
     super.key,
-    required this.title,
+    required this.category,
+    required this.grade,
     required this.board,
     required this.time,
     required this.description,
     required this.location,
     required this.type,
     required this.imageUrl,
+    required this.function,
   });
-  final String title;
+  final String category;
+  final String grade;
   final String board;
   final String time;
   final String description;
   final String location;
   final String type;
   final String imageUrl;
+  final Function function;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -41,8 +45,8 @@ class PostCard extends StatelessWidget {
             Flexible(
               flex: 2,
               child: BuildPostColumn(
-                title:
-                title,
+                category: category,
+                grade: grade,
                 board:
                 board,
                 type:type,
@@ -52,7 +56,7 @@ class PostCard extends StatelessWidget {
             )
           ],
         ),
-        Flexible(child: _buildBottomRow(context, location, time)),
+        Flexible(child: _buildBottomRow(context, location, time,function)),
       ],
     );
   }
@@ -62,13 +66,16 @@ class BuildPostColumn extends StatelessWidget {
   const BuildPostColumn({
     super.key,
     required this.type,
-    required this.title,
+
     required this.board,
-    required this.description
+    required this.description,
+    required this.category,
+    required this.grade,
   });
       final String type;
-      final String title;
       final String board;
+      final String category;
+      final String grade;
       final String description;
   @override
   Widget build(BuildContext context) {
@@ -79,14 +86,14 @@ class BuildPostColumn extends StatelessWidget {
       spacing: 5,
       children: [
         CustomText(
-          text: "I want to Exchange 1th class books",
+          text: "I want to $category $grade books",
           isBold: true,
           //overflow: TextOverflow.ellipsis,s
           fontSize: ResponsiveText.getSize(context, 15),
           maxLines: 5,
         ),
 
-        buildIconTextRow(context, Icons.school, board),
+        buildIconTextRow(context, Icons.school, board,false),
         CustomText(
           text: description,
           //overflow: TextOverflow.ellipsis,s
@@ -98,22 +105,19 @@ class BuildPostColumn extends StatelessWidget {
   }
 }
 ///bottom row of card which contains location, time and view details button
-_buildBottomRow(BuildContext context, String location, String time) {
+_buildBottomRow(BuildContext context, String location, String time, Function function) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     spacing: 5,
     //mainAxisSize: MainAxisSize.min,
     children: [
-      Flexible(child: buildIconTextRow(context, Icons.location_on, location)),
-      buildIconTextRow(context, Icons.access_time, time),
+      Flexible(child: buildIconTextRow(context, Icons.location_on, location,false)),
+      buildIconTextRow(context, Icons.access_time, time,false),
       CustomButton(
        // isBorder: false,
         radius: 5,
         onPress: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (builder) => ViewDetails()),
-          );
+         function();
         },
         title: 'View Details',
         width: ResponsiveBox.getSize(context, 120),
@@ -141,11 +145,11 @@ buildContainerImage(
           : null,
     ),
     
-    child: Image.asset("assets/images/book.jpg",fit: BoxFit.cover,),
+    child: Image.network(imageUrl,fit: BoxFit.cover,),
   );
 }
 ///row widget wrapped in a container with a app secondary color which contains icon and text
-buildIconTextRow(BuildContext context, IconData icon, String text) {
+buildIconTextRow(BuildContext context, IconData icon, String text,bool isExpend) {
   return Container(
    // width: double.infinity,
     padding: EdgeInsets.all(5),
@@ -156,6 +160,7 @@ buildIconTextRow(BuildContext context, IconData icon, String text) {
     child: Row(
       spacing: 3,
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(
           icon,
@@ -165,7 +170,7 @@ buildIconTextRow(BuildContext context, IconData icon, String text) {
         Flexible(
           child: CustomText(
             text: text,
-            maxLines: 1,
+            maxLines:isExpend? 4:1,
             fontSize: ResponsiveText.getSize(context, 12),
           ),
         ),

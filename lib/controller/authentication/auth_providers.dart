@@ -29,3 +29,4 @@ final userProfileProvider = FutureProvider.family<UserProfile?, String>((ref, ui
     return null;
   }
 });
+final userData=StateProvider<UserProfile>((ref)=>UserProfile(name: '', uid: '', email: '',));

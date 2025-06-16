@@ -2,14 +2,15 @@ import 'package:booksexchange/components/button.dart';
 import 'package:booksexchange/components/cards/post_card.dart';
 import 'package:booksexchange/components/layout_components/small_components.dart';
 import 'package:booksexchange/components/text_widget.dart';
+import 'package:booksexchange/model/post_model.dart';
 import 'package:booksexchange/screens/chat/chat.dart';
 import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
 import 'package:booksexchange/utils/fontsize/responsive_text.dart';
 import 'package:flutter/material.dart';
 
 class ViewDetails extends StatelessWidget {
-   ViewDetails({super.key});
-
+   ViewDetails({super.key,required this.booksModel});
+   final BooksModel booksModel;
   final List<String> subjects = [
     "English",
     "Urdu",
@@ -51,11 +52,11 @@ class ViewDetails extends StatelessWidget {
                       borderRadius: BorderRadius.circular(5),
                       border: Border.all(color: AppThemeClass.primary, width: .5)
                     ),
-                    child: Image.asset("assets/images/book.jpg",fit: BoxFit.cover,),
+                    child: Image.network(booksModel.imageUrl,fit: BoxFit.cover,),
                   ),
                   CustomText(text: "Description",isBold: true,),
-                  buildIconTextRow(context, Icons.access_time, '2 days ago '),
-                  CustomText(text: "I'm looking to exchange my books and find someone interested in purchasing them. If you're near Gilgit and need study materials, feel free to message me. The books are in great condition, covering different subjects for various classes. Prices are negotiable, and I'm happy to discuss any trade options too. Let’s connect if you're interested!",fontSize: 14,),
+                  buildIconTextRow(context, Icons.access_time, '2 days ago ',true),
+                  CustomText(text: booksModel.description,fontSize: 14,),
                   CustomText(text: "Total Subjects",isBold: true,),
                   Container(
                     width: double.infinity,
@@ -69,7 +70,7 @@ class ViewDetails extends StatelessWidget {
                     ),
                     child: Wrap(
                       spacing: 5.0,
-                      children: subjects.map((buttonText) {
+                      children: booksModel.subjects.map((buttonText) {
                         return OutlinedButton(
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(
@@ -86,8 +87,8 @@ class ViewDetails extends StatelessWidget {
                       }).toList(),
                     ),
                   ),
-                  buildIconTextRow(context, Icons.house_outlined, 'KIU Board'),
-                  buildIconTextRow(context, Icons.location_on, 'Jutial, Gilgit'),
+                  buildIconTextRow(context, Icons.house_outlined, booksModel.board,true),
+                  buildIconTextRow(context, Icons.location_on, booksModel.location,true),
                 ],
               ),
             )),

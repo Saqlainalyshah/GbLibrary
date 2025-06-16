@@ -1,7 +1,6 @@
 import 'package:booksexchange/components/layout_components/small_components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../components/button.dart';
 import '../../components/text_widget.dart';
 import '../../components/textfield.dart';
@@ -12,21 +11,7 @@ class UniformClothes extends StatelessWidget {
   final TextEditingController controller=TextEditingController();
 
 
-  final List<String> list=['KIU Examination Board','AKU-EB Aga Khan University Examination Board ','FBISE-Federal Board of Intermediate and Secondary Education'];
-  final List<String> nameOfClassList=['1th Class','2th Class','3th Class','4th Class','5th Class','6th Class','7th Class','8th Class','9th Class','10th Class','11th Class','12th Class'];
 
-  final List<String> subjects = [
-    "English",
-    "Urdu",
-    "Science",
-    "Computer Science",
-    "Pak-Studies",
-    "Biology",
-    "Physics",
-    "Maths",
-    "Chemistry",
-    "Other"
-  ];
   //final List<String> type = ["Exchange", "Sell", "Donate"];
   final _category = StateProvider.autoDispose<String>((ref) {
     final List<String> list = ["small", "medium","Large","Extra Large"];
@@ -67,7 +52,6 @@ class UniformClothes extends StatelessWidget {
               CustomTextField(controller: controller,hintText:  "I want to exchange my books.....",maxLines:  4),
               CustomText(text: "Location",isGoogleFont: true,),
               CustomTextField(controller: controller,hintText: "Noor Colony,Jutial Gilgit",),
-
               CustomText(text: "Is this school uniform?",isGoogleFont: true,),
               Consumer(
                 builder:(context,ref,child)=> _buildRadioButtons(

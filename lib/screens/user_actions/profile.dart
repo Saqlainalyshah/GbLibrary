@@ -14,9 +14,10 @@ import '../../utils/fontsize/app_theme/theme.dart';
 final isLoading=StateProvider.autoDispose<bool>((ref)=>false);
 final _isReadOnly=StateProvider.autoDispose<bool>((ref)=>true);
 final gender = StateProvider<String>((ref) => '');
+
 class Profile extends ConsumerStatefulWidget {
-  const Profile({super.key,required this.userProfile});
-  final UserProfile userProfile;
+  const Profile({super.key,});
+ // final UserProfile userProfile;
 
   @override
   ConsumerState createState() => _ProfileState();
@@ -28,16 +29,15 @@ class _ProfileState extends ConsumerState<Profile> {
   final TextEditingController address = TextEditingController();
   final TextEditingController whatsappNumber = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Added key
-
+  late final UserProfile userProfile;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    print(widget.userProfile.gender);
-    name.text=widget.userProfile.name;
-    address.text=widget.userProfile.address;
-    whatsappNumber.text=widget.userProfile.number;
-   // ref.read(_gender.notifier).state=widget.userProfile.gender;
+    userProfile= ref.read(userData);
+    name.text=userProfile.name;
+    address.text=userProfile.address;
+    whatsappNumber.text=userProfile.number;
   }
 
   @override
@@ -67,7 +67,7 @@ class _ProfileState extends ConsumerState<Profile> {
         },
       ),
     );
-    print(widget.userProfile.profilePicUrl);
+    print(userProfile.profilePicUrl);
     print("rebuilds");
     return SafeArea(
       top: false,
@@ -103,19 +103,14 @@ class _ProfileState extends ConsumerState<Profile> {
                 spacing: 10,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                /*  Center(
-                    child: CachedNetworkImage(
-                      imageUrl: widget.userProfile.profilePicUrl.toString(),
-                      placeholder: (context, url) => CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => Text(widget.userProfile.name.toString()[0]),
-                    ),
-                  ),*/
+                 // CachedNetworkImage(height: 100,width: 100,imageUrl: userProfile.profilePicUrl.toString()),
+
                   Center(
                     child:   Consumer(
                       builder:(context,ref,child)=> CircleAvatar(
                         radius: 100,
                         backgroundColor: AppThemeClass.secondary,
-                        backgroundImage: NetworkImage(widget.userProfile.profilePicUrl.toString(),),
+                        backgroundImage: NetworkImage(userProfile.profilePicUrl.toString(),),
                       ),
                     ),
                   ),
@@ -155,26 +150,32 @@ class _ProfileState extends ConsumerState<Profile> {
                       isLoading: ref.watch(isLoading),
                       onPress: () async {
                         ref.read(isLoading.notifier).state=true;
-                        print(widget.userProfile.profilePicUrl);
-                        widget.userProfile.copyWith(profilePicUrl: "Hello");
-
-                        print(widget.userProfile.profilePicUrl);
                         UserProfile user=UserProfile(
-                          //profilePicUrl: widget.userProfile.profilePicUrl??'',
-                          uid: widget.userProfile.uid,
+                          profilePicUrl: userProfile.profilePicUrl,
+                          uid: userProfile.uid,
                           name:name.text.toString(),
                           gender: ref.watch(gender),
                           address: address.text.toString(),
                           number:  whatsappNumber.text.toString(),
-                          email: widget.userProfile.email,
+                          email: userProfile.email,
                         );
+
                         //user.copyWith(n)
                         if (_formKey.currentState!.validate() ) {
-                          await ref.read(firebaseCRUDProvider).updateDocument('users',widget.userProfile.uid.toString(), user.toJson());
-                          ref.read(_isReadOnly.notifier).state=true;
-                          if(context.mounted){
-                            UiEventHandler.snackBarWidget(context, "Successfully updated");
+                          UserProfile previousData=ref.read(userData);
+                          if(user==previousData){
+                            ref.read(_isReadOnly.notifier).state=true;
+                            return;
+                          }else{
+                            await ref.read(firebaseCRUDProvider).updateDocument('users',userProfile.uid.toString(), user.toJson()).then((onValue){
+                              ref.read(userData.notifier).state=user;
+                            });
+                            ref.read(_isReadOnly.notifier).state=true;
+                            if(context.mounted){
+                              UiEventHandler.snackBarWidget(context, "Successfully updated");
+                            }
                           }
+
                         } else {
                           UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
                         }

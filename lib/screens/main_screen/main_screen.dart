@@ -10,9 +10,9 @@ import '../user_actions/post_books.dart';
 import '../user_actions/post_uniform_clothes.dart';
 
 class MainScreen extends ConsumerWidget {
-   MainScreen({super.key, required this.userProfile});
+   MainScreen({super.key,});
 
-   final UserProfile userProfile;
+  // final UserProfile userProfile;
   final _bottomNavigationIndex=StateProvider.autoDispose<int>((ref)=>0);
 
   final List<Widget> screens=[
@@ -40,7 +40,7 @@ class MainScreen extends ConsumerWidget {
             IconButton(onPressed: (){}, icon: Icon(Icons.sort,size: 30,))
           ],
         ),
-        drawer: DrawerWidget(userProfile: userProfile,),
+        drawer: DrawerWidget(),
         body: screens[ref.watch(_bottomNavigationIndex)],
         bottomNavigationBar: Theme(
           data: Theme.of(context).copyWith(
@@ -96,7 +96,8 @@ class PostItem extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           spacing: 10,
-          children: List.generate(2, (index){
+          children: [
+            ...List.generate(2, (index){
             final List<String> l=["Books","Uniform & Clothes "];
             final List<String> list=["Exchange or Donate your books. There are a lot of educators looking for books exchanges and books donation","Give your clothes to needy students. You can share schools uniforms"];
             return ListTile(
@@ -128,6 +129,8 @@ class PostItem extends StatelessWidget {
               ),
             );
           }),
+          ],
+
         ),
       ),
     );

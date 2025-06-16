@@ -1,17 +1,28 @@
+import 'dart:io';
+import 'package:booksexchange/controller/authentication/auth_providers.dart';
+import 'package:booksexchange/controller/firebase_crud_operations/user_profile_crud.dart';
+import 'package:booksexchange/model/post_model.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../components/button.dart';
 import '../../components/drop_down.dart';
+import '../../components/layout_components/alert_dialogue.dart';
 import '../../components/layout_components/small_components.dart';
 import '../../components/text_widget.dart';
 import '../../components/textfield.dart';
+import '../../model/ui_models.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
 final _subjectsList=StateProvider.autoDispose<List<String>>((ref)=>[]);
 final _item=StateProvider<String>((ref)=>'');
-
-
+final selectedImageProvider = StateProvider.autoDispose<File?>((ref) => null);
+final _grade=StateProvider.autoDispose<String?>((ref)=>null);
+final _category = StateProvider.autoDispose<String?>((ref)=>null);
+final _imageUrl=StateProvider.autoDispose<String?>((ref)=>null);
+final board=StateProvider.autoDispose<String?>((ref)=>null);
 
 class PostBooks extends StatelessWidget {
    PostBooks({super.key, required this.isEdit});
@@ -19,25 +30,49 @@ class PostBooks extends StatelessWidget {
    final TextEditingController location=TextEditingController();
    final TextEditingController description=TextEditingController();
 
-  final List<String> list=['KIU Examination Board','AKU-EB Aga Khan University Examination Board ','FBISE-Federal Board of Intermediate and Secondary Education'];
-  final List<String> nameOfClassList=['1th Class','2th Class','3th Class','4th Class','5th Class','6th Class','7th Class','8th Class','9th Class','10th Class','11th Class','12th Class'];
-
-  final List<String> subjects = [
-    "English",
-    "Urdu",
-    "Science",
-    "Computer Science",
-    "Pak-Studies",
-    "Biology",
-    "Physics",
-    "Maths",
-    "Chemistry",
-    "Other"
-  ];
   //final List<String> type = ["Exchange", "Sell", "Donate"];
-  final _category = StateProvider.autoDispose<String>((ref)=>'Exchange');
 
 
+   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+   Future<void> _pickImageAndCompress(WidgetRef ref) async {
+     final picker = ImagePicker();
+     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+     if (pickedFile != null) {
+       final file = File(pickedFile.path);
+       final targetPath = '${file.parent.path}/temp_${file.uri.pathSegments.last}';
+       final result = await FlutterImageCompress.compressAndGetFile(
+         file.absolute.path,
+         targetPath,
+         quality: 70,
+         minHeight: 1080,
+         minWidth: 1080,
+         //rotate: 180,
+       );
+
+       if (result != null) {
+         final fileData = File(result.path);
+         ref.read(selectedImageProvider.notifier).state = fileData;
+       }
+     }
+   }
+
+
+   Future<void> uploadPost(WidgetRef ref) async {
+     final fileName = '${ref.watch(userUIDProvider)!.uid}_${DateTime.now().millisecondsSinceEpoch}';
+    // final fileName = ref.watch(selectedImageProvider)!.path;
+     final storageRef = FirebaseStorage.instance.ref().child('posts/books/$fileName');
+     try {
+       await storageRef.putFile(ref.watch(selectedImageProvider)!);
+       final downloadUrl = await storageRef.getDownloadURL();
+
+       ref.read(_imageUrl.notifier).state=downloadUrl;
+       print('Download URL: $downloadUrl');
+     } catch (e) {
+       print('Error uploading file: $e');
+     }
+   }
   @override
   Widget build(BuildContext context) {
     print("Create Post Rebuilds.....");
@@ -54,11 +89,13 @@ class PostBooks extends StatelessWidget {
           body: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Column(
+              child: Form(
+                  key: _formKey,
+                  child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 5,
                 children: [
-                  CustomText(text: "Select one option",isGoogleFont: true,),
+                  CustomText(text: "Do you want to Exchange or Donate?",isGoogleFont: true,color: AppThemeClass.primary,),
                   Row(
                     children: List.generate(2, (index) {
                       List<String> list = ["Exchange", "Donate"];
@@ -80,17 +117,42 @@ class PostBooks extends StatelessWidget {
                       );
                     }),
                   ),
-                  CustomText(text: "Select Class",isGoogleFont: true,),
-                  CustomDropDown(value: nameOfClassList[0], list: nameOfClassList, onChanged: (String? val ) {
-                  }),
-                  CustomText(text: "Location",isGoogleFont: true,),
-                  CustomTextField(controller: location,hintText: "Noor Colony,Jutial Gilgit",),
-                  CustomText(text: "Description",isGoogleFont: true,),
-                 CustomTextField(controller: description,hintText:  "I want to exchange my books.....",maxLines:  6),
-                  CustomText(text: "Select Institutional Board",isGoogleFont: true,),
-                  CustomDropDown(value: list[0], list: list, onChanged: (String? val ) {
-                  }),
-                  CustomText(text: "Select Subjects",isGoogleFont: true,),
+                  CustomText(text: "Select Class",isGoogleFont: true,color: AppThemeClass.primary,),
+                  Consumer(
+                    builder:(context,ref,child)=> CustomDropDown(value:  ref.watch(_grade),hintText: "Class",list: nameOfClassList, onChanged: (String? val ) {
+                      ref.read(_grade.notifier).state=val;
+                      print(ref.read(_grade));
+                    }, validator: (value) {
+                      if (value==null) return "Class is required";
+                      return null;
+                    },
+                    ),
+                  ),
+                  CustomText(text: "Location",isGoogleFont: true,color: AppThemeClass.primary,),
+                  CustomTextField(controller: location,hintText: "Noor Colony,Jutial Gilgit", validator: (value) {
+                    if (value!.isEmpty) return "Address is required";
+                    return null;
+                  },),
+                  CustomText(text: "Description",isGoogleFont: true,color: AppThemeClass.primary,),
+                  CustomTextField(controller: description,hintText:  "I want to exchange my books.....",maxLines:  6,
+                    validator: (value) {
+                      if (value!.isEmpty) return "Description is required";
+                      if (value.length <50) return "Minimum character length is 50";
+                      return null;
+                    },
+                  ),
+                  CustomText(text: "Select Institutional Board",isGoogleFont: true,color: AppThemeClass.primary,),
+                  Consumer(
+                    builder:(context,ref,child)=> CustomDropDown( value: ref.watch(board),hintText: "Board",list: list, onChanged: (String? val ) {
+                      ref.read(board.notifier).state=val!;
+                    },
+                      validator: (value) {
+                        if (value==null) return "Board is required";
+                        return null;
+                      },
+                    ),
+                  ),
+                  CustomText(text: "Select Subjects",isGoogleFont: true,color: AppThemeClass.primary,),
                   Container(
                     width: double.infinity,
                     padding: EdgeInsets.all(10),
@@ -106,37 +168,77 @@ class PostBooks extends StatelessWidget {
                       children: List.generate(subjects.length, (index){
                         return ProviderScope(
                           overrides: [_item.overrideWith((it)=>subjects[index])],
-                         child: const ButtonSubjects(),
+                          child: const ButtonSubjects(),
                         );
                       }),
                     ),
                   ),
                   SizedBox(height: 10,),
-                  CustomText(text: "Select Picture",isGoogleFont: true,),
-                  Container(
-                    clipBehavior: Clip.antiAlias,
-                    height: 100,
-                    width: 200,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        border:Border.all(
-                            color: AppThemeClass.primary,
-                            width: 1.0
-                        )
-                    ),
-                    child: Center(child: CustomText(text: "Upload Image",color: AppThemeClass.primary,)),
+                  CustomText(text: "Select Picture",isGoogleFont: true,color: AppThemeClass.primary,),
+                  Consumer(
+                    builder:(context,ref,child){
+                      final selectedImage=ref.watch(selectedImageProvider);
+                      return GestureDetector(
+                        onTap: () => _pickImageAndCompress(ref),
+                        child: Container(
+                          clipBehavior: Clip.antiAlias,
+                          height: 300,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              border:Border.all(
+                                  color: AppThemeClass.primary,
+                                  width: 1.0
+                              ),
+                            image:selectedImage!=null? DecorationImage(image: FileImage(selectedImage,),fit: BoxFit.cover):null
+                          ),
+                          child: selectedImage!=null?SizedBox.shrink():Center(child: CustomText(text: "Upload Image",color: AppThemeClass.primary,)),
+                        ),
+                      );
+                    },
                   ),
-                  CustomText(text: "Only one image can be upload",isGoogleFont: true,fontSize: 9,),
+                  CustomText(text: "Only one image can be upload",isGoogleFont: true,fontSize: 9,color: AppThemeClass.primary,),
                   SizedBox(height: 10,),
-                 isEdit==true? Row(
-                   spacing: 20,
-                   children: [
-                     Flexible(child:CustomButton(onPress: (){},title: "Update",fontSize: 15,isBold: true,)),
-                     Flexible(child: CustomButton(onPress: (){},title: "Delete",fontSize: 15,isBold: true,))
-                   ],
-                 ):CustomButton(onPress: (){},title: "Post",fontSize: 15,isBold: true,),
+                  isEdit==true? Row(
+                    spacing: 20,
+                    children: [
+                      Flexible(child:CustomButton(onPress: (){},title: "Update",fontSize: 15,isBold: true,)),
+                      Flexible(child: CustomButton(onPress: (){},title: "Delete",fontSize: 15,isBold: true,))
+                    ],
+                  ):Consumer(
+                    builder:(context,ref,child)=> CustomButton(onPress: () {
+                      if (_formKey.currentState!.validate() && ref.watch(_category)!=null && ref.watch(_subjectsList).isNotEmpty) {
+                       UiEventHandler.customAlertDialog(context, "Please wait it will takes few seconds! Uploading...", CircularProgressIndicator(color: AppThemeClass.primary,));
+
+                         uploadPost(ref).whenComplete((){
+                           BooksModel book=BooksModel(
+                               userID: ref.watch(userUIDProvider)!.uid,
+                               type: 'books',
+                               category: ref.read(_category)!,
+                               grade: ref.read(_grade)??'',
+                               location: location.text,
+                               description: description.text,
+                               board: ref.read(board)??'',
+                               subjects: ref.read(_subjectsList),
+                               imageUrl: ref.read(_imageUrl)??''
+                           );
+                          FirebaseService firestore=FirebaseService();
+                           firestore.createDocument('posts', book.toJson()).whenComplete((){
+                           if(context.mounted){
+                             Navigator.pop(context);
+                           }
+                          });
+
+                        });
+
+                        UiEventHandler.snackBarWidget(context, "Successfully updated");
+                      } else {
+                        UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
+                      }
+                    },title: "Post",fontSize: 15,isBold: true,),
+                  ),
                 ],
-              ),
+              )),
             ),
           ),
         ));

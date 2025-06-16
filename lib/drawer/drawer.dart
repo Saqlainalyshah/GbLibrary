@@ -15,8 +15,8 @@ import 'subscreens/faq.dart';
 import '../components/listtile_component.dart';
 
 class DrawerWidget extends StatelessWidget {
-  const DrawerWidget({super.key, required this.userProfile});
-  final UserProfile userProfile;
+  const DrawerWidget({super.key,});
+ // final UserProfile userProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -71,11 +71,21 @@ class DrawerWidget extends StatelessWidget {
                   onTap: () async{
                     //Navigator.pop(context);
                     if (index == 0) {
-                      if(context.mounted){
-                      ref.read(gender.notifier).state=userProfile.gender;
+
+                      FirebaseService firebaseService=FirebaseService();
+                      final document=await firebaseService.getDoc('users', ref.read(userUIDProvider)!.uid);
+                      if(document!=null && document.exists){
+                        final data=UserProfile.fromJson(document.data()!);
+                       // print(data);
+                        ref.read(userData.notifier).state=data;
+                        ref.read(gender.notifier).state=data.gender;
+                      }
+
+                      if(context.mounted) {
+                       // ref.read(userData);
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (builder) => Profile(userProfile: userProfile,)),
+                          MaterialPageRoute(builder: (builder) => Profile()),
                         );
                       }
                     } else if (index == 1) {
