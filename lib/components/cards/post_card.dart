@@ -88,9 +88,9 @@ class BuildPostColumn extends StatelessWidget {
         CustomText(
           text: "I want to $category $grade books",
           isBold: true,
-          //overflow: TextOverflow.ellipsis,s
-          fontSize: ResponsiveText.getSize(context, 15),
-          maxLines: 5,
+          //overflow: TextOverflow.ellipsis,
+          fontSize: ResponsiveText.getSize(context, 13),
+          maxLines: 1,
         ),
 
         buildIconTextRow(context, Icons.school, board,false),

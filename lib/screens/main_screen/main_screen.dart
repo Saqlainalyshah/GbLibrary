@@ -113,7 +113,7 @@ class PostItem extends StatelessWidget {
                 if(index==0){
                   Navigator.push(context, MaterialPageRoute(builder: (builder)=>PostBooks(isEdit: false,)));
                 }else{
-                  Navigator.push(context, MaterialPageRoute(builder: (builder)=>UniformClothes()));
+                  Navigator.push(context, MaterialPageRoute(builder: (builder)=>UniformClothesScreen()));
                 }
               },
               title: Row(

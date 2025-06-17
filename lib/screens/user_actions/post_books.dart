@@ -13,6 +13,7 @@ import '../../components/layout_components/alert_dialogue.dart';
 import '../../components/layout_components/small_components.dart';
 import '../../components/text_widget.dart';
 import '../../components/textfield.dart';
+import '../../controller/firebase_Storage/crud_storage.dart';
 import '../../model/ui_models.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
@@ -35,30 +36,19 @@ class PostBooks extends StatelessWidget {
 
    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-   Future<void> _pickImageAndCompress(WidgetRef ref) async {
+
+   Future<void> _pickImageAndCompress(WidgetRef ref) async{
      final picker = ImagePicker();
      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-     if (pickedFile != null) {
-       final file = File(pickedFile.path);
-       final targetPath = '${file.parent.path}/temp_${file.uri.pathSegments.last}';
-       final result = await FlutterImageCompress.compressAndGetFile(
-         file.absolute.path,
-         targetPath,
-         quality: 70,
-         minHeight: 1080,
-         minWidth: 1080,
-         //rotate: 180,
-       );
-
-       if (result != null) {
-         final fileData = File(result.path);
+     if(pickedFile!=null){
+       FirebaseStorageService storage=FirebaseStorageService();
+       final XFile? file= await storage.pickImageAndCompress(pickedFile);
+       if(file!=null){
+         final fileData = File(file.path);
          ref.read(selectedImageProvider.notifier).state = fileData;
        }
      }
    }
-
-
    Future<void> uploadPost(WidgetRef ref) async {
      final fileName = '${ref.watch(userUIDProvider)!.uid}_${DateTime.now().millisecondsSinceEpoch}';
     // final fileName = ref.watch(selectedImageProvider)!.path;
@@ -73,6 +63,7 @@ class PostBooks extends StatelessWidget {
        print('Error uploading file: $e');
      }
    }
+
   @override
   Widget build(BuildContext context) {
     print("Create Post Rebuilds.....");
@@ -198,6 +189,7 @@ class PostBooks extends StatelessWidget {
                     },
                   ),
                   CustomText(text: "Only one image can be upload",isGoogleFont: true,fontSize: 9,color: AppThemeClass.primary,),
+
                   SizedBox(height: 10,),
                   isEdit==true? Row(
                     spacing: 20,
@@ -207,7 +199,7 @@ class PostBooks extends StatelessWidget {
                     ],
                   ):Consumer(
                     builder:(context,ref,child)=> CustomButton(onPress: () {
-                      if (_formKey.currentState!.validate() && ref.watch(_category)!=null && ref.watch(_subjectsList).isNotEmpty) {
+                      if (_formKey.currentState!.validate() && ref.watch(_category)!=null && ref.watch(_subjectsList).isNotEmpty && ref.watch(selectedImageProvider)!=null) {
                        UiEventHandler.customAlertDialog(context, "Please wait it will takes few seconds! Uploading...", CircularProgressIndicator(color: AppThemeClass.primary,));
 
                          uploadPost(ref).whenComplete((){
@@ -220,7 +212,8 @@ class PostBooks extends StatelessWidget {
                                description: description.text,
                                board: ref.read(board)??'',
                                subjects: ref.read(_subjectsList),
-                               imageUrl: ref.read(_imageUrl)??''
+                               imageUrl: ref.read(_imageUrl)??'',
+                             createdAt: DateTime.now(),
                            );
                           FirebaseService firestore=FirebaseService();
                            firestore.createDocument('posts', book.toJson()).whenComplete((){

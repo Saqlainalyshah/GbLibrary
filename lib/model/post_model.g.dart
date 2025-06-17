@@ -7,23 +7,27 @@ part of 'post_model.dart';
 // **************************************************************************
 
 _BooksModel _$BooksModelFromJson(Map<String, dynamic> json) => _BooksModel(
-  userID: json['userID'] as String,
-  type: json['type'] as String,
-  category: json['category'] as String,
-  grade: json['grade'] as String,
-  location: json['location'] as String,
-  description: json['description'] as String,
-  board: json['board'] as String,
-  subjects: (json['subjects'] as List<dynamic>)
-      .map((e) => e as String)
-      .toList(),
-  imageUrl: json['imageUrl'] as String,
+  userID: json['userID'] as String? ?? '',
+  type: json['type'] as String? ?? '',
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+  category: json['category'] as String? ?? '',
+  grade: json['grade'] as String? ?? '',
+  location: json['location'] as String? ?? '',
+  description: json['description'] as String? ?? '',
+  board: json['board'] as String? ?? '',
+  subjects:
+      (json['subjects'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
+  imageUrl: json['imageUrl'] as String? ?? '',
 );
 
 Map<String, dynamic> _$BooksModelToJson(_BooksModel instance) =>
     <String, dynamic>{
       'userID': instance.userID,
       'type': instance.type,
+      'createdAt': instance.createdAt?.toIso8601String(),
       'category': instance.category,
       'grade': instance.grade,
       'location': instance.location,
@@ -35,13 +39,16 @@ Map<String, dynamic> _$BooksModelToJson(_BooksModel instance) =>
 
 _ClothesModel _$ClothesModelFromJson(Map<String, dynamic> json) =>
     _ClothesModel(
-      userID: json['userID'] as String,
-      type: json['type'] as String,
-      size: json['size'] as String,
-      description: json['description'] as String,
-      location: json['location'] as String,
-      category: json['category'] as String,
-      imageUrl: json['imageUrl'] as String,
+      userID: json['userID'] as String? ?? '',
+      type: json['type'] as String? ?? '',
+      size: json['size'] as String? ?? '',
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+      description: json['description'] as String? ?? '',
+      location: json['location'] as String? ?? '',
+      category: json['category'] as String? ?? '',
+      imageUrl: json['imageUrl'] as String? ?? '',
     );
 
 Map<String, dynamic> _$ClothesModelToJson(_ClothesModel instance) =>
@@ -49,6 +56,7 @@ Map<String, dynamic> _$ClothesModelToJson(_ClothesModel instance) =>
       'userID': instance.userID,
       'type': instance.type,
       'size': instance.size,
+      'createdAt': instance.createdAt?.toIso8601String(),
       'description': instance.description,
       'location': instance.location,
       'category': instance.category,

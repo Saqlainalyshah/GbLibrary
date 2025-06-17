@@ -1,25 +1,58 @@
+import 'dart:io';
 import 'package:booksexchange/components/layout_components/small_components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../components/button.dart';
+import '../../components/layout_components/alert_dialogue.dart';
 import '../../components/text_widget.dart';
 import '../../components/textfield.dart';
+import '../../controller/authentication/auth_providers.dart';
+import '../../controller/firebase_Storage/crud_storage.dart';
+import '../../controller/firebase_crud_operations/user_profile_crud.dart';
+import '../../model/post_model.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
-class UniformClothes extends StatelessWidget {
-  UniformClothes({super.key});
-  final TextEditingController controller=TextEditingController();
+
+final _size = StateProvider.autoDispose<String>((ref)=>'');
+final _category=StateProvider.autoDispose<String>((ref)=>'');
+final selectedUniformImageProvider = StateProvider.autoDispose<File?>((ref) => null);
+class UniformClothesScreen extends StatelessWidget {
+  UniformClothesScreen({super.key});
+  final TextEditingController description=TextEditingController();
+  final TextEditingController location=TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
 
+  Future<String?> _upload(WidgetRef ref) async{
+    try{
+      FirebaseStorageService storage=FirebaseStorageService();
+      final fileName = '${ref.watch(userUIDProvider)!.uid}_${DateTime.now().millisecondsSinceEpoch}';
+      final url=await storage.uploadFile('posts/outfits/$fileName', File(ref.watch(selectedUniformImageProvider)!.path));
+      return url;
+    } catch (e){
+      return null;
+    }
+  }
+  Future<void> imagePickAndCompressed(WidgetRef ref) async{
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if(pickedFile!=null){
+      FirebaseStorageService storage=FirebaseStorageService();
+      final XFile? file= await storage.pickImageAndCompress(pickedFile);
+      if(file!=null){
+        final fileData = File(file.path);
+        ref.read(selectedUniformImageProvider.notifier).state = fileData;
+      }
+    }
+  }
 
   //final List<String> type = ["Exchange", "Sell", "Donate"];
-  final _category = StateProvider.autoDispose<String>((ref) {
-    final List<String> list = ["small", "medium","Large","Extra Large"];
-    return list.first; // Safe access to first element
-  });
+
 
   @override
   Widget build(BuildContext context) {
+
     print("build");
     return SafeArea(
         top: false,
@@ -34,55 +67,114 @@ class UniformClothes extends StatelessWidget {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 5,
-            children: [
-              CustomText(text: "Select size",isGoogleFont: true,),
-              Consumer(
-                  builder:(context,ref,child)=>  _buildRadioButtons(
-                    options: ["S", "M","L","XL"],
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 5,
+              children: [
+                CustomText(text: "Select size",isGoogleFont: true,color: AppThemeClass.primary,),
+                Consumer(
+                    builder:(context,ref,child)=>  _buildRadioButtons(
+                      options: ["S", "M","L","XL"],
+                      selectedOption: ref.watch(_size),
+                      onChanged: (newValue) {
+                        ref.read(_size.notifier).state=newValue;
+                      },
+                    )
+                ),
+                CustomText(text: "Description",isGoogleFont: true,color: AppThemeClass.primary,),
+                CustomTextField(controller: description,hintText:  "I want to exchange my books.....",maxLines:  4,
+                  validator: (value) {
+                    if (value!.isEmpty) return "Description is required";
+                    if (value.length <50) return "Minimum character length is 50";
+                    return null;
+                  },
+                ),
+                CustomText(text: "Location",isGoogleFont: true,color: AppThemeClass.primary,),
+                CustomTextField(controller: location,hintText: "Noor Colony,Jutial Gilgit",
+                  validator: (value) {
+                    if (value!.isEmpty) return "Address is required";
+                    return null;
+                  },),
+                CustomText(text: "Is this school uniform?",isGoogleFont: true,color: AppThemeClass.primary,),
+                Consumer(
+                  builder:(context,ref,child)=> _buildRadioButtons(
+                    options: ["Yes","No"],
                     selectedOption: ref.watch(_category),
                     onChanged: (newValue) {
                       ref.read(_category.notifier).state=newValue;
                     },
-                  )
-              ),
-              CustomText(text: "Description",isGoogleFont: true,),
-              CustomTextField(controller: controller,hintText:  "I want to exchange my books.....",maxLines:  4),
-              CustomText(text: "Location",isGoogleFont: true,),
-              CustomTextField(controller: controller,hintText: "Noor Colony,Jutial Gilgit",),
-              CustomText(text: "Is this school uniform?",isGoogleFont: true,),
-              Consumer(
-                builder:(context,ref,child)=> _buildRadioButtons(
-                  options: ["Yes","No"],
-                  selectedOption: ref.watch(_category),
-                  onChanged: (newValue) {
-                    ref.read(_category.notifier).state=newValue;
+                  ),
+                ),
+                /*  CustomText(text: "Select Institutional Board",isBold: true,),
+                    customDropdownField(value: list[0], itemsList: list, onChanged: (String? val ) {
+                    }),*/
+                CustomText(text: "Select Picture",isGoogleFont: true,color: AppThemeClass.primary,),
+                Consumer(
+                  builder:(context,ref,child){
+                    final selectedImage=ref.watch(selectedUniformImageProvider);
+                    print(selectedImage);
+
+                    return GestureDetector(
+                      onTap: ()=>imagePickAndCompressed(ref),
+                      child: Container(
+                        clipBehavior: Clip.antiAlias,
+                        height: 300,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border:Border.all(
+                                color: AppThemeClass.primary,
+                                width: 1.0
+                            ),
+                            image:selectedImage!=null? DecorationImage(image: FileImage(selectedImage,),fit: BoxFit.cover):null
+                        ),
+                        child: selectedImage!=null?SizedBox.shrink():Center(child: CustomText(text: "Upload Image",color: AppThemeClass.primary,)),
+                      ),
+                    );
                   },
                 ),
-              ),
-              /*  CustomText(text: "Select Institutional Board",isBold: true,),
-                  customDropdownField(value: list[0], itemsList: list, onChanged: (String? val ) {
-                  }),*/
-              CustomText(text: "Select Picture",isGoogleFont: true,),
-              Container(
-                clipBehavior: Clip.antiAlias,
-                height: 100,
-                width: 200,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    border:Border.all(
-                        color: AppThemeClass.primary,
-                        width: 1.0
-                    )
-                ),
-                child: Center(child: CustomText(text: "Upload Image",color: AppThemeClass.primary,)),
-              ),
-              CustomText(text: "Only one image can be upload",isGoogleFont:true,fontSize: 10,),
-              SizedBox(height: 10,),
-              CustomButton(onPress: (){},title: "Post",fontSize: 20,),
-            ],
+                CustomText(text: "Only one image can be upload",isGoogleFont: true,fontSize: 9,color: AppThemeClass.primary,),
+
+                SizedBox(height: 10,),Consumer(
+                  builder:(context,ref,child)=> CustomButton(onPress: () {
+                    if (_formKey.currentState!.validate() && ref.watch(_category).length>0 && ref.watch(_size).length>0 && ref.watch(selectedUniformImageProvider)!=null) {
+                      UiEventHandler.customAlertDialog(context, "Please wait it will takes few seconds! Uploading...", CircularProgressIndicator(color: AppThemeClass.primary,));
+
+                      _upload(ref).then((val){
+                        if(val!=null){
+                          ClothesModel clothe=ClothesModel(
+                            userID: ref.watch(userUIDProvider)!.uid,
+                            type: 'outfits',
+                            size: ref.watch(_size),
+                            category: ref.watch(_category),
+                            location: location.text,
+                            description: description.text,
+                            imageUrl: val,
+                            createdAt: DateTime.now(),
+                          );
+                          FirebaseService firestore=FirebaseService();
+                          firestore.createDocument('outfits', clothe.toJson()).whenComplete((){
+                            if(context.mounted){
+                              Navigator.pop(context);
+                              description.clear();
+                              location.clear();
+                            //  Navigator.pop(context);
+                              UiEventHandler.snackBarWidget(context, "Successfully updated");
+                            }
+
+                          });
+                        }
+                      });
+
+                    } else {
+                      UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
+                    }
+                  },title: "Post",fontSize: 15,isBold: true,),
+                )
+              ],
+            ),
           ),
         ),
       ),

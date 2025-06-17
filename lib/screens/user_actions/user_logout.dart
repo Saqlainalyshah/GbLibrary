@@ -30,11 +30,11 @@ void showLogout(BuildContext context) {
                  builder:(context,ref,child)=>InkWell(
                      onTap: ()async{
                        //final result=
-                       await ref.read(loginControllerProvider).signOut();
-
-                      if(context.mounted){
-                        Navigator.pop(context);
-                      }
+                       await ref.read(loginControllerProvider).signOut().whenComplete((){
+                         if(context.mounted){
+                           Navigator.pop(context);
+                         }
+                       });
                      },
                      child: Padding(
                        padding: const EdgeInsets.symmetric(horizontal: 8.0),

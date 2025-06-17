@@ -1,6 +1,7 @@
 import 'package:booksexchange/components/button.dart';
 import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/controller/firebase_crud_operations/user_profile_crud.dart';
+import 'package:booksexchange/controller/time_format/time_format.dart';
 import 'package:booksexchange/model/post_model.dart';
 import 'package:booksexchange/screens/home/view_details.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,7 +38,6 @@ class FeedPortion extends ConsumerWidget {
         data: (posts){
           if(posts.docs.isNotEmpty){
             final data=posts.docs;
-
             List<BooksModel> list=data.map((document)=>BooksModel.fromJson(document.data())).toList();
             return CustomScrollView(
               // physics: BouncingScrollPhysics(),
@@ -54,7 +54,7 @@ class FeedPortion extends ConsumerWidget {
                         category: list[index].category,
                         grade: list[index].grade,
                         board: list[index].board,
-                        time: ' 2 minutes ago',
+                        time: TimeFormater.timeAgo(list[index].createdAt.toString()),
                         description: list[index].description,
                         location: list[index].location,
                         type:list[index].type,
@@ -73,70 +73,46 @@ class FeedPortion extends ConsumerWidget {
               ],
             );
           }else{
-            return SafeArea(
-              top: false,
-              child: Scaffold(
-                body: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Column(
-                      spacing: 10,
-                      mainAxisSize: MainAxisSize.min,
-                      //crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(Icons.wifi_off,size: 50,color: AppThemeClass.primary,),
-                        CustomText(text: "Oops! Something went wrong!",fontSize: 18,isBold: true,color: AppThemeClass.primary,),
-                        CustomButton(width: 200,onPress: (){
-                          ref.invalidate(_booksFeedProvider);
-                        },title: "Refresh",),
+            return Center(
+              child: Column(
+                spacing: 10,
+                mainAxisSize: MainAxisSize.min,
+                //crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.wifi_off,size: 50,color: AppThemeClass.primary,),
+                  CustomText(text: "No posts found!",fontSize: 18,isBold: true,color: AppThemeClass.primary,),
+                  CustomButton(width: 200,onPress: (){
+                    ref.invalidate(_booksFeedProvider);
+                  },title: "Refresh",),
 
-                      ],
-                    ),
-                  ),
-                ),
+                ],
               ),
             );
           }
         },
-        error: (error,track)=>SafeArea(
-          top: false,
-          child: Scaffold(
-            body: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(
-                child: Column(
-                  spacing: 10,
-                  mainAxisSize: MainAxisSize.min,
-                  //crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                  Icon(Icons.wifi_off,size: 50,color: AppThemeClass.primary,),
+        error: (error,track)=>Center(
+          child: Column(
+              spacing: 10,
+              mainAxisSize: MainAxisSize.min,
+              //crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.wifi_off,size: 50,color: AppThemeClass.primary,),
                 CustomText(text: "Oops! Unknown error occurred!",fontSize: 18,isBold: true,color: AppThemeClass.primary,),
                 CustomButton(width: 200,onPress: (){
                   ref.invalidate(_booksFeedProvider);
                 },title: "Refresh",),]
 
-              ),
-              ),
-            ),
           ),
         ),
-        loading: ()=>SafeArea(
-          top: false,
-          child: Scaffold(
-            body: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                 // crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CustomText(text: "Loading....!",fontSize: 15,isBold: true,color: AppThemeClass.primary,),
-                   CircularProgressIndicator(color: AppThemeClass.primary,),
+        loading: ()=>Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            // crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomText(text: "Loading....!",fontSize: 15,isBold: true,color: AppThemeClass.primary,),
+              CircularProgressIndicator(color: AppThemeClass.primary,),
 
-                  ],
-                ),
-              ),
-            ),
+            ],
           ),
         )
 
