@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../components/text_widget.dart';
 import '../../../utils/fontsize/app_theme/theme.dart';
-import '../../controller/authentication/auth_providers.dart';
+import '../../controller/authentication/auth_repository.dart';
+import '../../controller/providers/global_providers.dart';
 
 /// Alert dialogue to user logout action
 void showLogout(BuildContext context) {
@@ -29,8 +30,10 @@ void showLogout(BuildContext context) {
                Consumer(
                  builder:(context,ref,child)=>InkWell(
                      onTap: ()async{
-                       //final result=
-                       await ref.read(loginControllerProvider).signOut().whenComplete((){
+                       AuthRepository auth=AuthRepository();
+                       await auth.signOut().whenComplete((){
+                         ref.invalidate(userProfileProvider);
+                         ref.invalidate(getUserDocument);
                          if(context.mounted){
                            Navigator.pop(context);
                          }

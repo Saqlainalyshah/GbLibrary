@@ -1,5 +1,3 @@
-import 'package:booksexchange/controller/authentication/auth_providers.dart';
-import 'package:booksexchange/model/user_profile.dart';
 import 'package:booksexchange/screens/user_actions/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +6,7 @@ import '../../components/button.dart';
 import '../../components/layout_components/alert_dialogue.dart';
 import '../../components/text_widget.dart';
 import '../../components/textfield.dart';
+import '../../controller/authentication/auth_repository.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 import 'otp_screen.dart';
 
@@ -102,9 +101,10 @@ class Login extends ConsumerWidget {
                         loadingColor: AppThemeClass.primary,
                         isLoading: index==0?ref.watch(isLoading):false,
                       onPress: ()async{
+                        AuthRepository auth=AuthRepository();
                           ref.watch(isLoading.notifier).state=true;
                         if(index==0){
-                         final result= await ref.watch(loginControllerProvider).signInWithGoogle();
+                         final result= await auth.signInWithGoogle();
                         if(context.mounted){
                           if(result==false){
                             if(context.mounted){

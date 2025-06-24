@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:booksexchange/components/layout_components/small_components.dart';
+import 'package:booksexchange/screens/user_actions/clothes_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,16 +8,17 @@ import '../../components/button.dart';
 import '../../components/layout_components/alert_dialogue.dart';
 import '../../components/text_widget.dart';
 import '../../components/textfield.dart';
-import '../../controller/authentication/auth_providers.dart';
 import '../../controller/firebase_Storage/crud_storage.dart';
-import '../../controller/firebase_crud_operations/user_profile_crud.dart';
+import '../../controller/firebase_crud_operations/firestore_crud_operations.dart';
+import '../../controller/providers/global_providers.dart';
 import '../../model/post_model.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
 
-final _size = StateProvider.autoDispose<String>((ref)=>'');
-final _category=StateProvider.autoDispose<String>((ref)=>'');
+final _size = StateProvider.autoDispose<String?>((ref)=>null);
+final _category=StateProvider.autoDispose<String?>((ref)=>null);
 final selectedUniformImageProvider = StateProvider.autoDispose<File?>((ref) => null);
+
 class UniformClothesScreen extends StatelessWidget {
   UniformClothesScreen({super.key});
   final TextEditingController description=TextEditingController();
@@ -27,7 +29,7 @@ class UniformClothesScreen extends StatelessWidget {
   Future<String?> _upload(WidgetRef ref) async{
     try{
       FirebaseStorageService storage=FirebaseStorageService();
-      final fileName = '${ref.watch(userUIDProvider)!.uid}_${DateTime.now().millisecondsSinceEpoch}';
+      final fileName = '${ref.watch(userProfileProvider)!.uid}_${DateTime.now().millisecondsSinceEpoch}';
       final url=await storage.uploadFile('posts/outfits/$fileName', File(ref.watch(selectedUniformImageProvider)!.path));
       return url;
     } catch (e){
@@ -75,9 +77,9 @@ class UniformClothesScreen extends StatelessWidget {
               children: [
                 CustomText(text: "Select size",isGoogleFont: true,color: AppThemeClass.primary,),
                 Consumer(
-                    builder:(context,ref,child)=>  _buildRadioButtons(
+                    builder:(context,ref,child)=>  buildRadioButtons(
                       options: ["S", "M","L","XL"],
-                      selectedOption: ref.watch(_size),
+                      selectedOption: ref.watch(_size)??'',
                       onChanged: (newValue) {
                         ref.read(_size.notifier).state=newValue;
                       },
@@ -99,9 +101,9 @@ class UniformClothesScreen extends StatelessWidget {
                   },),
                 CustomText(text: "Is this school uniform?",isGoogleFont: true,color: AppThemeClass.primary,),
                 Consumer(
-                  builder:(context,ref,child)=> _buildRadioButtons(
+                  builder:(context,ref,child)=> buildRadioButtons(
                     options: ["Yes","No"],
-                    selectedOption: ref.watch(_category),
+                    selectedOption: ref.watch(_category)??'',
                     onChanged: (newValue) {
                       ref.read(_category.notifier).state=newValue;
                     },
@@ -139,22 +141,23 @@ class UniformClothesScreen extends StatelessWidget {
 
                 SizedBox(height: 10,),Consumer(
                   builder:(context,ref,child)=> CustomButton(onPress: () {
-                    if (_formKey.currentState!.validate() && ref.watch(_category).length>0 && ref.watch(_size).length>0 && ref.watch(selectedUniformImageProvider)!=null) {
+                    Navigator.push(context, MaterialPageRoute(builder: (builder)=>UniformClothes()));
+                    /*
+                    if (_formKey.currentState!.validate() && ref.watch(_category)!=null && ref.watch(_size)!=null && ref.watch(selectedUniformImageProvider)!=null) {
                       UiEventHandler.customAlertDialog(context, "Please wait it will takes few seconds! Uploading...", CircularProgressIndicator(color: AppThemeClass.primary,));
-
                       _upload(ref).then((val){
                         if(val!=null){
                           ClothesModel clothe=ClothesModel(
-                            userID: ref.watch(userUIDProvider)!.uid,
+                            userID: ref.watch(userProfileProvider)!.uid,
                             type: 'outfits',
-                            size: ref.watch(_size),
-                            category: ref.watch(_category),
+                            size: ref.watch(_size)??'M',
+                            isSchoolUniform: ref.watch(_category)??'Yes',
                             location: location.text,
                             description: description.text,
                             imageUrl: val,
                             createdAt: DateTime.now(),
                           );
-                          FirebaseService firestore=FirebaseService();
+                          FirebaseFireStoreServices firestore=FirebaseFireStoreServices();
                           firestore.createDocument('outfits', clothe.toJson()).whenComplete((){
                             if(context.mounted){
                               Navigator.pop(context);
@@ -170,7 +173,7 @@ class UniformClothesScreen extends StatelessWidget {
 
                     } else {
                       UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
-                    }
+                    }*/
                   },title: "Post",fontSize: 15,isBold: true,),
                 )
               ],
@@ -182,7 +185,7 @@ class UniformClothesScreen extends StatelessWidget {
   }
 }
 
-Widget _buildRadioButtons({
+Widget buildRadioButtons({
   required List<String> options,
   required String selectedOption,
   required Function(String) onChanged,

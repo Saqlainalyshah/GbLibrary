@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$BooksModel {
 
- String get userID; String get type; DateTime? get createdAt; String get category; String get grade; String get location; String get description; String get board; List<String> get subjects; String get imageUrl;
+ String get userID; String get type; DateTime get createdAt; String get category; String get grade; String get location; String get description; String get board; List<String> get subjects; String get imageUrl;
 /// Create a copy of BooksModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $BooksModelCopyWith<$Res>  {
   factory $BooksModelCopyWith(BooksModel value, $Res Function(BooksModel) _then) = _$BooksModelCopyWithImpl;
 @useResult
 $Res call({
- String userID, String type, DateTime? createdAt, String category, String grade, String location, String description, String board, List<String> subjects, String imageUrl
+ String userID, String type, DateTime createdAt, String category, String grade, String location, String description, String board, List<String> subjects, String imageUrl
 });
 
 
@@ -66,12 +66,12 @@ class _$BooksModelCopyWithImpl<$Res>
 
 /// Create a copy of BooksModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userID = null,Object? type = null,Object? createdAt = freezed,Object? category = null,Object? grade = null,Object? location = null,Object? description = null,Object? board = null,Object? subjects = null,Object? imageUrl = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? userID = null,Object? type = null,Object? createdAt = null,Object? category = null,Object? grade = null,Object? location = null,Object? description = null,Object? board = null,Object? subjects = null,Object? imageUrl = null,}) {
   return _then(_self.copyWith(
 userID: null == userID ? _self.userID : userID // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
-as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
+as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as String,grade: null == grade ? _self.grade : grade // ignore: cast_nullable_to_non_nullable
 as String,location: null == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -89,12 +89,12 @@ as String,
 @JsonSerializable()
 
 class _BooksModel implements BooksModel {
-  const _BooksModel({this.userID = '', this.type = '', this.createdAt, this.category = '', this.grade = '', this.location = '', this.description = '', this.board = '', final  List<String> subjects = const [], this.imageUrl = ''}): _subjects = subjects;
+  const _BooksModel({this.userID = '', this.type = '', required this.createdAt, this.category = '', this.grade = '', this.location = '', this.description = '', this.board = '', final  List<String> subjects = const [], this.imageUrl = ''}): _subjects = subjects;
   factory _BooksModel.fromJson(Map<String, dynamic> json) => _$BooksModelFromJson(json);
 
 @override@JsonKey() final  String userID;
 @override@JsonKey() final  String type;
-@override final  DateTime? createdAt;
+@override final  DateTime createdAt;
 @override@JsonKey() final  String category;
 @override@JsonKey() final  String grade;
 @override@JsonKey() final  String location;
@@ -142,7 +142,7 @@ abstract mixin class _$BooksModelCopyWith<$Res> implements $BooksModelCopyWith<$
   factory _$BooksModelCopyWith(_BooksModel value, $Res Function(_BooksModel) _then) = __$BooksModelCopyWithImpl;
 @override @useResult
 $Res call({
- String userID, String type, DateTime? createdAt, String category, String grade, String location, String description, String board, List<String> subjects, String imageUrl
+ String userID, String type, DateTime createdAt, String category, String grade, String location, String description, String board, List<String> subjects, String imageUrl
 });
 
 
@@ -159,12 +159,12 @@ class __$BooksModelCopyWithImpl<$Res>
 
 /// Create a copy of BooksModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userID = null,Object? type = null,Object? createdAt = freezed,Object? category = null,Object? grade = null,Object? location = null,Object? description = null,Object? board = null,Object? subjects = null,Object? imageUrl = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? userID = null,Object? type = null,Object? createdAt = null,Object? category = null,Object? grade = null,Object? location = null,Object? description = null,Object? board = null,Object? subjects = null,Object? imageUrl = null,}) {
   return _then(_BooksModel(
 userID: null == userID ? _self.userID : userID // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
-as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
+as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as String,grade: null == grade ? _self.grade : grade // ignore: cast_nullable_to_non_nullable
 as String,location: null == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -182,7 +182,7 @@ as String,
 /// @nodoc
 mixin _$ClothesModel {
 
- String get userID; String get type; String get size; DateTime? get createdAt; String get description; String get location; String get category; String get imageUrl;
+ String get userID; String get type; String get size; DateTime get createdAt; String get description; String get location; String get isSchoolUniform; String get imageUrl;
 /// Create a copy of ClothesModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -195,16 +195,16 @@ $ClothesModelCopyWith<ClothesModel> get copyWith => _$ClothesModelCopyWithImpl<C
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClothesModel&&(identical(other.userID, userID) || other.userID == userID)&&(identical(other.type, type) || other.type == type)&&(identical(other.size, size) || other.size == size)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.description, description) || other.description == description)&&(identical(other.location, location) || other.location == location)&&(identical(other.category, category) || other.category == category)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClothesModel&&(identical(other.userID, userID) || other.userID == userID)&&(identical(other.type, type) || other.type == type)&&(identical(other.size, size) || other.size == size)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.description, description) || other.description == description)&&(identical(other.location, location) || other.location == location)&&(identical(other.isSchoolUniform, isSchoolUniform) || other.isSchoolUniform == isSchoolUniform)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userID,type,size,createdAt,description,location,category,imageUrl);
+int get hashCode => Object.hash(runtimeType,userID,type,size,createdAt,description,location,isSchoolUniform,imageUrl);
 
 @override
 String toString() {
-  return 'ClothesModel(userID: $userID, type: $type, size: $size, createdAt: $createdAt, description: $description, location: $location, category: $category, imageUrl: $imageUrl)';
+  return 'ClothesModel(userID: $userID, type: $type, size: $size, createdAt: $createdAt, description: $description, location: $location, isSchoolUniform: $isSchoolUniform, imageUrl: $imageUrl)';
 }
 
 
@@ -215,7 +215,7 @@ abstract mixin class $ClothesModelCopyWith<$Res>  {
   factory $ClothesModelCopyWith(ClothesModel value, $Res Function(ClothesModel) _then) = _$ClothesModelCopyWithImpl;
 @useResult
 $Res call({
- String userID, String type, String size, DateTime? createdAt, String description, String location, String category, String imageUrl
+ String userID, String type, String size, DateTime createdAt, String description, String location, String isSchoolUniform, String imageUrl
 });
 
 
@@ -232,15 +232,15 @@ class _$ClothesModelCopyWithImpl<$Res>
 
 /// Create a copy of ClothesModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userID = null,Object? type = null,Object? size = null,Object? createdAt = freezed,Object? description = null,Object? location = null,Object? category = null,Object? imageUrl = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? userID = null,Object? type = null,Object? size = null,Object? createdAt = null,Object? description = null,Object? location = null,Object? isSchoolUniform = null,Object? imageUrl = null,}) {
   return _then(_self.copyWith(
 userID: null == userID ? _self.userID : userID // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,size: null == size ? _self.size : size // ignore: cast_nullable_to_non_nullable
-as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,location: null == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
-as String,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
+as String,isSchoolUniform: null == isSchoolUniform ? _self.isSchoolUniform : isSchoolUniform // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String,
   ));
@@ -253,16 +253,16 @@ as String,
 @JsonSerializable()
 
 class _ClothesModel implements ClothesModel {
-  const _ClothesModel({this.userID = '', this.type = '', this.size = '', this.createdAt, this.description = '', this.location = '', this.category = '', this.imageUrl = ''});
+  const _ClothesModel({this.userID = '', this.type = '', this.size = '', required this.createdAt, this.description = '', this.location = '', this.isSchoolUniform = '', this.imageUrl = ''});
   factory _ClothesModel.fromJson(Map<String, dynamic> json) => _$ClothesModelFromJson(json);
 
 @override@JsonKey() final  String userID;
 @override@JsonKey() final  String type;
 @override@JsonKey() final  String size;
-@override final  DateTime? createdAt;
+@override final  DateTime createdAt;
 @override@JsonKey() final  String description;
 @override@JsonKey() final  String location;
-@override@JsonKey() final  String category;
+@override@JsonKey() final  String isSchoolUniform;
 @override@JsonKey() final  String imageUrl;
 
 /// Create a copy of ClothesModel
@@ -278,16 +278,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ClothesModel&&(identical(other.userID, userID) || other.userID == userID)&&(identical(other.type, type) || other.type == type)&&(identical(other.size, size) || other.size == size)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.description, description) || other.description == description)&&(identical(other.location, location) || other.location == location)&&(identical(other.category, category) || other.category == category)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ClothesModel&&(identical(other.userID, userID) || other.userID == userID)&&(identical(other.type, type) || other.type == type)&&(identical(other.size, size) || other.size == size)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.description, description) || other.description == description)&&(identical(other.location, location) || other.location == location)&&(identical(other.isSchoolUniform, isSchoolUniform) || other.isSchoolUniform == isSchoolUniform)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userID,type,size,createdAt,description,location,category,imageUrl);
+int get hashCode => Object.hash(runtimeType,userID,type,size,createdAt,description,location,isSchoolUniform,imageUrl);
 
 @override
 String toString() {
-  return 'ClothesModel(userID: $userID, type: $type, size: $size, createdAt: $createdAt, description: $description, location: $location, category: $category, imageUrl: $imageUrl)';
+  return 'ClothesModel(userID: $userID, type: $type, size: $size, createdAt: $createdAt, description: $description, location: $location, isSchoolUniform: $isSchoolUniform, imageUrl: $imageUrl)';
 }
 
 
@@ -298,7 +298,7 @@ abstract mixin class _$ClothesModelCopyWith<$Res> implements $ClothesModelCopyWi
   factory _$ClothesModelCopyWith(_ClothesModel value, $Res Function(_ClothesModel) _then) = __$ClothesModelCopyWithImpl;
 @override @useResult
 $Res call({
- String userID, String type, String size, DateTime? createdAt, String description, String location, String category, String imageUrl
+ String userID, String type, String size, DateTime createdAt, String description, String location, String isSchoolUniform, String imageUrl
 });
 
 
@@ -315,15 +315,15 @@ class __$ClothesModelCopyWithImpl<$Res>
 
 /// Create a copy of ClothesModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userID = null,Object? type = null,Object? size = null,Object? createdAt = freezed,Object? description = null,Object? location = null,Object? category = null,Object? imageUrl = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? userID = null,Object? type = null,Object? size = null,Object? createdAt = null,Object? description = null,Object? location = null,Object? isSchoolUniform = null,Object? imageUrl = null,}) {
   return _then(_ClothesModel(
 userID: null == userID ? _self.userID : userID // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,size: null == size ? _self.size : size // ignore: cast_nullable_to_non_nullable
-as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,location: null == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
-as String,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
+as String,isSchoolUniform: null == isSchoolUniform ? _self.isSchoolUniform : isSchoolUniform // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String,
   ));

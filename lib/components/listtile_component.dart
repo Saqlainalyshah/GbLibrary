@@ -3,31 +3,25 @@ import 'package:flutter/material.dart';
 
 class CustomListTile extends StatelessWidget {
   final Widget? leadingWidget;
-  final double leadingIconSize;
   final IconData? leadingIcon;
   final Color? leadingIconColor;
-  final double trailingIconSize;
+  final double? trailingIconSize;
   final IconData? trailingIcon;
   final Color? trailingIconColor;
-  // final Color subTitleColor;
   final Color? titleColor;
   final String title;
-  //final String? subtitle;
   final Function onTap;
 
   const CustomListTile({
     this.leadingWidget,
-    this.leadingIconSize = 24.0,
     this.leadingIcon,
     this.leadingIconColor,
-    this.trailingIconSize = 24.0,
+    this.trailingIconSize,
     this.trailingIcon,
     this.trailingIconColor,
     required this.title,
     this.titleColor,
     required this.onTap,
-    // this.subtitle,
-    //this.subTitleColor = Colors.black,
     super.key,
   });
 
@@ -49,16 +43,13 @@ class CustomListTile extends StatelessWidget {
         ),
         child: Icon(
           leadingIcon,
-          size: leadingIconSize,
+          //size: leadingIconSize,
           color: leadingIconColor,
         ),
       )
           : leadingWidget,
-      title: CustomText(text:
+      title: Text(
         title,
-            //color:  ?titleColor,
-            //fontSize: 13,
-            //fontWeight: FontWeight.w600
 
       ),
       trailing: Icon(

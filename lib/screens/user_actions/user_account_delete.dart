@@ -1,14 +1,10 @@
 import 'package:booksexchange/components/layout_components/alert_dialogue.dart';
 import 'package:booksexchange/components/layout_components/small_components.dart';
 import 'package:booksexchange/components/text_widget.dart';
-import 'package:booksexchange/controller/authentication/auth_checker.dart';
 import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:booksexchange/controller/authentication/auth_providers.dart';
-
-import '../../controller/authentication/auth_providers.dart';
+import '../../controller/authentication/auth_repository.dart';
 
 class AccountSecurity extends StatelessWidget {
   const AccountSecurity({super.key});
@@ -34,8 +30,8 @@ class AccountSecurity extends StatelessWidget {
                     color: AppThemeClass.secondary
                 )
             ),
-            onTap: (){
-              _showLogout(context);
+            onTap: () {
+               _showLogout(context);
             },
             title: CustomText(text: "Delete Account",isBold: true,fontSize: 16,),
             subtitle: CustomText(text: "Once you delete your account all your data will be deleted permanently"),
@@ -72,15 +68,15 @@ void _showLogout(BuildContext context) {
               children: [
                 Consumer(
                   builder:(context,ref,child)=>InkWell(
-                      onTap: ()async{
+                      onTap: (){
+                        Navigator.pop(context);
+                        UiEventHandler.customAlertDialog(context, "Deleting Account...", CircularProgressIndicator(color: AppThemeClass.primary,));
                         //final result=
-
-                       await ref.read(loginControllerProvider).deleteAccount();
-                      
-                        if(context.mounted){
-                          Navigator.pop(context);
-                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (builder)=>AuthChecker()), (route)=>route.isFirst);
-                        }
+                        AuthRepository auth=AuthRepository();
+                        auth.deleteAccount().whenComplete((){
+                         print("object");
+                       });
+                        Navigator.pop(context);
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),

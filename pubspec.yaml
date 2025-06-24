@@ -41,13 +41,12 @@ dependencies:
   firebase_auth: ^5.6.0
   firebase_storage: ^12.4.7
   firebase_messaging: ^15.2.7
-  equatable: ^2.0.7
   google_sign_in: ^6.3.0
-  freezed_annotation: ^3.0.0
-  json_annotation: ^4.9.0
   cached_network_image: ^3.4.1
   image_picker: ^1.1.2
   flutter_image_compress: ^2.4.0
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.9.0
 
 dev_dependencies:
   flutter_test:
@@ -59,9 +58,10 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
-  build_runner: ^2.4.15
+  build_runner: ^2.5.2
   freezed: ^3.0.6
   json_serializable: ^6.9.5
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

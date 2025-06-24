@@ -2,6 +2,7 @@ import 'package:booksexchange/components/button.dart';
 import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/controller/time_format/time_format.dart';
 import 'package:booksexchange/screens/home/view_details.dart';
+import 'package:booksexchange/screens/home/view_uniform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/cards/post_card.dart';
@@ -10,16 +11,16 @@ import '../../utils/fontsize/app_theme/theme.dart';
 
 
 
-class FeedPortion extends ConsumerWidget {
-   const FeedPortion({super.key,});
+class UniformFeed extends ConsumerWidget {
+  const UniformFeed({super.key,});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     print("Feed Portion Screen Rebuilds");
-    final streamBooksPostData=ref.watch(booksFeedProvider);
-   return streamBooksPostData.when(
-        data: (bookPosts){
-          if(bookPosts.isNotEmpty){
+    final streamUniformPostData=ref.watch(uniformFeedProvider);
+    return streamUniformPostData.when(
+        data: (uniformPosts){
+          if(uniformPosts.isNotEmpty){
             return CustomScrollView(
               // physics: BouncingScrollPhysics(),
               slivers: [
@@ -27,24 +28,24 @@ class FeedPortion extends ConsumerWidget {
                   child: ListView.separated(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
-                    itemCount: bookPosts.length,
+                    itemCount: uniformPosts.length,
                     padding: EdgeInsets.all(5),
                     itemBuilder: (context,index){
-                     // print("index");
+                      // print("index");
                       return PostCard(
-                        title: "I want to ${bookPosts[index].category} ${bookPosts[index].grade}",
-                        category: bookPosts[index].category,
-                        grade: bookPosts[index].grade,
-                        board: bookPosts[index].board,
-                        time: TimeFormater.timeAgo(bookPosts[index].createdAt.toString()),
-                        description: bookPosts[index].description,
-                        location: bookPosts[index].location,
-                        type:bookPosts[index].type,
-                        imageUrl: bookPosts[index].imageUrl,
+                        title: "Donated Outfits",
+                        category: '',
+                        grade: '',
+                        board: uniformPosts[index].size=='S'?'Small Size':uniformPosts[index].size=='M'?'Medium Size':uniformPosts[index].size=='L'?'Large Size':'Extra Large Size',
+                        time: TimeFormater.timeAgo(uniformPosts[index].createdAt.toString()),
+                        description: uniformPosts[index].description,
+                        location: uniformPosts[index].location,
+                        type:'',
+                        imageUrl: uniformPosts[index].imageUrl,
                         function: (){
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (builder) => ViewDetails(booksModel: bookPosts[index],)),
+                            MaterialPageRoute(builder: (builder) =>  SchoolUniformScreen(clothesModel: uniformPosts[index],)),
                           );
                         },
                       );
@@ -75,8 +76,8 @@ class FeedPortion extends ConsumerWidget {
           ),
         ),
         loading: ()=>Center(
-          child:  CustomText(text: "Loading....!",fontSize: 15,isBold: true,color: AppThemeClass.primary,),
-        )
+          child: CircularProgressIndicator(color: AppThemeClass.primary,)),
+
     );
   }
 }

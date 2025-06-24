@@ -9,7 +9,7 @@ abstract class BooksModel with _$BooksModel {
   const factory BooksModel({
     @Default('') String userID,
     @Default('') String type,
-     DateTime? createdAt,
+     required DateTime createdAt,
     @Default('') String category,
     @Default('') String grade,
     @Default('') String location,
@@ -29,22 +29,13 @@ abstract class ClothesModel with _$ClothesModel {
      @Default('')  String userID,
      @Default('')  String type,
      @Default('')  String size,
-      DateTime? createdAt,
+      required DateTime createdAt,
      @Default('')  String description,
      @Default('')  String location,
-     @Default('')  String category,
+     @Default('')  String isSchoolUniform,
      @Default('')  String imageUrl,
 
   }) = _ClothesModel;
   factory ClothesModel.fromJson(Map<String, dynamic> json) => _$ClothesModelFromJson(json);
 }
 
-
-class User{
-  String profileName;
-  Timestamp createdAt;
-  User({
-    required this.profileName,
-    required this.createdAt,
-});
-}

@@ -1,19 +1,25 @@
 import 'package:booksexchange/components/layout_components/alert_dialogue.dart';
-import 'package:booksexchange/controller/authentication/auth_providers.dart';
 import 'package:booksexchange/model/user_profile.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/button.dart';
 import '../../components/layout_components/small_components.dart';
 import '../../components/text_widget.dart';
 import '../../components/textfield.dart';
-import '../../controller/firebase_crud_operations/user_profile_crud.dart';
+import '../../controller/firebase_crud_operations/firestore_crud_operations.dart';
+import '../../controller/providers/global_providers.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
 final isLoading=StateProvider.autoDispose<bool>((ref)=>false);
 final _isReadOnly=StateProvider.autoDispose<bool>((ref)=>true);
-final gender = StateProvider<String>((ref) => '');
+final gender = StateProvider<String>((ref) {
+  final temp=ref.watch(userProfileProvider);
+  if(temp!=null){
+    return temp.gender;
+  }else{
+    return '';
+  }
+});
 
 class Profile extends ConsumerStatefulWidget {
   const Profile({super.key,});
@@ -34,7 +40,7 @@ class _ProfileState extends ConsumerState<Profile> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    userProfile= ref.read(userData);
+    userProfile= ref.read(userProfileProvider)!;
     name.text=userProfile.name;
     address.text=userProfile.address;
     whatsappNumber.text=userProfile.number;
@@ -52,7 +58,6 @@ class _ProfileState extends ConsumerState<Profile> {
   @override
   Widget build(BuildContext context) {
 
-
     final nameField=Consumer(
       builder:(context,ref,child)=> CustomTextField(isRead: ref.watch(_isReadOnly),controller: name,hintText: name.text.isEmpty?"Saqlain Ali Shah":name.text, validator: (value) => value!.isEmpty ? "Name is required" : null, // Validation
       ),
@@ -67,7 +72,6 @@ class _ProfileState extends ConsumerState<Profile> {
         },
       ),
     );
-    print(userProfile.profilePicUrl);
     print("rebuilds");
     return SafeArea(
       top: false,
@@ -104,7 +108,6 @@ class _ProfileState extends ConsumerState<Profile> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                  // CachedNetworkImage(height: 100,width: 100,imageUrl: userProfile.profilePicUrl.toString()),
-
                   Center(
                     child:   Consumer(
                       builder:(context,ref,child)=> CircleAvatar(
@@ -151,6 +154,7 @@ class _ProfileState extends ConsumerState<Profile> {
                       onPress: () async {
                         ref.read(isLoading.notifier).state=true;
                         UserProfile user=UserProfile(
+                          createdAt: userProfile.createdAt,
                           profilePicUrl: userProfile.profilePicUrl,
                           uid: userProfile.uid,
                           name:name.text.toString(),
@@ -162,20 +166,19 @@ class _ProfileState extends ConsumerState<Profile> {
 
                         //user.copyWith(n)
                         if (_formKey.currentState!.validate() ) {
-                          UserProfile previousData=ref.read(userData);
+                          UserProfile previousData=ref.read(userProfileProvider)!;
                           if(user==previousData){
                             ref.read(_isReadOnly.notifier).state=true;
                             return;
                           }else{
                             await ref.read(firebaseCRUDProvider).updateDocument('users',userProfile.uid.toString(), user.toJson()).then((onValue){
-                              ref.read(userData.notifier).state=user;
+                              ref.read(userProfileProvider.notifier).state=user;
                             });
                             ref.read(_isReadOnly.notifier).state=true;
                             if(context.mounted){
                               UiEventHandler.snackBarWidget(context, "Successfully updated");
                             }
                           }
-
                         } else {
                           UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
                         }

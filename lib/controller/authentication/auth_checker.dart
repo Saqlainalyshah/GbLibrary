@@ -1,24 +1,20 @@
-
-import 'package:booksexchange/components/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../screens/login_signup/login.dart';
 import '../../screens/main_screen/main_screen.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
-import 'auth_providers.dart';
+import '../providers/global_providers.dart';
 
 class AuthChecker extends ConsumerWidget {
   const AuthChecker({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(currentUserProvider);
-
+    final authState = ref.watch(currentUserAuthStatus);
     return authState.when(
       data: (user) {
         if (user != null) {
-          return MainScreen();
+          return MainScreen(id: user.uid,);
         } else {
           return Login();
         }

@@ -1,29 +1,51 @@
+
 import 'package:booksexchange/components/text_widget.dart';
-import 'package:booksexchange/model/user_profile.dart';
 import 'package:booksexchange/screens/home/feed_portion.dart';
+import 'package:booksexchange/screens/home/uniform_feed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../controller/providers/global_providers.dart';
 import '../../drawer/drawer.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 import '../chat/chat.dart';
 import '../user_actions/post_books.dart';
 import '../user_actions/post_uniform_clothes.dart';
 
-class MainScreen extends ConsumerWidget {
-   MainScreen({super.key,});
+final _bottomNavigationIndex=StateProvider.autoDispose<int>((ref)=>0);
+
+
+class MainScreen extends ConsumerStatefulWidget {
+  const MainScreen({super.key, required this.id});
+  final String id;
+  @override
+  ConsumerState<MainScreen> createState() => _MainScreenState();
+}
+
+
+class _MainScreenState extends ConsumerState<MainScreen> {
 
   // final UserProfile userProfile;
-  final _bottomNavigationIndex=StateProvider.autoDispose<int>((ref)=>0);
+  @override
+  void initState() {
+    // TODO: implement initState
+    ref.read(getUserDocument);
+    ref.read(booksFeedProvider);
+    ref.read(myBooksPosts);
+    ref.read(myClothesPosts);
+    ref.read(uniformFeedProvider);
 
-  final List<Widget> screens=[
-    FeedPortion(),
-    PostItem(),
-    ChatScreen(),
+    super.initState();
+  }
 
+  final List<Widget> screens=  [
+    const FeedPortion(),
+    const UniformFeed(),
+    const PostItem(),
+    const ChatScreen(),
   ];
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -41,42 +63,56 @@ class MainScreen extends ConsumerWidget {
           ],
         ),
         drawer: DrawerWidget(),
-        body: screens[ref.watch(_bottomNavigationIndex)],
+        body: IndexedStack(
+          index: ref.watch(_bottomNavigationIndex),
+          children: screens,
+        ),
         bottomNavigationBar: Theme(
           data: Theme.of(context).copyWith(
-            canvasColor: Colors.white,
+            canvasColor: AppThemeClass.primaryOptional,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            hoverColor: Colors.transparent,
+
           ),
           child: BottomNavigationBar(
+            //fixedColor: AppThemeClass.primaryOptional,
             type: BottomNavigationBarType.fixed,
-            selectedItemColor: AppThemeClass.primary,
-            unselectedItemColor: AppThemeClass.darkTextOptional,
-            unselectedIconTheme: IconThemeData(color: AppThemeClass.darkTextOptional),
-            elevation: 0.0,
+            selectedItemColor: AppThemeClass.whiteText,
+            unselectedItemColor: AppThemeClass.primary,
+            unselectedIconTheme: IconThemeData(color: AppThemeClass.primary),
+            elevation: 3.0,
             currentIndex: ref.watch(_bottomNavigationIndex),
             selectedIconTheme: const IconThemeData(size: 30),
             showUnselectedLabels: true,
-            selectedLabelStyle: const TextStyle(letterSpacing: 0,fontWeight: FontWeight.bold),
-            unselectedLabelStyle: const TextStyle(letterSpacing: 0,),
+            selectedLabelStyle: const TextStyle(
+              letterSpacing: 0,
+              fontWeight: FontWeight.bold,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              letterSpacing: 0,
+              fontWeight: FontWeight.bold,
+            ),
             onTap: (index) {
               ref.read(_bottomNavigationIndex.notifier).state = index;
             },
-            items:  const [
+            items: const [
               BottomNavigationBarItem(
-                label: "Feed",
+                label: "Books",
                 icon: Icon(Icons.feed),
               ),
               BottomNavigationBarItem(
-                label: "Post Item",
-                icon: Icon(Icons.add_circle), // Updated icon for clarity
+                label: "Clothes",
+                icon: Icon(Icons.groups),
+              ),
+              BottomNavigationBarItem(
+                label: "Post",
+                icon: Icon(Icons.add_circle),
               ),
               BottomNavigationBarItem(
                 label: "Chat",
-                icon: Icon(Icons.chat), // Updated icon for clarity
+                icon: Icon(Icons.chat),
               ),
-             /* BottomNavigationBarItem(
-                label: "Account",
-                icon: Icon(Icons.perm_identity),
-              ),*/
             ],
           ),
         ),
@@ -91,12 +127,14 @@ class PostItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("PostItem Screen Rebuilds");
     return  SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           spacing: 10,
           children: [
+
             ...List.generate(2, (index){
             final List<String> l=["Books","Uniform & Clothes "];
             final List<String> list=["Exchange or Donate your books. There are a lot of educators looking for books exchanges and books donation","Give your clothes to needy students. You can share schools uniforms"];

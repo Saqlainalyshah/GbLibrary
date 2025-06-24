@@ -27,6 +27,7 @@ class CustomDropDown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
+
       dropdownColor: AppThemeClass.whiteText,
       padding: EdgeInsets.zero,
       isExpanded: true,
@@ -42,17 +43,18 @@ class CustomDropDown extends StatelessWidget {
       items: list.map((String item) {
         return DropdownMenuItem<String>(
           value: item,
-
           child: Text(
              item,
             overflow: TextOverflow.ellipsis,
-            maxLines: 1,
+            maxLines: 2,
             style: TextStyle(color: Colors.black),
           ),
         );
       }).toList(),
       decoration: InputDecoration(
-        contentPadding: EdgeInsets.symmetric(horizontal: 10),
+        //contentPadding: EdgeInsets.all(0),
+
+         contentPadding: EdgeInsets.symmetric(horizontal: 10,vertical: 0),
         hintStyle:GoogleFonts.robotoSerif(color: AppThemeClass.darkTextOptional,fontSize: 10),
         hintText: hintText,
         enabledBorder: OutlineInputBorder(

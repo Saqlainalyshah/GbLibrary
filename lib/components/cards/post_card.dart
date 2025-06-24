@@ -1,5 +1,7 @@
+import 'package:booksexchange/screens/home/image_view.dart';
 import 'package:booksexchange/screens/home/view_details.dart';
 import 'package:booksexchange/utils/fontsize/responsive_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
@@ -19,9 +21,11 @@ class PostCard extends StatelessWidget {
     required this.type,
     required this.imageUrl,
     required this.function,
+    required this.title
   });
   final String category;
   final String grade;
+  final String title;
   final String board;
   final String time;
   final String description;
@@ -41,17 +45,18 @@ class PostCard extends StatelessWidget {
          crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 5,
           children: [
-            Flexible(child:    buildContainerImage(context, imageUrl, 175,true),),
+           GestureDetector(
+             onTap: (){
+               Navigator.push(context, MaterialPageRoute(builder: (builder)=>ImageView(url: imageUrl)));
+             },
+             child:  buildContainerImage(context, imageUrl, 150,100,true),),
             Flexible(
-              flex: 2,
+              flex: 3,
               child: BuildPostColumn(
-                category: category,
-                grade: grade,
-                board:
-                board,
+                title: title,
+                board: board,
                 type:type,
-                description:
-                description,
+                description: description,
               ),
             )
           ],
@@ -69,13 +74,13 @@ class BuildPostColumn extends StatelessWidget {
 
     required this.board,
     required this.description,
-    required this.category,
-    required this.grade,
+    required this.title,
+
   });
       final String type;
       final String board;
-      final String category;
-      final String grade;
+      final String title;
+
       final String description;
   @override
   Widget build(BuildContext context) {
@@ -86,18 +91,18 @@ class BuildPostColumn extends StatelessWidget {
       spacing: 5,
       children: [
         CustomText(
-          text: "I want to $category $grade books",
+          text: title,
           isBold: true,
           //overflow: TextOverflow.ellipsis,
-          fontSize: ResponsiveText.getSize(context, 13),
+          fontSize:14,
           maxLines: 1,
         ),
 
-        buildIconTextRow(context, Icons.school, board,false),
+        buildIconTextRow( Icons.school, board,false),
         CustomText(
           text: description,
           //overflow: TextOverflow.ellipsis,s
-          fontSize: ResponsiveText.getSize(context, 13),
+          fontSize: 13,
           maxLines: 5,
         ),
       ],
@@ -111,8 +116,8 @@ _buildBottomRow(BuildContext context, String location, String time, Function fun
     spacing: 5,
     //mainAxisSize: MainAxisSize.min,
     children: [
-      Flexible(child: buildIconTextRow(context, Icons.location_on, location,false)),
-      buildIconTextRow(context, Icons.access_time, time,false),
+      Flexible(child: buildIconTextRow( Icons.location_on, location,false)),
+      Flexible(child: buildIconTextRow( Icons.access_time, time,false),),
       CustomButton(
        // isBorder: false,
         radius: 5,
@@ -132,24 +137,39 @@ _buildBottomRow(BuildContext context, String location, String time, Function fun
 buildContainerImage(
   BuildContext context,
   String imageUrl,
-  double size,
+  double height,
+    double width,
   bool isBorder,
 ) {
   return Container(
     padding: EdgeInsets.all(2),
-    height: ResponsiveBox.getSize(context,size ),
+    height: ResponsiveBox.getSize(context,height ),
+    width: ResponsiveBox.getSize(context, width),
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(5),
       border: isBorder
           ? Border.all(color: AppThemeClass.primary, width: .5)
           : null,
     ),
-    
-    child: Image.network(imageUrl,fit: BoxFit.cover,),
+    child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: imageUrl,
+      progressIndicatorBuilder: (context, url, downloadProgress) =>
+          Center(
+            child: SizedBox(
+              height: 50,
+              width: 50,
+              //margin: const EdgeInsets.all(20.0),
+              child: CircularProgressIndicator(
+                value: downloadProgress.progress,
+                  color: AppThemeClass.primary
+              ),
+            ),
+          ),
+      errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+    ),
   );
 }
 ///row widget wrapped in a container with a app secondary color which contains icon and text
-buildIconTextRow(BuildContext context, IconData icon, String text,bool isExpend) {
+buildIconTextRow(IconData icon, String text,bool isExpend) {
   return Container(
    // width: double.infinity,
     padding: EdgeInsets.all(5),
@@ -165,13 +185,13 @@ buildIconTextRow(BuildContext context, IconData icon, String text,bool isExpend)
         Icon(
           icon,
           color: AppThemeClass.primary,
-          size: ResponsiveBox.getSize(context, 18),
+          size: 20,
         ),
         Flexible(
           child: CustomText(
             text: text,
             maxLines:isExpend? 4:1,
-            fontSize: ResponsiveText.getSize(context, 12),
+            fontSize: 12,
           ),
         ),
       ],

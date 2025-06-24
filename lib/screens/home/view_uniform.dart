@@ -15,15 +15,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/cards/listTile_card.dart';
 import '../../controller/providers/global_providers.dart';
 
-class ViewDetails extends ConsumerStatefulWidget {
-  const ViewDetails({super.key, required this.booksModel});
-  final BooksModel booksModel;
+class SchoolUniformScreen extends ConsumerStatefulWidget {
+  const SchoolUniformScreen({super.key, required this.clothesModel});
+  final ClothesModel clothesModel;
 
   @override
-  ConsumerState<ViewDetails> createState() => _ViewDetailsState();
+  ConsumerState<SchoolUniformScreen> createState() => _SchoolUniformScreenState();
 }
 
-class _ViewDetailsState extends ConsumerState<ViewDetails> {
+class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
 
   @override
   void initState() {
@@ -31,7 +31,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
     super.initState();
     ref
         .read(mapDataProvider.notifier)
-        .getMapData('users', widget.booksModel.userID);
+        .getMapData('users', widget.clothesModel.userID);
   }
 
   @override
@@ -58,7 +58,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                     children: [
                       GestureDetector(
                         onTap:(){
-                          Navigator.push(context, MaterialPageRoute(builder: (builder)=>ImageView(url: widget.booksModel.imageUrl)));
+                          Navigator.push(context, MaterialPageRoute(builder: (builder)=>ImageView(url: widget.clothesModel.imageUrl)));
                         },
                         child: Container(
                           padding: EdgeInsets.all(2),
@@ -72,7 +72,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                             ),
                           ),
                           child: CachedNetworkImage(
-                            imageUrl: widget.booksModel.imageUrl,
+                            imageUrl: widget.clothesModel.imageUrl,
                             fit: BoxFit.cover,
                             progressIndicatorBuilder:
                                 (context, url, downloadProgress) => Center(
@@ -98,7 +98,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                       ),
                       CustomText(
                         text:
-                        "I want to ${widget.booksModel.category} ${widget.booksModel.grade} Books",
+                        "Donated Clothes",
                         fontSize: ResponsiveText.getSize(context, 18),
                         isBold: true,
                       ),
@@ -110,57 +110,15 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                       buildIconTextRow(
                         Icons.access_time,
                         TimeFormater.timeAgo(
-                          widget.booksModel.createdAt.toString(),
+                          widget.clothesModel.createdAt.toString(),
                         ),
                         true,
                       ),
                       CustomText(
-                        text: widget.booksModel.description,
+                        text: widget.clothesModel.description,
                         fontSize: 14,
                       ),
-                      CustomText(
-                        text: "Total Subjects:",
-                        isBold: true,
-                        color: AppThemeClass.primary,
-                      ),
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(
-                            color: AppThemeClass.primary,
-                            width: 1.0,
-                          ),
-                        ),
-                        child: Wrap(
-                          spacing: 5.0,
-                          children: widget.booksModel.subjects.map((
-                              buttonText,
-                              ) {
-                            return OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(
-                                  width: 1,
-                                  color: AppThemeClass.primary,
-                                ),
-                              ),
-                              onPressed: () {},
-                              child: CustomText(text: buttonText),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      CustomText(
-                        text: "Institute:",
-                        isBold: true,
-                        color: AppThemeClass.primary,
-                      ),
-                      buildIconTextRow(
-                        Icons.house_outlined,
-                        widget.booksModel.board,
-                        true,
-                      ),
+
                       CustomText(
                         text: "Address:",
                         isBold: true,
@@ -168,19 +126,10 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                       ),
                       buildIconTextRow(
                         Icons.location_on,
-                        widget.booksModel.location,
+                        widget.clothesModel.location,
                         true,
                       ),
-                      CustomText(
-                        text: "Class:",
-                        isBold: true,
-                        color: AppThemeClass.primary,
-                      ),
-                      buildIconTextRow(
-                        Icons.school_outlined,
-                        widget.booksModel.grade,
-                        true,
-                      ),
+
                       Divider(color: AppThemeClass.primary),
                       CustomText(
                         text: "About User:",

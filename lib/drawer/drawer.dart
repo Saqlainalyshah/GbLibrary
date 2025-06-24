@@ -1,6 +1,5 @@
 import 'package:booksexchange/components/text_widget.dart';
-import 'package:booksexchange/controller/authentication/auth_providers.dart';
-import 'package:booksexchange/controller/firebase_crud_operations/user_profile_crud.dart';
+import 'package:booksexchange/controller/firebase_crud_operations/firestore_crud_operations.dart';
 import 'package:booksexchange/drawer/subscreens/privacy_policy.dart';
 import 'package:booksexchange/drawer/subscreens/terms_services.dart';
 import 'package:booksexchange/model/user_profile.dart';
@@ -9,6 +8,7 @@ import 'package:booksexchange/screens/user_actions/profile.dart';
 import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../controller/providers/global_providers.dart';
 import '../screens/user_actions/user_account_delete.dart';
 import '../screens/user_actions/user_logout.dart';
 import 'subscreens/faq.dart';
@@ -53,12 +53,46 @@ class DrawerWidget extends StatelessWidget {
                 ],
               ),
             ),
-
-            Divider(color: Theme.of(context).dividerColor),
-            ...List.generate(8, (index) {
+            Divider(color: AppThemeClass.primary),
+            Consumer(builder: (context,ref,child){
+              List<String> list=['Profile','My Posts'];
+              final user=ref.watch(userProfileProvider);
+              if(user!=null){
+                return ListView.builder(
+                  shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: list.length,
+                    itemBuilder: (context,index){
+                  return CustomListTile(
+                    onTap: () async{
+                      //Navigator.pop(context);
+                      if (index == 0) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (builder) => Profile()),
+                        );
+                      } else  {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (builder) => MyPosts()),
+                        );
+                      }
+                    },
+                    leadingIconColor: index == 0
+                        ? Colors.teal
+                        : Colors.redAccent,
+                    title: list[index],
+                    leadingIcon: index == 0
+                        ? Icons.person_pin
+                        : Icons.post_add,
+                  );
+                });
+              }else{
+                return SizedBox.shrink();
+              }
+            }),
+            ...List.generate(6, (index) {
               List<String> list1 = [
-                "Profile",
-                "My Posts",
                 "Account & Security",
                 "FAQ",
                 "Privacy Policy",
@@ -66,92 +100,65 @@ class DrawerWidget extends StatelessWidget {
                 "Share",
                 "Logout",
               ];
-              return Consumer(
-                builder:(context,ref,child)=> CustomListTile(
-                  onTap: () async{
-                    //Navigator.pop(context);
-                    if (index == 0) {
+              return CustomListTile(
+                onTap: () async{
+                  //Navigator.pop(context);
+                  if  (index == 0) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (builder) => AccountSecurity(),
+                      ),
+                    );
+                  } else if (index == 1) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (builder) => FAQScreen()),
+                    );
+                  } else if (index == 2) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (builder) => PrivacyPolicy()),
+                    );
+                  } else if (index == 3) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (builder) => TermsServices()),
+                    );
+                  }else if (index == 4) {
+                   /* Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (builder) => TermsServices()),
+                    );*/
+                  }
+                  else {
+                    showLogout(context);
+                  }
+                },
+                leadingIconColor: index == 0
+                    ? Colors.green
+                    : index == 1
+                    ? Colors.blueAccent
+                    : index == 2
+                    ? Colors.pinkAccent
+                    : index == 3
+                    ? Colors.deepPurple
+                    : index == 4
+                    ? Colors.orange
+                    : Colors.red,
 
-                      FirebaseService firebaseService=FirebaseService();
-                      final document=await firebaseService.getDoc('users', ref.read(userUIDProvider)!.uid);
-                      if(document!=null && document.exists){
-                        final data=UserProfile.fromJson(document.data()!);
-                       // print(data);
-                        ref.read(userData.notifier).state=data;
-                        ref.read(gender.notifier).state=data.gender;
-                      }
-
-                      if(context.mounted) {
-                       // ref.read(userData);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (builder) => Profile()),
-                        );
-                      }
-                    } else if (index == 1) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (builder) => MyPosts()),
-                      );
-                    } else if (index == 2) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (builder) => AccountSecurity(),
-                        ),
-                      );
-                    } else if (index == 3) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (builder) => FAQScreen()),
-                      );
-                    } else if (index == 4) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (builder) => PrivacyPolicy()),
-                      );
-                    } else if (index == 5) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (builder) => TermsServices()),
-                      );
-                    } else if (index == 7) {
-                      showLogout(context);
-                    }
-                  },
-                  leadingIconColor: index == 0
-                      ? Colors.teal
-                      : index == 1
-                      ? Colors.redAccent
-                      : index == 2
-                      ? Colors.green
-                      : index == 3
-                      ? Colors.blueAccent
-                      : index == 4
-                      ? Colors.pinkAccent
-                      : index == 5
-                      ? Colors.deepPurple
-                      : index == 6
-                      ? Colors.orange
-                      : Colors.red,
-
-                  title: list1[index],
-                  leadingIcon: index == 0
-                      ? Icons.person_pin
-                      : index == 1
-                      ? Icons.post_add
-                      : index == 2
-                      ? Icons.lock_clock
-                      : index == 3
-                      ? Icons.question_answer_outlined
-                      : index == 4
-                      ? Icons.privacy_tip
-                      : index == 5
-                      ? Icons.help
-                      : index == 6
-                      ? Icons.share
-                      : Icons.logout,
-                ),
+                title: list1[index],
+                leadingIcon: index == 0
+                    ? Icons.lock_clock
+                    : index == 1
+                    ? Icons.question_answer_outlined
+                    : index == 2
+                    ?Icons.privacy_tip
+                    : index == 3
+                    ?  Icons.help
+                    : index == 4
+                    ? Icons.share
+                    : Icons.logout,
               );
             }),
           ],

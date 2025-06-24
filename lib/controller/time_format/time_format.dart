@@ -23,4 +23,34 @@ class TimeFormater{
 
     return 'just now';
   }
+
+  static String formatIsoDate(String isoString) {
+    DateTime date = DateTime.parse(isoString);
+
+    const List<String> monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    String day = date.day.toString().padLeft(2, '0');
+    String month = monthNames[date.month - 1];
+    String year = date.year.toString();
+
+    return '$day/$month/$year';
+  }
+  static bool isLessThanTenMinutesAgo(String? timeString) {
+  if(timeString!=null){
+      final past = DateTime.parse(timeString);
+      final now = DateTime.now();
+      return now.difference(past).inMinutes < 10;
+
+  }else{
+    return false;
+  }
+  }
+  static String sortString(String input) {
+    List<String> characters = input.split('');
+    characters.sort();
+    return characters.join();
+  }
 }

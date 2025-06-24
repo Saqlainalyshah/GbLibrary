@@ -58,6 +58,8 @@ class FAQScreen extends StatelessWidget {
                  // print(index);
                   return Consumer(
                     builder: (context, ref, _) {
+                      
+
                       final isSelected=ref.watch(_selectedIndex.select((item)=>item==index));
                      // final isSelected=index==itemIndex;
                       print("build only single $index");
@@ -86,20 +88,24 @@ class FAQScreen extends StatelessWidget {
                 builder:(context,ref,child){
                   final len= ref.watch(faqProvider.select((p)=>p.filteredItems));
                   final len2= ref.watch(faqProvider.select((p)=>p.searchedList));
-                  print("outer");
+
+                  final list=controller.text.isNotEmpty?
+                  len2.length:
+                  len.length;
+
                   return ListView.separated(
                     shrinkWrap: true,
                     physics: BouncingScrollPhysics(),
-                    itemCount:controller.text.isNotEmpty?
-                   len2.length:
-                    len.length,
+                    itemCount:list,
                     padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
                     itemBuilder: (context,index){
                       print("Nested Item $index rebuild");
                       return Consumer(builder: (context,ref,child){
                         print("rebuild $index");
                        // final isRead = ref.watch(readStatusProvider(index));
-                        final item= ref.read(faqProvider.select((itemVal)=>itemVal.filteredItems[index]));
+                        final item= ref.watch(faqProvider.select((itemVal)=>itemVal.filteredItems[index]));
+
+
                         return GestureDetector(
                           key: ValueKey(index),
                           onTap: (){
@@ -232,12 +238,18 @@ class FAQNotifier extends StateNotifier<FilterList> {
   }
 
   void toggleIsReadByFilteredIndex(FAQ item, int index) {
+    final modifiedItem=item.copyWith(isRead: !item.isRead);
     final updatedItem = item.copyWith(isRead: !item.isRead);
     final updatedList = [...state.filteredItems];
     updatedList[index] = updatedItem;
     state = state.copyWith(filteredItems: updatedList);
   }
-
+ /* void toggleIsReadByFilteredIndex(int index) {
+    final updatedList = List<FAQ>.from(state.filteredItems);
+    final currentItem = updatedList[index];
+    updatedList[index] = currentItem.copyWith(isRead: !currentItem.isRead);
+    state = state.copyWith(filteredItems: updatedList);
+  }*/
 
   void filterListByCategory(String type) {
     state = state.copyWith(

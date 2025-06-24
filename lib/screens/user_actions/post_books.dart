@@ -1,10 +1,9 @@
 import 'dart:io';
-import 'package:booksexchange/controller/authentication/auth_providers.dart';
-import 'package:booksexchange/controller/firebase_crud_operations/user_profile_crud.dart';
+import 'package:booksexchange/controller/firebase_crud_operations/firestore_crud_operations.dart';
 import 'package:booksexchange/model/post_model.dart';
+import 'package:booksexchange/screens/user_actions/post_uniform_clothes.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../components/button.dart';
@@ -14,6 +13,7 @@ import '../../components/layout_components/small_components.dart';
 import '../../components/text_widget.dart';
 import '../../components/textfield.dart';
 import '../../controller/firebase_Storage/crud_storage.dart';
+import '../../controller/providers/global_providers.dart';
 import '../../model/ui_models.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
@@ -26,8 +26,9 @@ final _imageUrl=StateProvider.autoDispose<String?>((ref)=>null);
 final board=StateProvider.autoDispose<String?>((ref)=>null);
 
 class PostBooks extends StatelessWidget {
-   PostBooks({super.key, required this.isEdit});
+   PostBooks({super.key, required this.isEdit,  this.booksModel});
   final bool isEdit;
+  final BooksModel? booksModel;
    final TextEditingController location=TextEditingController();
    final TextEditingController description=TextEditingController();
 
@@ -50,8 +51,7 @@ class PostBooks extends StatelessWidget {
      }
    }
    Future<void> uploadPost(WidgetRef ref) async {
-     final fileName = '${ref.watch(userUIDProvider)!.uid}_${DateTime.now().millisecondsSinceEpoch}';
-    // final fileName = ref.watch(selectedImageProvider)!.path;
+     final fileName = '${ref.watch(userProfileProvider)!.uid}_${DateTime.now().millisecondsSinceEpoch}';
      final storageRef = FirebaseStorage.instance.ref().child('posts/books/$fileName');
      try {
        await storageRef.putFile(ref.watch(selectedImageProvider)!);
@@ -108,17 +108,7 @@ class PostBooks extends StatelessWidget {
                       );
                     }),
                   ),
-                  CustomText(text: "Select Class",isGoogleFont: true,color: AppThemeClass.primary,),
-                  Consumer(
-                    builder:(context,ref,child)=> CustomDropDown(value:  ref.watch(_grade),hintText: "Class",list: nameOfClassList, onChanged: (String? val ) {
-                      ref.read(_grade.notifier).state=val;
-                      print(ref.read(_grade));
-                    }, validator: (value) {
-                      if (value==null) return "Class is required";
-                      return null;
-                    },
-                    ),
-                  ),
+
                   CustomText(text: "Location",isGoogleFont: true,color: AppThemeClass.primary,),
                   CustomTextField(controller: location,hintText: "Noor Colony,Jutial Gilgit", validator: (value) {
                     if (value!.isEmpty) return "Address is required";
@@ -131,6 +121,18 @@ class PostBooks extends StatelessWidget {
                       if (value.length <50) return "Minimum character length is 50";
                       return null;
                     },
+                  ),
+
+                  CustomText(text: "Select Class",isGoogleFont: true,color: AppThemeClass.primary,),
+                  Consumer(
+                    builder:(context,ref,child)=> CustomDropDown(value:  ref.watch(_grade),hintText: "Class",list: nameOfClassList, onChanged: (String? val ) {
+                      ref.read(_grade.notifier).state=val;
+                      print(ref.read(_grade));
+                    }, validator: (value) {
+                      if (value==null) return "Class is required";
+                      return null;
+                    },
+                    ),
                   ),
                   CustomText(text: "Select Institutional Board",isGoogleFont: true,color: AppThemeClass.primary,),
                   Consumer(
@@ -165,8 +167,8 @@ class PostBooks extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 10,),
-                  CustomText(text: "Select Picture",isGoogleFont: true,color: AppThemeClass.primary,),
-                  Consumer(
+                  if(!isEdit)   CustomText(text: "Select Picture",isGoogleFont: true,color: AppThemeClass.primary,),
+                 if(!isEdit) Consumer(
                     builder:(context,ref,child){
                       final selectedImage=ref.watch(selectedImageProvider);
                       return GestureDetector(
@@ -188,7 +190,7 @@ class PostBooks extends StatelessWidget {
                       );
                     },
                   ),
-                  CustomText(text: "Only one image can be upload",isGoogleFont: true,fontSize: 9,color: AppThemeClass.primary,),
+                  if(!isEdit)   CustomText(text: "Only one image can be upload",isGoogleFont: true,fontSize: 9,color: AppThemeClass.primary,),
 
                   SizedBox(height: 10,),
                   isEdit==true? Row(
@@ -204,7 +206,7 @@ class PostBooks extends StatelessWidget {
 
                          uploadPost(ref).whenComplete((){
                            BooksModel book=BooksModel(
-                               userID: ref.watch(userUIDProvider)!.uid,
+                               userID: ref.watch(userProfileProvider)!.uid,
                                type: 'books',
                                category: ref.read(_category)!,
                                grade: ref.read(_grade)??'',
@@ -215,7 +217,7 @@ class PostBooks extends StatelessWidget {
                                imageUrl: ref.read(_imageUrl)??'',
                              createdAt: DateTime.now(),
                            );
-                          FirebaseService firestore=FirebaseService();
+                          FirebaseFireStoreServices firestore=FirebaseFireStoreServices();
                            firestore.createDocument('posts', book.toJson()).whenComplete((){
                            if(context.mounted){
                              Navigator.pop(context);

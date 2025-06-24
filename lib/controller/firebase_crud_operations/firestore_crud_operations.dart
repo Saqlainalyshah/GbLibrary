@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final firebaseCRUDProvider = Provider<FirebaseService>((ref) => FirebaseService());
+final firebaseCRUDProvider = Provider<FirebaseFireStoreServices>((ref) => FirebaseFireStoreServices());
 
-class FirebaseService {
+class FirebaseFireStoreServices {
   final _fireStore = FirebaseFirestore.instance;
 
   Future<bool> documentExists(String collectionPath, String docId) async {
@@ -16,16 +16,12 @@ class FirebaseService {
     }
   }
 
- /* updateArrayElements(String path, String id, String field, dynamic data) async {
-    if (data is List) {
-      await _fireStore.collection(path).doc(id).update({
-        field: FieldValue.arrayUnion(data)
-      });
-    } else if (data is Map<String, dynamic>) {
-      await _fireStore.collection(path).doc(id).update({
-        field: FieldValue.arrayUnion([data])
-      });
-    } else {
+  updateArrayElements(String path, String id, String field, Map<String,dynamic> data) async {
+    try{
+    await _fireStore.collection(path).doc(id).update({
+    field: FieldValue.arrayUnion([data])
+    });
+    }catch(e){
       throw ArgumentError('data must be either a List or a Map<String, dynamic>');
     }
   }
@@ -43,16 +39,16 @@ class FirebaseService {
       throw ArgumentError('data must be either a List or a Map<String, dynamic>');
     }
   }
-*/
-  Stream<QuerySnapshot<Map<String, dynamic>>> getDocuments(String collectionName) {
+  Stream<QuerySnapshot<Map<String, dynamic>>>? getDocuments(String collectionName) {
     return _fireStore.collection(collectionName).snapshots();
+
   }
 
-  Future<DocumentSnapshot<Map<String,dynamic>>?> getDoc(String collectionPath, String docId)async{
+  Future<Map<String,dynamic>?> getDoc(String collectionPath, String docId)async{
     try{
-      DocumentSnapshot<Map<String,dynamic>>? documentSnapshot= await _fireStore.collection(collectionPath).doc(docId).get();
-    if(documentSnapshot.exists){
-      return documentSnapshot;
+     final documentSnapshot= await _fireStore.collection(collectionPath).doc(docId).get();
+    if(documentSnapshot.data()!=null && documentSnapshot.exists){
+      return documentSnapshot.data();
     }else{
       return null;
     }
@@ -72,6 +68,7 @@ class FirebaseService {
       await _fireStore.collection(collectionPath).doc(id).set(data);
       return true;
     } catch (e) {
+      print("Error:$e");
       return false;
     }
   }
@@ -80,11 +77,12 @@ class FirebaseService {
       await _fireStore.collection(collectionPath).doc().set(data);
       return true;
     } catch (e) {
+      print("Error:$e");
       return false;
     }
   }
 
-  Future<bool> createSubCollectionDocument(String collectionPath, String subCollectionPath, String id, dynamic data) async {
+  Future<bool> createSubCollectionDocument(String collectionPath,String id,String subCollectionPath, dynamic data) async {
     try {
       await _fireStore.collection(collectionPath).doc(id).collection(subCollectionPath).add(data);
       return true;

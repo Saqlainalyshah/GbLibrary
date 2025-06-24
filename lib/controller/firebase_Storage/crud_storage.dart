@@ -24,8 +24,6 @@ class FirebaseStorageService {
         file.absolute.path,
         targetPath,
         quality: 80,
-        minHeight: 1080,
-        minWidth: 1080,
         //rotate: 180,
       );
       return result;
