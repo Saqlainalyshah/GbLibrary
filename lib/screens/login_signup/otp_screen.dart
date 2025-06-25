@@ -60,11 +60,11 @@ class OTPScreen extends StatelessWidget {
                   ),
                 ),
                 CustomButton( title: 'Verify Number', onPress: (){
-                  UiEventHandler.customAlertDialog(context, "Please wait! We're verifying your number", CircularProgressIndicator(color: AppThemeClass.primary,));
+                 /* UiEventHandler.customAlertDialog(context, "Please wait! We're verifying your number", CircularProgressIndicator(color: AppThemeClass.primary,));
                   Future.delayed(Duration(seconds: 2),(){
                     Navigator.pop(context);
                    // Navigator.push(context, MaterialPageRoute(builder: (builder)=>MainScreen()));
-                  });
+                  });*/
                 },),
 
               ],

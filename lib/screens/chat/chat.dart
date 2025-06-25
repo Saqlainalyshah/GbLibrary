@@ -91,7 +91,7 @@ final TextEditingController controller=TextEditingController();
                               isMe:isMe,
                               time: data[index].createdAt.toString(),
                               title: user.name,
-                                subTitle: data[index].lastMessageFrom==FirebaseAuth.instance.currentUser!.uid?data[index].lastMessage:data[index].lastMessage,
+                                subTitle: data[index].lastMessage,
                                 imageUrl: user.profilePicUrl,
                               function: (){
                               Navigator.push(context, MaterialPageRoute(builder: (builder)=>MessageRoom(userProfile: user)));

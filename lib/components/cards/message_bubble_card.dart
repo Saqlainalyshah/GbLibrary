@@ -24,22 +24,20 @@ class MessageBubble extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
-          spacing: 0,
+          spacing: 2,
           mainAxisAlignment: isMe? MainAxisAlignment.end:MainAxisAlignment.start,
           crossAxisAlignment:isMe? CrossAxisAlignment.end:CrossAxisAlignment.start,
           children: [
             !isMe? CircleAvatar(backgroundImage: NetworkImage(messageModel.userPic),):SizedBox.shrink(),
             Container(
-             constraints: BoxConstraints(
-               maxWidth: ResponsiveBox.getSize(context, 250),
+              constraints: BoxConstraints(
+                maxWidth: ResponsiveBox.getSize(context, 260),
               ),
-              padding: EdgeInsets.all(10),
-              width: ResponsiveBox.getSize(context, 250),
-              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+              padding: EdgeInsets.symmetric(horizontal: 15,vertical: 3),
               decoration: BoxDecoration(
                 color: isMe ? AppThemeClass.secondary:AppThemeClass.primary ,
                 borderRadius: BorderRadius.only(
-                  topLeft:  Radius.circular(!isMe?0:30) ,
+                  topLeft:  Radius.circular(isMe?30:0) ,
                   topRight:  Radius.circular(30),
                   bottomLeft: Radius.circular(30),
                   bottomRight:Radius.circular(isMe?0:30),
@@ -47,24 +45,29 @@ class MessageBubble extends StatelessWidget {
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   CustomText(text:
                   message,
-                    color: isMe ?  Colors.black:Colors.white ,fontSize: 15,
+                      color: isMe ?  Colors.black:Colors.white ,//fontSize: 15,
+                      //isBold: true,
+                      isGoogleFont:true
                   ),
                   SizedBox(height: 5), // Space for timestamp & ticks
                   Row(
                     spacing: 5,
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment:MainAxisAlignment.end,
                     children: [
                       CustomText(text:
                       TimeFormater.timeAgo(messageModel.createdAt.toString()), // Example timestamp
-                        fontSize: 12, color: index.isEven ?Colors.white70:Colors.black54,
+                        fontSize: 10, color: isMe ?AppThemeClass.primary:AppThemeClass.primaryOptional,
+                        isGoogleFont: true,
                       ),
-                      Icon(
+                      if(isMe) Icon(
                         Icons.done_all,
                         size: 16,
-                        color: isMe ? Colors.blueAccent:Colors.white70,
+                        color:  Colors.blueAccent,
                       ),
                     ],
                   ),

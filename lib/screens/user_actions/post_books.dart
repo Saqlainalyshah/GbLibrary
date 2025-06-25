@@ -17,23 +17,26 @@ import '../../controller/providers/global_providers.dart';
 import '../../model/ui_models.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
-final _subjectsList=StateProvider.autoDispose<List<String>>((ref)=>[]);
+final bookSubjectsList=StateProvider<List<String>>((ref)=>[]);
 final _item=StateProvider<String>((ref)=>'');
 final selectedImageProvider = StateProvider.autoDispose<File?>((ref) => null);
-final _grade=StateProvider.autoDispose<String?>((ref)=>null);
-final _category = StateProvider.autoDispose<String?>((ref)=>null);
+final bookGrade=StateProvider<String?>((ref)=>null);
+final bookCategory = StateProvider<String?>((ref)=>null);
 final _imageUrl=StateProvider.autoDispose<String?>((ref)=>null);
-final board=StateProvider.autoDispose<String?>((ref)=>null);
+final bookBoard=StateProvider<String?>((ref)=>null);
 
-class PostBooks extends StatelessWidget {
-   PostBooks({super.key, required this.isEdit,  this.booksModel});
+class PostBooks extends ConsumerStatefulWidget {
+   const PostBooks({super.key, required this.isEdit,  required this.booksWithIds});
   final bool isEdit;
-  final BooksModel? booksModel;
+  final BookIds booksWithIds;
+
+  @override
+  ConsumerState<PostBooks> createState() => _PostBooksState();
+}
+
+class _PostBooksState extends ConsumerState<PostBooks> {
    final TextEditingController location=TextEditingController();
    final TextEditingController description=TextEditingController();
-
-  //final List<String> type = ["Exchange", "Sell", "Donate"];
-
 
    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -50,6 +53,7 @@ class PostBooks extends StatelessWidget {
        }
      }
    }
+
    Future<void> uploadPost(WidgetRef ref) async {
      final fileName = '${ref.watch(userProfileProvider)!.uid}_${DateTime.now().millisecondsSinceEpoch}';
      final storageRef = FirebaseStorage.instance.ref().child('posts/books/$fileName');
@@ -64,6 +68,30 @@ class PostBooks extends StatelessWidget {
      }
    }
 
+   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    location.text=widget.booksWithIds.booksModel.location;
+    description.text=widget.booksWithIds.booksModel.description;
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    location.dispose();
+    description.dispose();
+  }
+
+  invalidate(){
+    location.clear();
+    description.clear();
+    ref.invalidate(selectedImageProvider);
+    ref.invalidate(bookBoard);
+    ref.invalidate(bookGrade);
+    ref.invalidate(bookCategory);
+    ref.invalidate(bookSubjectsList);
+  }
   @override
   Widget build(BuildContext context) {
     print("Create Post Rebuilds.....");
@@ -97,9 +125,9 @@ class PostBooks extends StatelessWidget {
                             return RadioListTile<String>(
                               activeColor: AppThemeClass.primary,
                               value: list[index],
-                              groupValue: ref.watch(_category.select((index)=>index)),
+                              groupValue: ref.watch(bookCategory.select((index)=>index)),
                               onChanged: (val) {
-                                ref.read(_category.notifier).state = val!;
+                                ref.read(bookCategory.notifier).state = val!;
                               },
                               title: CustomText(text: option),
                             );
@@ -125,9 +153,8 @@ class PostBooks extends StatelessWidget {
 
                   CustomText(text: "Select Class",isGoogleFont: true,color: AppThemeClass.primary,),
                   Consumer(
-                    builder:(context,ref,child)=> CustomDropDown(value:  ref.watch(_grade),hintText: "Class",list: nameOfClassList, onChanged: (String? val ) {
-                      ref.read(_grade.notifier).state=val;
-                      print(ref.read(_grade));
+                    builder:(context,ref,child)=> CustomDropDown(value:  ref.watch(bookGrade),hintText: "Class",list: nameOfClassList, onChanged: (String? val ) {
+                      ref.read(bookGrade.notifier).state=val;
                     }, validator: (value) {
                       if (value==null) return "Class is required";
                       return null;
@@ -136,8 +163,8 @@ class PostBooks extends StatelessWidget {
                   ),
                   CustomText(text: "Select Institutional Board",isGoogleFont: true,color: AppThemeClass.primary,),
                   Consumer(
-                    builder:(context,ref,child)=> CustomDropDown( value: ref.watch(board),hintText: "Board",list: list, onChanged: (String? val ) {
-                      ref.read(board.notifier).state=val!;
+                    builder:(context,ref,child)=> CustomDropDown( value: ref.watch(bookBoard),hintText: "Board",list: list, onChanged: (String? val ) {
+                      ref.read(bookBoard.notifier).state=val!;
                     },
                       validator: (value) {
                         if (value==null) return "Board is required";
@@ -167,8 +194,8 @@ class PostBooks extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 10,),
-                  if(!isEdit)   CustomText(text: "Select Picture",isGoogleFont: true,color: AppThemeClass.primary,),
-                 if(!isEdit) Consumer(
+                  if(!widget.isEdit)   CustomText(text: "Select Picture",isGoogleFont: true,color: AppThemeClass.primary,),
+                 if(!widget.isEdit) Consumer(
                     builder:(context,ref,child){
                       final selectedImage=ref.watch(selectedImageProvider);
                       return GestureDetector(
@@ -190,35 +217,77 @@ class PostBooks extends StatelessWidget {
                       );
                     },
                   ),
-                  if(!isEdit)   CustomText(text: "Only one image can be upload",isGoogleFont: true,fontSize: 9,color: AppThemeClass.primary,),
+                  if(!widget.isEdit)   CustomText(text: "Only one image can be upload",isGoogleFont: true,fontSize: 9,color: AppThemeClass.primary,),
 
                   SizedBox(height: 10,),
-                  isEdit==true? Row(
+                  widget.isEdit==true? Row(
                     spacing: 20,
                     children: [
-                      Flexible(child:CustomButton(onPress: (){},title: "Update",fontSize: 15,isBold: true,)),
-                      Flexible(child: CustomButton(onPress: (){},title: "Delete",fontSize: 15,isBold: true,))
+                      Flexible(child:CustomButton(onPress: (){
+
+                        if (_formKey.currentState!.validate() && ref.watch(bookCategory)!=null && ref.watch(bookSubjectsList).isNotEmpty ) {
+                          // UiEventHandler.customAlertDialog(context, "Please wait it will takes few seconds! Uploading...", CircularProgressIndicator(color: AppThemeClass.primary,));
+
+                          uploadPost(ref).whenComplete((){
+                            BooksModel book=BooksModel(
+                              userID: widget.booksWithIds.booksModel.userID,
+                              category: ref.read(bookCategory)!,
+                              type: 'books',
+                              grade: ref.read(bookGrade)??'',
+                              location: location.text,
+                              description: description.text,
+                              board: ref.read(bookBoard)??'',
+                              subjects: ref.read(bookSubjectsList),
+                              createdAt: DateTime.now(),
+                              imageUrl: widget.booksWithIds.booksModel.imageUrl,
+                            );
+                            FirebaseFireStoreServices instance=FirebaseFireStoreServices();
+                            instance.updateDocument('posts',widget.booksWithIds.docId,book.toJson()).whenComplete((){
+                              invalidate();
+                              if(context.mounted){
+                                Navigator.pop(context);
+                              }
+                            });
+                          });
+                          UiEventHandler.snackBarWidget(context, "Successfully updated");
+                        } else {
+                          UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
+                        }
+                      },title: "Update",fontSize: 15,isBold: true,)),
+                      Flexible(child: CustomButton(onPress: () async{
+                        FirebaseFireStoreServices instance=FirebaseFireStoreServices();
+                        FirebaseStorageService storage =FirebaseStorageService();
+                      bool result=await storage.deleteFile(widget.booksWithIds.booksModel.imageUrl);
+                      if(result){
+                        instance.deleteDocument('posts', widget.booksWithIds.docId).then((onValue){
+                          invalidate();
+                        });
+                      }
+                   if(context.mounted){
+                     Navigator.pop(context);
+                   }
+                      },title: "Delete",fontSize: 15,isBold: true,))
                     ],
                   ):Consumer(
                     builder:(context,ref,child)=> CustomButton(onPress: () {
-                      if (_formKey.currentState!.validate() && ref.watch(_category)!=null && ref.watch(_subjectsList).isNotEmpty && ref.watch(selectedImageProvider)!=null) {
-                       UiEventHandler.customAlertDialog(context, "Please wait it will takes few seconds! Uploading...", CircularProgressIndicator(color: AppThemeClass.primary,));
-
+                      if (_formKey.currentState!.validate() && ref.watch(bookCategory)!=null && ref.watch(bookSubjectsList).isNotEmpty && ref.watch(selectedImageProvider)!=null) {
+                      // UiEventHandler.customAlertDialog(context, "Please wait it will takes few seconds! Uploading...", CircularProgressIndicator(color: AppThemeClass.primary,));
                          uploadPost(ref).whenComplete((){
                            BooksModel book=BooksModel(
                                userID: ref.watch(userProfileProvider)!.uid,
                                type: 'books',
-                               category: ref.read(_category)!,
-                               grade: ref.read(_grade)??'',
+                               category: ref.read(bookCategory)!,
+                               grade: ref.read(bookGrade)??'',
                                location: location.text,
                                description: description.text,
-                               board: ref.read(board)??'',
-                               subjects: ref.read(_subjectsList),
+                               board: ref.read(bookBoard)??'',
+                               subjects: ref.read(bookSubjectsList),
                                imageUrl: ref.read(_imageUrl)??'',
                              createdAt: DateTime.now(),
                            );
                           FirebaseFireStoreServices firestore=FirebaseFireStoreServices();
                            firestore.createDocument('posts', book.toJson()).whenComplete((){
+                             invalidate();
                            if(context.mounted){
                              Navigator.pop(context);
                            }
@@ -246,7 +315,7 @@ class ButtonSubjects extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final item=ref.watch(_item);
     final isSelected = ref.watch(
-      _subjectsList.select((list) => list.contains(item)),
+      bookSubjectsList.select((list) => list.contains(item)),
     );
     print("Only $item was rebuilt");
     return OutlinedButton(
@@ -255,13 +324,13 @@ class ButtonSubjects extends ConsumerWidget {
         side: BorderSide(width: 1, color: AppThemeClass.primary),
       ),
       onPressed: () {
-        final list = [...ref.read(_subjectsList)];
+        final list = [...ref.read(bookSubjectsList)];
         if (isSelected) {
           list.remove(item);
         } else {
           list.add(item);
         }
-        ref.read(_subjectsList.notifier).state = list;
+        ref.read(bookSubjectsList.notifier).state = list;
       },
       child: CustomText(
         text: item,

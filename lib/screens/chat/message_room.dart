@@ -1,3 +1,5 @@
+import 'package:booksexchange/components/button.dart';
+import 'package:booksexchange/components/layout_components/alert_dialogue.dart';
 import 'package:booksexchange/controller/firebase_crud_operations/firestore_crud_operations.dart';
 import 'package:booksexchange/model/user_profile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -14,10 +16,7 @@ import '../../model/chat_model.dart';
 import '../../model/message_model.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
-final _messages = StreamProvider.family<List<MessageModel>, String>((
-  ref,
-  roomID,
-) {
+final _messages = StreamProvider.family<List<ChatIDs>, String>((ref, roomID) {
   final data = FirebaseFirestore.instance
       .collection('chats')
       .doc(roomID)
@@ -25,12 +24,38 @@ final _messages = StreamProvider.family<List<MessageModel>, String>((
       .orderBy('createdAt', descending: true)
       .snapshots()
       .map(
-        (snapshot) => snapshot.docs
-            .map((doc) => MessageModel.fromJson(doc.data()))
-            .toList(),
-      );
+        (snapshot) => snapshot.docs.map(
+          (doc) => ChatIDs(
+        messageModel: MessageModel.fromJson(doc.data()),
+        docId: doc.id,
+      ),
+    ).toList(),
+  );
   return data;
 });
+
+
+class ChatIDs {
+  final MessageModel messageModel;
+  final String docId;
+
+  ChatIDs({required this.messageModel, required this.docId});
+
+  factory ChatIDs.fromJson(Map<String, dynamic> json) {
+    return ChatIDs(
+      messageModel: MessageModel.fromJson(json['messageModel']),
+      docId: json['docId'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'messageModel': messageModel.toJson(),
+      'docId': docId,
+    };
+  }
+}
+
 
 class MessageRoom extends ConsumerStatefulWidget {
   const MessageRoom({super.key, required this.userProfile});
@@ -78,8 +103,12 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
             icon: Icon(Icons.arrow_back_ios),
           ),
           title: ListTile(
-            leading: CachedNetworkImage(
-              imageUrl: widget.userProfile.profilePicUrl,
+            leading: ClipOval(
+              child: CachedNetworkImage(
+                fit: BoxFit.cover,
+                filterQuality: FilterQuality.high,
+                imageUrl: widget.userProfile.profilePicUrl,
+              ),
             ),
             title: CustomText(
               text: widget.userProfile.name,
@@ -109,13 +138,31 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                           padding: EdgeInsets.symmetric(vertical: 10),
                           itemCount: data.length,
                           itemBuilder: (context, index) {
-                            return MessageBubble(
-                              messageModel: data[index],
-                              index: index,
-                              message: data[index].message,
-                              isMe:
-                                  data[index].userId ==
-                                  FirebaseAuth.instance.currentUser!.uid,
+                            return GestureDetector(
+                              onLongPress: (){
+                                String id = FirebaseAuth.instance.currentUser!.uid+widget.userProfile.uid;
+                                final roomID = TimeFormater.sortString(id);
+                               bool isMyMessage= data[index].messageModel.userId ==
+                                    FirebaseAuth.instance.currentUser!.uid;
+                               if(isMyMessage){
+                                 UiEventHandler.customAlertDialog(context, "Do you want to delete this message?",data[index].messageModel.message,'Delete','Cancel',()async {
+                                   FirebaseFireStoreServices instance=FirebaseFireStoreServices();
+                                   await instance.deleteDocument('chats/$roomID/messages', data[index].docId);
+                                   if(context.mounted){
+                                     Navigator.pop(context);
+                                   }
+                                 }
+                                 );
+                               }
+                              },
+                              child: MessageBubble(
+                                messageModel: data[index].messageModel,
+                                index: index,
+                                message: data[index].messageModel.message,
+                                isMe:
+                                    data[index].messageModel.userId ==
+                                    FirebaseAuth.instance.currentUser!.uid,
+                              ),
                             );
                           },
                         ),
@@ -194,8 +241,6 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                                 .watch(userProfileProvider)!
                                 .profilePicUrl,
                           );
-                          print(chatRoomModel.toJson());
-                          print(messageModel.toJson());
                           FirebaseFireStoreServices firestore =
                               FirebaseFireStoreServices();
                           // print(chatRoomModel.toJson());

@@ -114,19 +114,78 @@ final uniformFeedProvider = StreamProvider<List<ClothesModel>>((ref) {
 });
 
 
-final myBooksPosts = StreamProvider<List<BooksModel>>((ref) {
+/*final myBooksPosts = StreamProvider<List<BookIds>>((ref) {
   return FirebaseFirestore.instance
       .collection('posts')
-      .where('userID', isNotEqualTo:FirebaseAuth.instance.currentUser!.uid)
+      .where('userID', isEqualTo:FirebaseAuth.instance.currentUser!.uid)
       .snapshots()
       .map((snapshot) {
     return snapshot.docs.map((doc) {
       final data = doc.data();
-      return BooksModel.fromJson(data);
+      return BookIds.fromJson(data);
     }).toList();
   });
+});*/
+final myBooksPosts = StreamProvider<List<BookIds>>((ref) {
+  final data = FirebaseFirestore.instance
+      .collection('posts')
+      .where('userID', isEqualTo:FirebaseAuth.instance.currentUser!.uid)
+      .snapshots()
+      .map(
+        (snapshot) => snapshot.docs.map(
+          (doc) => BookIds(
+        booksModel: BooksModel.fromJson(doc.data()),
+        docId: doc.id,
+      ),
+    ).toList(),
+  );
+  return data;
 });
-final myClothesPosts = StreamProvider<List<ClothesModel>>((ref) {
+
+
+class BookIds {
+  final BooksModel booksModel;
+  final String docId;
+
+  BookIds({required this.booksModel, required this.docId});
+
+  factory BookIds.fromJson(Map<String, dynamic> json) {
+    return BookIds(
+      booksModel: BooksModel.fromJson(json['booksModel']),
+      docId: json['docId'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'booksModel': booksModel.toJson(),
+      'docId': docId,
+    };
+  }
+}
+
+class ClothesIds {
+  final ClothesModel clothesModel;
+  final String docId;
+
+  ClothesIds({required this.clothesModel, required this.docId});
+
+  factory ClothesIds.fromJson(Map<String, dynamic> json) {
+    return ClothesIds(
+      clothesModel: ClothesModel.fromJson(json['clothesModel']),
+      docId: json['docId'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'clothesModel': clothesModel.toJson(),
+      'docId': docId,
+    };
+  }
+}
+
+final myClothesPosts = StreamProvider<List<ClothesIds>>((ref) {
   return FirebaseFirestore.instance
       .collection('clothes')
       .where('userID', isNotEqualTo:FirebaseAuth.instance.currentUser!.uid)
@@ -134,7 +193,7 @@ final myClothesPosts = StreamProvider<List<ClothesModel>>((ref) {
       .map((snapshot) {
     return snapshot.docs.map((doc) {
       final data = doc.data();
-      return ClothesModel.fromJson(data);
+      return ClothesIds.fromJson(data);
     }).toList();
   });
 });

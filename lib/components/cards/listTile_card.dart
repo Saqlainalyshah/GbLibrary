@@ -46,10 +46,9 @@ final String title;
               alignment: Alignment.bottomRight,
               children: [
                 ClipOval(
-
                 child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: imageUrl,
-                  width: ResponsiveBox.getSize(context, 80),
-                  height:  ResponsiveBox.getSize(context, 80),
+                  width: ResponsiveBox.getSize(context, 60),
+                  height:  ResponsiveBox.getSize(context, 60),
                   progressIndicatorBuilder: (context, url, downloadProgress) =>
                       Center(
                         child: SizedBox(
@@ -70,8 +69,8 @@ final String title;
                     right: 10,
                     bottom: 5,
                     child: Container(
-                      height: 10,
-                      width: 10,
+                      height: 15,
+                      width: 15,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: AppThemeClass.primary,
@@ -80,7 +79,74 @@ final String title;
                   )
               ],
             ),
-            Expanded(
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                spacing: 5,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                   // mainAxisSize: MainAxisSize.min,
+                    spacing: 5,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: CustomText(
+                          text: isError ? "gblibrayuser" : title,
+                          maxLines: 1,
+                          fontSize: 15,
+                          isBold: true,
+                          //isGoogleFont: true,
+                        ),
+                      ),
+                   if(time!=null)   CustomText(text: TimeFormater.timeAgo(time!.toString()), maxLines: 1,fontSize: 10,isGoogleFont: true,color: AppThemeClass.primary,),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                   // mainAxisSize: MainAxisSize.min,
+                    spacing: 5,
+                    children: [
+                      Flexible(
+                        child: RichText(
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          text: TextSpan(
+                            children: [
+                              if(isMe)TextSpan(
+                                text: '$hint: ',
+                                style: GoogleFonts.robotoSerif(
+                                  color: AppThemeClass.primary,
+                                  letterSpacing: 0,
+                                  fontSize: ResponsiveText.getSize(context, 13),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              TextSpan(
+                                text: subTitle,
+                                style: GoogleFonts.robotoSerif(
+                                  color: AppThemeClass.darkTextOptional,
+                                  letterSpacing: 0,
+                                  fontSize: ResponsiveText.getSize(context, 13),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      if (time != null)  Icon(Icons.done_all,color: isMe?Colors.black26:Colors.blue),
+
+                    ],
+                  )
+                ],
+              ),
+            ),
+          )
+
+           /* Expanded(
               child: Padding(
               //  color: Colors.black,
                 padding: const EdgeInsets.only(top: 15.0, left: 5),
@@ -124,7 +190,6 @@ final String title;
                         ],
                       ),
                     ),
-
                   ],
                 ),
               ),
@@ -137,7 +202,7 @@ final String title;
                 Icon(Icons.done_all,color: isMe?Colors.black26:Colors.blue),
                 CustomText(text: TimeFormater.timeAgo(time!.toString()), maxLines: 1,fontSize: 10,isGoogleFont: true,color: AppThemeClass.primary,),
               ],),
-            SizedBox(width: 3,),
+            SizedBox(width: 3,),*/
 
           ],
         ),

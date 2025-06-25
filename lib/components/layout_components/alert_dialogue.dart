@@ -18,7 +18,7 @@ class UiEventHandler{
     );
   }
 
-  static customAlertDialog(BuildContext context, String title,Widget widget,) {
+  static customAlertDialog(BuildContext context, String title,String message, String primaryButton,String secondaryButton, Function primary,) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -27,14 +27,53 @@ class UiEventHandler{
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
           elevation: 10,
           // content: Text("Please wait verification is in process"),
-          content: Column(
+          content:  Column(
             mainAxisSize: MainAxisSize.min,
-            spacing: 20,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            //  spacing: 10,
             children: [
-              CustomText(text: title,fontSize: 14,),
-              widget,
+              CustomText(text: title,fontSize: 14,color: AppThemeClass.primary,isBold: true,),
+              CustomText(text: message,maxLines: 1,),
+              Row(
+                spacing: 25,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                      onTap: (){
+                        Navigator.pop(context);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: CustomText(text: "Cancel",isBold: true,fontSize: 15,color: AppThemeClass.primary,),
+                      )),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor:  AppThemeClass.primary ,
+                      side: BorderSide(width: 1, color: AppThemeClass.primary),
+                    ),
+                    onPressed: () {
+                      primary();
+                    },
+                    child: CustomText(
+                        text: primaryButton,
+                        color: AppThemeClass.whiteText
+                    ),
+                  ),
+                ],
+              )
+
             ],
           ),
+
+          /*Column(
+            mainAxisSize: MainAxisSize.min,
+           crossAxisAlignment: CrossAxisAlignment.start,
+           // spacing: 20,
+            children: [
+
+
+            ],
+          ),*/
         );
       },
     );

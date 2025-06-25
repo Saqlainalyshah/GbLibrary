@@ -30,13 +30,17 @@ void showLogout(BuildContext context) {
                Consumer(
                  builder:(context,ref,child)=>InkWell(
                      onTap: ()async{
+                       Navigator.pop(context);
                        AuthRepository auth=AuthRepository();
+
+                       ref.invalidate(userProfileProvider);
+                       ref.invalidate(getUserDocument);
+                       ref.invalidate(getUserDocument);
+                       ref.invalidate(myBooksPosts);
+                       ref.invalidate(myClothesPosts);
+                       ref.invalidate(booksFeedProvider);
                        await auth.signOut().whenComplete((){
-                         ref.invalidate(userProfileProvider);
-                         ref.invalidate(getUserDocument);
-                         if(context.mounted){
-                           Navigator.pop(context);
-                         }
+
                        });
                      },
                      child: Padding(

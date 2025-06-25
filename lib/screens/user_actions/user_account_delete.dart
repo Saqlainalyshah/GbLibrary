@@ -70,7 +70,7 @@ void _showLogout(BuildContext context) {
                   builder:(context,ref,child)=>InkWell(
                       onTap: (){
                         Navigator.pop(context);
-                        UiEventHandler.customAlertDialog(context, "Deleting Account...", CircularProgressIndicator(color: AppThemeClass.primary,));
+                       // UiEventHandler.customAlertDialog(context, "Deleting Account...", CircularProgressIndicator(color: AppThemeClass.primary,));
                         //final result=
                         AuthRepository auth=AuthRepository();
                         auth.deleteAccount().whenComplete((){

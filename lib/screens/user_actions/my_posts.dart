@@ -2,7 +2,9 @@ import 'package:booksexchange/components/layout_components/small_components.dart
 import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/controller/providers/global_providers.dart';
 import 'package:booksexchange/model/post_model.dart';
+import 'package:booksexchange/screens/home/image_view.dart';
 import 'package:booksexchange/screens/user_actions/post_books.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
@@ -51,7 +53,7 @@ class _MyPostsState extends ConsumerState<MyPosts> {
                     ),
                     itemBuilder: (context,index){
                       final post=data[index];
-                      return  GridItem(booksModel: post,);
+                      return  GridItem(booksWithIds: post,);
                     }
 
                 ),
@@ -71,9 +73,9 @@ class _MyPostsState extends ConsumerState<MyPosts> {
 }
 
 class GridItem extends StatelessWidget {
-  const GridItem({super.key,required this.booksModel});
+  const GridItem({super.key,required this.booksWithIds});
 
-  final BooksModel booksModel;
+  final BookIds booksWithIds;
   @override
   Widget build(BuildContext context) {
       return Container(
@@ -91,42 +93,61 @@ class GridItem extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Expanded(
-
-              child: Image.asset(
-                width: double.infinity,
-                booksModel.imageUrl,
-                fit: BoxFit.cover,
-                //width: double.infinity,
+              child:  GestureDetector(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (builder)=>ImageView(url:  booksWithIds.booksModel.imageUrl)));
+                },
+                child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: booksWithIds.booksModel.imageUrl,width: double.infinity,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      Center(
+                        child: SizedBox(
+                          height: 50,
+                          width: 50,
+                          //margin: const EdgeInsets.all(20.0),
+                          child: CircularProgressIndicator(
+                              value: downloadProgress.progress,
+                              color: AppThemeClass.primary
+                          ),
+                        ),
+                      ),
+                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                ),
               ),
             ),
          Column(
            crossAxisAlignment: CrossAxisAlignment.start,
            mainAxisSize: MainAxisSize.min,
            children: [
-             CustomText(text: "I want to ${booksModel.category} books", isGoogleFont: true,isBold: true,fontSize: 13,maxLines: 2,),
+             CustomText(text: "I want to ${ booksWithIds.booksModel.category} books", isGoogleFont: true,isBold: true,fontSize: 13,maxLines: 2,),
              Flexible(
                child: CustomText(
-                 text: booksModel.description,
+                 text:  booksWithIds.booksModel.description,
                  fontSize: 10,
                  maxLines: 2,
                  isGoogleFont: true,
                ),
              ),
-             OutlinedButton(
-               style: OutlinedButton.styleFrom(
-                 shape: RoundedRectangleBorder(
-                   borderRadius: BorderRadius.circular(8),
+             Consumer(
+               builder:(context,ref,child)=> OutlinedButton(
+                 style: OutlinedButton.styleFrom(
+                   shape: RoundedRectangleBorder(
+                     borderRadius: BorderRadius.circular(8),
+                   ),
+                   backgroundColor: AppThemeClass.primary,
+                   side: BorderSide(width: 1, color: AppThemeClass.primary),
                  ),
-                 backgroundColor: AppThemeClass.primary,
-                 side: BorderSide(width: 1, color: AppThemeClass.primary),
-               ),
-               onPressed: () {
-                 Navigator.push(context,MaterialPageRoute(builder: (builder)=> PostBooks(isEdit: true,booksModel: booksModel,)));
-               },
-               child: CustomText(
-                 text: "Edit",
-                 isBold: true,
-                 color: AppThemeClass.whiteText,
+                 onPressed: () {
+                   ref.read(bookSubjectsList.notifier).state= booksWithIds.booksModel.subjects;
+                   ref.read(bookCategory.notifier).state= booksWithIds.booksModel.category;
+                   ref.read(bookGrade.notifier).state= booksWithIds.booksModel.grade;
+                   ref.read(bookBoard.notifier).state= booksWithIds.booksModel.board;
+                   Navigator.push(context,MaterialPageRoute(builder: (builder)=> PostBooks(isEdit: true,booksWithIds:  booksWithIds,)));
+                 },
+                 child: CustomText(
+                   text: "Edit",
+                   isBold: true,
+                   color: AppThemeClass.whiteText,
+                 ),
                ),
              ),
            ],
