@@ -15,16 +15,24 @@ import '../../model/post_model.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
 
-final _size = StateProvider.autoDispose<String?>((ref)=>null);
-final _category=StateProvider.autoDispose<String?>((ref)=>null);
+final uniformSize = StateProvider<String?>((ref)=>null);
+final isSchoolUniform=StateProvider<String?>((ref)=>null);
 final selectedUniformImageProvider = StateProvider.autoDispose<File?>((ref) => null);
 
-class UniformClothesScreen extends StatelessWidget {
-  UniformClothesScreen({super.key});
-  final TextEditingController description=TextEditingController();
-  final TextEditingController location=TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+class UniformClothesScreen extends ConsumerStatefulWidget {
+ const  UniformClothesScreen({super.key,required this.clothesIds,required this.isEdit});
+final ClothesIds clothesIds;
+final bool isEdit;
+  @override
+  ConsumerState<UniformClothesScreen> createState() => _UniformClothesScreenState();
+}
 
+class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
+  final TextEditingController description=TextEditingController();
+
+  final TextEditingController location=TextEditingController();
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   Future<String?> _upload(WidgetRef ref) async{
     try{
@@ -36,6 +44,7 @@ class UniformClothesScreen extends StatelessWidget {
       return null;
     }
   }
+
   Future<void> imagePickAndCompressed(WidgetRef ref) async{
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -48,10 +57,30 @@ class UniformClothesScreen extends StatelessWidget {
       }
     }
   }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    location.text=widget.clothesIds.clothesModel.location;
+    description.text=widget.clothesIds.clothesModel.description;
+  }
 
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    location.dispose();
+    description.dispose();
+  }
+
+  invalidate(){
+    location.clear();
+    description.clear();
+    ref.invalidate(selectedUniformImageProvider);
+    ref.invalidate(isSchoolUniform);
+    ref.invalidate(uniformSize);
+  }
   //final List<String> type = ["Exchange", "Sell", "Donate"];
-
-
   @override
   Widget build(BuildContext context) {
 
@@ -79,12 +108,18 @@ class UniformClothesScreen extends StatelessWidget {
                 Consumer(
                     builder:(context,ref,child)=>  buildRadioButtons(
                       options: ["S", "M","L","XL"],
-                      selectedOption: ref.watch(_size)??'',
+                      selectedOption: ref.watch(uniformSize)??'',
                       onChanged: (newValue) {
-                        ref.read(_size.notifier).state=newValue;
+                        ref.read(uniformSize.notifier).state=newValue;
                       },
                     )
                 ),
+                CustomText(text: "Location",isGoogleFont: true,color: AppThemeClass.primary,),
+                CustomTextField(controller: location,hintText: "Noor Colony,Jutial Gilgit",
+                  validator: (value) {
+                    if (value!.isEmpty) return "Address is required";
+                    return null;
+                  },),
                 CustomText(text: "Description",isGoogleFont: true,color: AppThemeClass.primary,),
                 CustomTextField(controller: description,hintText:  "I want to exchange my books.....",maxLines:  4,
                   validator: (value) {
@@ -93,27 +128,21 @@ class UniformClothesScreen extends StatelessWidget {
                     return null;
                   },
                 ),
-                CustomText(text: "Location",isGoogleFont: true,color: AppThemeClass.primary,),
-                CustomTextField(controller: location,hintText: "Noor Colony,Jutial Gilgit",
-                  validator: (value) {
-                    if (value!.isEmpty) return "Address is required";
-                    return null;
-                  },),
                 CustomText(text: "Is this school uniform?",isGoogleFont: true,color: AppThemeClass.primary,),
                 Consumer(
                   builder:(context,ref,child)=> buildRadioButtons(
                     options: ["Yes","No"],
-                    selectedOption: ref.watch(_category)??'',
+                    selectedOption: ref.watch(isSchoolUniform)??'',
                     onChanged: (newValue) {
-                      ref.read(_category.notifier).state=newValue;
+                      ref.read(isSchoolUniform.notifier).state=newValue;
                     },
                   ),
                 ),
                 /*  CustomText(text: "Select Institutional Board",isBold: true,),
                     customDropdownField(value: list[0], itemsList: list, onChanged: (String? val ) {
                     }),*/
-                CustomText(text: "Select Picture",isGoogleFont: true,color: AppThemeClass.primary,),
-                Consumer(
+             if(!widget.isEdit)   CustomText(text: "Select Picture",isGoogleFont: true,color: AppThemeClass.primary,),
+                if(!widget.isEdit)    Consumer(
                   builder:(context,ref,child){
                     final selectedImage=ref.watch(selectedUniformImageProvider);
                     print(selectedImage);
@@ -137,33 +166,80 @@ class UniformClothesScreen extends StatelessWidget {
                     );
                   },
                 ),
-                CustomText(text: "Only one image can be upload",isGoogleFont: true,fontSize: 9,color: AppThemeClass.primary,),
+                if(!widget.isEdit)   CustomText(text: "Only one image can be upload",isGoogleFont: true,fontSize: 9,color: AppThemeClass.primary,),
 
                 SizedBox(height: 10,),Consumer(
                   builder:(context,ref,child)=> CustomButton(onPress: () {
                     Navigator.push(context, MaterialPageRoute(builder: (builder)=>UniformClothes()));
-                    /*
-                    if (_formKey.currentState!.validate() && ref.watch(_category)!=null && ref.watch(_size)!=null && ref.watch(selectedUniformImageProvider)!=null) {
-                      UiEventHandler.customAlertDialog(context, "Please wait it will takes few seconds! Uploading...", CircularProgressIndicator(color: AppThemeClass.primary,));
+
+                  },title: "Post",fontSize: 15,isBold: true,),
+                ),
+                widget.isEdit==true? Row(
+                  spacing: 20,
+                  children: [
+                    Flexible(child:CustomButton(onPress: (){
+                      if (_formKey.currentState!.validate() && ref.watch(isSchoolUniform)!=null && ref.watch(uniformSize)!=null) {
+                        ClothesModel clothe=ClothesModel(
+                          userID: widget.clothesIds.clothesModel.userID,
+                          type: 'outfits',
+                          size: ref.watch(uniformSize)??'M',
+                          isSchoolUniform: ref.watch(isSchoolUniform)??'Yes',
+                          location: location.text,
+                          description: description.text,
+                          imageUrl: widget.clothesIds.clothesModel.imageUrl,
+                          createdAt: DateTime.now(),
+                        );
+                        FirebaseFireStoreServices instance=FirebaseFireStoreServices();
+                        instance.updateDocument('outfits', widget.clothesIds.docId,clothe.toJson()).whenComplete((){
+                          if(context.mounted){
+                            invalidate();
+                            Navigator.pop(context);
+                            //  Navigator.pop(context);
+                            UiEventHandler.snackBarWidget(context, "Successfully updated");
+                          }
+                        });
+
+                      } else {
+                        UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
+                      }
+                    },title: "Update",fontSize: 15,isBold: true,)),
+                    Flexible(child: CustomButton(onPress: () async{
+                      FirebaseFireStoreServices instance=FirebaseFireStoreServices();
+                      FirebaseStorageService storage =FirebaseStorageService();
+                      bool result=await storage.deleteFile(widget.clothesIds.clothesModel.imageUrl);
+                      if(result){
+                        instance.deleteDocument('clothes', widget.clothesIds.docId).then((onValue){
+                          invalidate();
+                        });
+                      }
+                      if(context.mounted){
+                        Navigator.pop(context);
+                      }
+                    },title: "Delete",fontSize: 15,isBold: true,))
+                  ],
+                ):Consumer(
+                  builder:(context,ref,child)=> CustomButton(onPress: () {
+                    if (_formKey.currentState!.validate() && ref.watch(isSchoolUniform)!=null && ref.watch(uniformSize)!=null && ref.watch(selectedUniformImageProvider)!=null) {
+
                       _upload(ref).then((val){
                         if(val!=null){
                           ClothesModel clothe=ClothesModel(
                             userID: ref.watch(userProfileProvider)!.uid,
                             type: 'outfits',
-                            size: ref.watch(_size)??'M',
-                            isSchoolUniform: ref.watch(_category)??'Yes',
+                            size: ref.watch(uniformSize)??'M',
+                            isSchoolUniform: ref.watch(isSchoolUniform)??'Yes',
                             location: location.text,
                             description: description.text,
                             imageUrl: val,
                             createdAt: DateTime.now(),
                           );
-                          FirebaseFireStoreServices firestore=FirebaseFireStoreServices();
-                          firestore.createDocument('outfits', clothe.toJson()).whenComplete((){
+                          FirebaseFireStoreServices instance=FirebaseFireStoreServices();
+                          instance.createDocument('outfits', clothe.toJson()).whenComplete((){
                             if(context.mounted){
                               Navigator.pop(context);
                               description.clear();
                               location.clear();
-                            //  Navigator.pop(context);
+                              //  Navigator.pop(context);
                               UiEventHandler.snackBarWidget(context, "Successfully updated");
                             }
 
@@ -173,9 +249,9 @@ class UniformClothesScreen extends StatelessWidget {
 
                     } else {
                       UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
-                    }*/
+                    }
                   },title: "Post",fontSize: 15,isBold: true,),
-                )
+                ),
               ],
             ),
           ),

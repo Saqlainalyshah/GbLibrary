@@ -4,10 +4,19 @@ import 'package:booksexchange/controller/providers/global_providers.dart';
 import 'package:booksexchange/model/post_model.dart';
 import 'package:booksexchange/screens/home/image_view.dart';
 import 'package:booksexchange/screens/user_actions/post_books.dart';
+import 'package:booksexchange/screens/user_actions/post_uniform_clothes.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
+import 'package:booksexchange/components/layout_components/small_components.dart';
+import 'package:booksexchange/components/text_widget.dart';
+import 'package:booksexchange/controller/providers/global_providers.dart';
+import 'package:booksexchange/model/post_model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../utils/fontsize/app_theme/theme.dart';
+
 class MyPosts extends ConsumerStatefulWidget {
   const MyPosts({super.key});
 
@@ -16,66 +25,160 @@ class MyPosts extends ConsumerStatefulWidget {
 }
 
 class _MyPostsState extends ConsumerState<MyPosts> {
-//final _index= StateProvider.autoDispose<int>((ref)=>0);
-
-@override
+  @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     ref.read(myBooksPosts);
+    // You can fetch clothes posts too if needed
+     ref.read(myClothesPosts);
   }
+
   @override
   Widget build(BuildContext context) {
-    print("MyPosts rebuild");
     return SafeArea(
-        top: false,
+      top: false,
+      child: DefaultTabController(
+        length: 2,
         child: Scaffold(
           backgroundColor: AppThemeClass.whiteText,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-           surfaceTintColor: Colors.transparent,
-           leading: buildCustomBackButton(context),
-            title: CustomText(text: "My Posts",isBold: true,fontSize: 20,),
+            surfaceTintColor: Colors.transparent,
+            leading: buildCustomBackButton(context),
+            title: const CustomText(
+              text: "My Posts",
+              isBold: true,
+              fontSize: 20,
+            ),
+            bottom: const TabBar(
+              labelColor: Colors.black,
+              indicatorColor: AppThemeClass.primary,
+              labelStyle: TextStyle(fontWeight: FontWeight.bold),
+              tabs: [
+                Tab(text: "Books"),
+                Tab(text: "Clothes"),
+              ],
+            ),
           ),
-          body:   Consumer(builder: (context,ref,child){
-            final myPosts=ref.watch(myBooksPosts);
-          return  myPosts.when(data: (data){
-            if(data.isNotEmpty){
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: GridView.builder(
-                    itemCount: data.length,
-                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 300,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
-                        childAspectRatio: 0.6
-                    ),
-                    itemBuilder: (context,index){
-                      final post=data[index];
-                      return  GridItem(booksWithIds: post,);
+          body: TabBarView(
+            children: [
+              /// Tab 1: Books
+              Consumer(builder: (context, ref, _) {
+                final myPosts = ref.watch(myBooksPosts);
+                return myPosts.when(
+                  data: (data) {
+                    if (data.isEmpty) {
+                      return const Center(
+                          child: CustomText(
+                              text: "No Book Posts",
+                              isGoogleFont: true,
+                              isBold: true));
                     }
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GridView.builder(
+                        itemCount: data.length,
+                        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 300,
+                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 10,
+                          childAspectRatio: 0.6,
+                        ),
+                        itemBuilder: (context, index) {
+                          final post = data[index];
+                          return GridItem(title: 'I want to ${post.booksModel.category} ${post.booksModel.grade} Books',
+                            description: post.booksModel.description, imageUrl: post.booksModel.imageUrl, function: (){
+                              ref.read(bookSubjectsList.notifier).state= post.booksModel.subjects;
+                              ref.read(bookCategory.notifier).state= post.booksModel.category;
+                              ref.read(bookGrade.notifier).state= post.booksModel.grade;
+                              ref.read(bookBoard.notifier).state= post.booksModel.board;
+                              Navigator.push(context,MaterialPageRoute(builder: (builder)=> PostBooks(isEdit: true,booksWithIds:  post,)));
+                            },);
+                        },
+                      ),
+                    );
+                  },
+                  error: (error, _) => Center(
+                      child: CustomText(
+                          text: "Error: $error",
+                          isGoogleFont: true,
+                          isBold: true)),
+                  loading: () => const Center(
+                      child: CircularProgressIndicator(
+                          color: AppThemeClass.primary)),
+                );
+              }),
 
-                ),
-              );
-            }else{
-              return Center(child: CustomText(text: "No Posts",isGoogleFont: true,isBold: true,),);
-            }
-          },
-              error: (error,track){
-                return Center(child: CustomText(text: "Error: $error",isGoogleFont: true,isBold: true,),);
-              },
-              loading: ()=>Center(child: CircularProgressIndicator(color: AppThemeClass.primary,),)
-          );
-          }),
-    ));
+              /// Tab 2: Clothes (Placeholder or another provider)
+              Consumer(builder: (context, ref, _) {
+                final myPosts = ref.watch(myClothesPosts);
+                return myPosts.when(
+                  data: (data) {
+                    if (data.isEmpty) {
+                      return const Center(
+                          child: CustomText(
+                              text: "No Book Posts",
+                              isGoogleFont: true,
+                              isBold: true));
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GridView.builder(
+                        itemCount: data.length,
+                        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 300,
+                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 10,
+                          childAspectRatio: 0.6,
+                        ),
+                        itemBuilder: (context, index) {
+                          final post = data[index];
+                          bool isTrue=post.clothesModel.isSchoolUniform=='Yes';
+                          return GridItem(  title: isTrue?'Donate School Uniform':'Donated Clothes', description: post.clothesModel.description,
+                            imageUrl: post.clothesModel.imageUrl, function: (){
+                              ref.read(uniformSize.notifier).state= post.clothesModel.size;
+                              ref.read(isSchoolUniform.notifier).state=  post.clothesModel.isSchoolUniform;
+                              Navigator.push(context,MaterialPageRoute(builder: (builder)=> UniformClothesScreen(isEdit: true,clothesIds:  post,)));
+                            },);
+                        },
+                      ),
+                    );
+                  },
+                  error: (error, _) => Center(
+                      child: CustomText(
+                          text: "Error: $error",
+                          isGoogleFont: true,
+                          isBold: true)),
+                  loading: () => const Center(
+                      child: CircularProgressIndicator(
+                          color: AppThemeClass.primary)),
+                );
+              }),
+              // You can replace this with another Consumer + provider like:
+              // Consumer(builder: (context, ref, _) {
+              //   final clothesPosts = ref.watch(myClothesPosts);
+              //   return ...
+              // })
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
 class GridItem extends StatelessWidget {
-  const GridItem({super.key,required this.booksWithIds});
+  const GridItem({super.key,
+    required this.title,
+    required this.description,
+    required this.imageUrl,
+    required this.function
+  });
+final String title;
+final String description;
+final String imageUrl;
+final Function function;
 
-  final BookIds booksWithIds;
   @override
   Widget build(BuildContext context) {
       return Container(
@@ -95,9 +198,9 @@ class GridItem extends StatelessWidget {
             Expanded(
               child:  GestureDetector(
                 onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (builder)=>ImageView(url:  booksWithIds.booksModel.imageUrl)));
+                  Navigator.push(context, MaterialPageRoute(builder: (builder)=>ImageView(url:  imageUrl)));
                 },
-                child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: booksWithIds.booksModel.imageUrl,width: double.infinity,
+                child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: imageUrl,width: double.infinity,
                   progressIndicatorBuilder: (context, url, downloadProgress) =>
                       Center(
                         child: SizedBox(
@@ -118,10 +221,10 @@ class GridItem extends StatelessWidget {
            crossAxisAlignment: CrossAxisAlignment.start,
            mainAxisSize: MainAxisSize.min,
            children: [
-             CustomText(text: "I want to ${ booksWithIds.booksModel.category} books", isGoogleFont: true,isBold: true,fontSize: 13,maxLines: 2,),
+             CustomText(text: title, isGoogleFont: true,isBold: true,fontSize: 13,maxLines: 2,),
              Flexible(
                child: CustomText(
-                 text:  booksWithIds.booksModel.description,
+                 text: description,
                  fontSize: 10,
                  maxLines: 2,
                  isGoogleFont: true,
@@ -137,11 +240,7 @@ class GridItem extends StatelessWidget {
                    side: BorderSide(width: 1, color: AppThemeClass.primary),
                  ),
                  onPressed: () {
-                   ref.read(bookSubjectsList.notifier).state= booksWithIds.booksModel.subjects;
-                   ref.read(bookCategory.notifier).state= booksWithIds.booksModel.category;
-                   ref.read(bookGrade.notifier).state= booksWithIds.booksModel.grade;
-                   ref.read(bookBoard.notifier).state= booksWithIds.booksModel.board;
-                   Navigator.push(context,MaterialPageRoute(builder: (builder)=> PostBooks(isEdit: true,booksWithIds:  booksWithIds,)));
+                function();
                  },
                  child: CustomText(
                    text: "Edit",

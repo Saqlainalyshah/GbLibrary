@@ -186,14 +186,16 @@ class ClothesIds {
 }
 
 final myClothesPosts = StreamProvider<List<ClothesIds>>((ref) {
-  return FirebaseFirestore.instance
+  final data = FirebaseFirestore.instance
       .collection('clothes')
-      .where('userID', isNotEqualTo:FirebaseAuth.instance.currentUser!.uid)
+      .where('userID', isEqualTo:FirebaseAuth.instance.currentUser!.uid)
       .snapshots()
-      .map((snapshot) {
-    return snapshot.docs.map((doc) {
-      final data = doc.data();
-      return ClothesIds.fromJson(data);
-    }).toList();
-  });
+      .map(
+        (snapshot) => snapshot.docs.map(
+          (doc) => ClothesIds(
+        docId: doc.id, clothesModel:ClothesModel.fromJson(doc.data())
+      ),
+    ).toList(),
+  );
+  return data;
 });

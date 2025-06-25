@@ -10,22 +10,25 @@ import 'components/textfield.dart';
 import 'controller/authentication/auth_checker.dart';
 
 void main()async {
-  /*await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );*/
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
   runApp(
       ProviderScope(
-    child: MaterialApp(
-      debugShowCheckedModeBanner: false,
-     // home:  Login(),
-      home: AuthChecker(),
-    ),
+    child: MyApp()
   ));
 }
 
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      // home:  Login(),
+      home: AuthChecker(),
+    );
+  }
+}
 
 

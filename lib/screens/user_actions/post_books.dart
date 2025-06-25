@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tflite_flutter/tflite_flutter.dart';
 import '../../components/button.dart';
 import '../../components/drop_down.dart';
 import '../../components/layout_components/alert_dialogue.dart';
@@ -16,6 +17,30 @@ import '../../controller/firebase_Storage/crud_storage.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../model/ui_models.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
+
+import 'package:image/image.dart' as img;
+import 'dart:math'; // Import for max function
+
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/services.dart' show rootBundle;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 final bookSubjectsList=StateProvider<List<String>>((ref)=>[]);
 final _item=StateProvider<String>((ref)=>'');
@@ -82,8 +107,10 @@ class _PostBooksState extends ConsumerState<PostBooks> {
     location.dispose();
     description.dispose();
   }
+   late Interpreter _interpreter;
 
-  invalidate(){
+
+   invalidate(){
     location.clear();
     description.clear();
     ref.invalidate(selectedImageProvider);
@@ -92,6 +119,11 @@ class _PostBooksState extends ConsumerState<PostBooks> {
     ref.invalidate(bookCategory);
     ref.invalidate(bookSubjectsList);
   }
+  /// model function
+
+
+
+  ///build function
   @override
   Widget build(BuildContext context) {
     print("Create Post Rebuilds.....");
@@ -335,6 +367,179 @@ class ButtonSubjects extends ConsumerWidget {
       child: CustomText(
         text: item,
         color: isSelected ? AppThemeClass.whiteText : AppThemeClass.darkText,
+      ),
+    );
+  }
+}
+
+
+
+
+
+class BookDetector extends StatefulWidget {
+  @override
+  _BookDetectorState createState() => _BookDetectorState();
+}
+
+class _BookDetectorState extends State<BookDetector> {
+  late Interpreter _interpreter;
+  List<int> _inputShape = [1, 640, 640, 3]; // Assuming YOLOv8 input size
+  List<int> _outputShape = [1, 8, 8400]; // Assuming YOLOv8 output size
+  final picker = ImagePicker();
+  String _resultText = 'Select an image to begin.';
+
+  // 🔧 Set this to the label index of the "book" class
+  // You'll need to know the index of the 'book' class from your dataset's labels.txt or data.yaml
+  // If your dataset has only one class (book), the index is likely 0.
+  final int bookClassIndex = 0; // ← Update based on your training
+
+  // Adjust confidence threshold as needed
+  final double confidenceThreshold = 0.5;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadModel();
+  }
+
+  Future<void> _loadModel() async {
+    try {
+      _interpreter = await Interpreter.fromAsset('assets/model/best_float32.tflite');
+      _inputShape = _interpreter.getInputTensor(0).shape;
+      _outputShape = _interpreter.getOutputTensor(0).shape;
+      print('Model loaded successfully with input shape: $_inputShape and output shape: $_outputShape');
+      setState(() {});
+    } catch (e) {
+      print('Failed to load model: $e');
+      setState(() {
+        _resultText = 'Error loading model: $e';
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _interpreter.close();
+    super.dispose();
+  }
+
+  Future<void> _pickImageAndDetect() async {
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+
+    final file = File(picked.path);
+    setState(() {
+      _resultText = 'Detecting...';
+    });
+    final result = await detectBook(file);
+
+    setState(() {
+      _resultText = result ? 'Book detected 📚' : 'No book detected ❌';
+    });
+  }
+
+  Future<bool> detectBook(File imageFile) async {
+    final imgBytes = await imageFile.readAsBytes();
+    final image = img.decodeImage(imgBytes);
+    if (image == null) {
+      print("Invalid image file.");
+      return false;
+    }
+
+
+    final width = _inputShape[1];
+    final height = _inputShape[2];
+
+    // Resize image to model's input size
+    final resized = img.copyResize(image, width: width, height: height);
+
+    // Prepare input tensor
+    final input = Float32List(1 * width * height * 3);
+    final buffer = Float32List.view(input.buffer);
+
+    int pixelIndex = 0;
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        final pixel = resized.getPixel(x, y);
+        // Assuming RGB format, normalize pixel values to [0, 1]
+        buffer[pixelIndex++] = pixel.r / 255.0;
+        buffer[pixelIndex++] = pixel.g / 255.0;
+        buffer[pixelIndex++] = pixel.b / 255.0;
+      }
+    }
+
+    // Prepare output tensor (assuming [1, 8, 8400])
+    // You might need to adjust the output shape based on your model's actual output
+    var output = List.filled(_outputShape.reduce((a, b) => a * b), 0).reshape(_outputShape);
+
+
+    // Run inference
+    _interpreter.run(input.buffer, output);
+
+    // Process the output to check for detections
+    // Assuming the output structure is [1, 8, 8400] where 8 contains box + class scores
+    // and class scores start from index 4
+
+    // Transpose the output for easier processing [1, 8400, 8]
+    List<List<List<double>>> transposedOutput = List.generate(
+      output.length,
+          (batchIndex) => List.generate(
+        output[batchIndex][0].length,
+            (predictionIndex) => List.generate(
+          output[batchIndex].length,
+              (paramIndex) => output[batchIndex][paramIndex][predictionIndex].toDouble(),
+        ),
+      ),
+    );
+
+
+    for (var prediction in transposedOutput[0]) {
+      // Check the confidence score for the book class
+      // Assuming class scores start at index 4 and bookClassIndex is the index within those scores
+      if (bookClassIndex >= 0 && bookClassIndex < (prediction.length - 4)) {
+        if (prediction[4 + bookClassIndex] > confidenceThreshold) {
+          // Book detected
+          return true;
+        }
+      } else {
+        print('Warning: bookClassIndex ($bookClassIndex) is out of bounds for prediction output.');
+      }
+    }
+
+    // No book detected above the confidence threshold
+    return false;
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Book Detector'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                _resultText,
+                style: TextStyle(fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            ElevatedButton(
+              onPressed: _loadModel, // Option to reload model
+              child: Text('Reload Model'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _pickImageAndDetect,
+              child: Text('Pick Image and Detect Book'),
+            ),
+          ],
+        ),
       ),
     );
   }
