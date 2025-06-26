@@ -14,6 +14,7 @@ sealed class ChatRoomModel with _$ChatRoomModel {
    @Default([]) List<UserProfile> users,
     required DateTime createdAt,
     @Default('') String lastMessage,
+    @Default(false) bool isRead,
     @Default('') String lastMessageFrom,
   }) = _ChatRoomModel;
   factory ChatRoomModel.fromJson(Map<String, dynamic> json) => _$ChatRoomModelFromJson(json);

@@ -48,7 +48,7 @@ class CustomListTile extends StatelessWidget {
         ),
       )
           : leadingWidget,
-      title: Text(
+      title: CustomText(text: 
         title,
 
       ),

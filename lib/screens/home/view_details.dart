@@ -97,8 +97,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                         color: AppThemeClass.primary,
                       ),
                       CustomText(
-                        text:
-                        "I want to ${widget.booksModel.category} ${widget.booksModel.grade} Books",
+                        text: widget.booksModel.category=="Exchange"? "I want to ${widget.booksModel.category} ${widget.booksModel.grade} Books":'I am donating ${widget.booksModel.grade} Books',
                         fontSize: ResponsiveText.getSize(context, 18),
                         isBold: true,
                       ),

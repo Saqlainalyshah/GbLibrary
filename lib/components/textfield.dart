@@ -21,6 +21,7 @@ class CustomTextField extends StatelessWidget {
     this.isRead=false,
     this.hintText = " ",
     this.isBorder = false,
+    this.isExpanded=false,
     this.onChanged,
     this.counterText,
     this.trailingFn,
@@ -33,6 +34,7 @@ class CustomTextField extends StatelessWidget {
   final int? maxLength;
   final String? counterText;
   final bool isRead;
+  final bool isExpanded;
   final bool isBorder;
   final bool isPhone;
   final String hintText;
@@ -57,7 +59,10 @@ class CustomTextField extends StatelessWidget {
       readOnly: isRead,
       onChanged: onChanged,
       maxLines: maxLines,
+      expands: isExpanded,
+
       style: GoogleFonts.robotoSerif(
+        letterSpacing: -0.4
        // color: color,
         //fontSize: ResponsiveText.getSize(context, fontSize),
         //fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
@@ -92,7 +97,6 @@ class CustomTextField extends StatelessWidget {
 
         filled: true,
         fillColor: fillColor,
-
         prefixIcon: leadingIcon == null
             ? null
             : Icon(leadingIcon, color: AppThemeClass.primary, size: 25.0),
@@ -106,7 +110,6 @@ class CustomTextField extends StatelessWidget {
           child: Icon(trailingIcon, color: AppThemeClass.primary, size: 25.0),
         ) : null,
         hintText: hintText,
-
         hintStyle:GoogleFonts.robotoSerif(color: AppThemeClass.darkTextOptional,fontSize: 13),
       ),
     );

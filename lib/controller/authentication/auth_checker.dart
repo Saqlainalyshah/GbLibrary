@@ -10,6 +10,7 @@ class AuthChecker extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print(" AuthChecker run time:${DateTime.now()}");
     final authState = ref.watch(currentUserAuthStatus);
     return authState.when(
       data: (user) {

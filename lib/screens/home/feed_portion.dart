@@ -31,8 +31,9 @@ class FeedPortion extends ConsumerWidget {
                     padding: EdgeInsets.all(5),
                     itemBuilder: (context,index){
                      // print("index");
+                      final type=bookPosts[index].category;
                       return PostCard(
-                        title: "I want to ${bookPosts[index].category} ${bookPosts[index].grade}",
+                        title: type=="Exchange"? "I want to ${bookPosts[index].category} ${bookPosts[index].grade} Books":'I am donating ${bookPosts[index].grade} Books',
                         category: bookPosts[index].category,
                         grade: bookPosts[index].grade,
                         board: bookPosts[index].board,

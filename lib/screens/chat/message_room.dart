@@ -16,7 +16,7 @@ import '../../model/chat_model.dart';
 import '../../model/message_model.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
-final _messages = StreamProvider.family<List<ChatIDs>, String>((ref, roomID) {
+final _messages = StreamProvider.family<List<MessagesIDs>, String>((ref, roomID) {
   final data = FirebaseFirestore.instance
       .collection('chats')
       .doc(roomID)
@@ -25,7 +25,7 @@ final _messages = StreamProvider.family<List<ChatIDs>, String>((ref, roomID) {
       .snapshots()
       .map(
         (snapshot) => snapshot.docs.map(
-          (doc) => ChatIDs(
+          (doc) => MessagesIDs(
         messageModel: MessageModel.fromJson(doc.data()),
         docId: doc.id,
       ),
@@ -35,14 +35,14 @@ final _messages = StreamProvider.family<List<ChatIDs>, String>((ref, roomID) {
 });
 
 
-class ChatIDs {
+class MessagesIDs {
   final MessageModel messageModel;
   final String docId;
 
-  ChatIDs({required this.messageModel, required this.docId});
+  MessagesIDs({required this.messageModel, required this.docId});
 
-  factory ChatIDs.fromJson(Map<String, dynamic> json) {
-    return ChatIDs(
+  factory MessagesIDs.fromJson(Map<String, dynamic> json) {
+    return MessagesIDs(
       messageModel: MessageModel.fromJson(json['messageModel']),
       docId: json['docId'],
     );
@@ -151,7 +151,7 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                                    if(context.mounted){
                                      Navigator.pop(context);
                                    }
-                                 }
+                                 },false
                                  );
                                }
                               },
@@ -189,7 +189,7 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                       ),
                     );
                   },
-                  loading: () => Center(child: CircularProgressIndicator()),
+                  loading: () => Expanded(child: Center(child: CircularProgressIndicator())),
                 );
               },
             ),
@@ -219,6 +219,7 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                               ref.watch(userProfileProvider)!,
                               widget.userProfile,
                             ],
+                            isRead: false,
                             createdAt: DateTime.now(),
                             participants: [
                               ref.watch(userProfileProvider)!.uid,
@@ -241,25 +242,24 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                                 .watch(userProfileProvider)!
                                 .profilePicUrl,
                           );
-                          FirebaseFireStoreServices firestore =
+                          FirebaseFireStoreServices instance =
                               FirebaseFireStoreServices();
                           // print(chatRoomModel.toJson());
                           controller.clear();
-                          firestore
+                          instance
                               .createDocumentWithId(
                                 'chats',
                                 roomID,
                                 chatRoomModel.toJson(),
                               )
                               .then((onValue) {
-                                firestore
+                            instance
                                     .createSubCollectionDocument(
                                       'chats',
                                       roomID,
                                       'messages',
                                       messageModel.toJson(),
-                                    )
-                                    .then((onValue) {});
+                                    );
                               });
                         },
                         icon: Icon(

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../components/text_widget.dart';
 import '../../../utils/fontsize/app_theme/theme.dart';
 import '../../controller/authentication/auth_repository.dart';
-import '../../controller/providers/global_providers.dart';
 
 /// Alert dialogue to user logout action
 void showLogout(BuildContext context) {
@@ -32,15 +31,7 @@ void showLogout(BuildContext context) {
                      onTap: ()async{
                        Navigator.pop(context);
                        AuthRepository auth=AuthRepository();
-
-                       ref.invalidate(userProfileProvider);
-                       ref.invalidate(getUserDocument);
-                       ref.invalidate(getUserDocument);
-                       ref.invalidate(myBooksPosts);
-                       ref.invalidate(myClothesPosts);
-                       ref.invalidate(booksFeedProvider);
                        await auth.signOut().whenComplete((){
-
                        });
                      },
                      child: Padding(

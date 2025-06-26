@@ -138,15 +138,11 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                     },
                   ),
                 ),
-                /*  CustomText(text: "Select Institutional Board",isBold: true,),
-                    customDropdownField(value: list[0], itemsList: list, onChanged: (String? val ) {
-                    }),*/
+
              if(!widget.isEdit)   CustomText(text: "Select Picture",isGoogleFont: true,color: AppThemeClass.primary,),
                 if(!widget.isEdit)    Consumer(
                   builder:(context,ref,child){
                     final selectedImage=ref.watch(selectedUniformImageProvider);
-                    print(selectedImage);
-
                     return GestureDetector(
                       onTap: ()=>imagePickAndCompressed(ref),
                       child: Container(
@@ -167,13 +163,28 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                   },
                 ),
                 if(!widget.isEdit)   CustomText(text: "Only one image can be upload",isGoogleFont: true,fontSize: 9,color: AppThemeClass.primary,),
-
-                SizedBox(height: 10,),Consumer(
-                  builder:(context,ref,child)=> CustomButton(onPress: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (builder)=>UniformClothes()));
-
-                  },title: "Post",fontSize: 15,isBold: true,),
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Note:',
+                        style: TextStyle(color: Colors.red, fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                            letterSpacing: -0.5),
+                      ),
+                      TextSpan(
+                        text: 'You cannot edit image once image uploaded!',
+                        style: TextStyle(
+                          color: AppThemeClass.primary,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                          letterSpacing: -0.5
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                SizedBox(height: 10,),
                 widget.isEdit==true? Row(
                   spacing: 20,
                   children: [
@@ -208,7 +219,7 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                       FirebaseStorageService storage =FirebaseStorageService();
                       bool result=await storage.deleteFile(widget.clothesIds.clothesModel.imageUrl);
                       if(result){
-                        instance.deleteDocument('clothes', widget.clothesIds.docId).then((onValue){
+                        instance.deleteDocument('outfits', widget.clothesIds.docId).then((onValue){
                           invalidate();
                         });
                       }

@@ -14,11 +14,15 @@ class ListTileCard extends StatelessWidget {
      this.time,
     this.isError=false,
     this.isMe=false,
+    this.isIcon=false,
+    this.newMessage=false,
     this.hint='You',
     this.function});
 
   final bool isMe;
 final String title;
+final bool isIcon;
+final bool newMessage;
   final String subTitle;
   final String imageUrl;
   final String? time;
@@ -64,18 +68,23 @@ final String title;
                   errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
                 ),
               ),
-                if (time!=null &&TimeFormater.isLessThanTenMinutesAgo(time))
+                if (isIcon && !isMe && TimeFormater.isLessThanTenMinutesAgo(time))
                   Positioned(
-                    right: 10,
+                    right: 5,
                     bottom: 5,
-                    child: Container(
-                      height: 15,
-                      width: 15,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppThemeClass.primary,
+                    child: Material(
+                      elevation: 4.0, // Adjust the elevation value as needed
+                      shape: CircleBorder(), // Ensures the material maintains circular shape
+                      color: Colors.transparent, // Keep the container's original color
+                      child: Container(
+                        height: 10,
+                        width: 10,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppThemeClass.primary,
+                        ),
                       ),
-                    ),
+                    )
                   )
               ],
             ),
@@ -127,7 +136,7 @@ final String title;
                               TextSpan(
                                 text: subTitle,
                                 style: GoogleFonts.robotoSerif(
-                                  color: AppThemeClass.darkTextOptional,
+                                  color:  isMe?AppThemeClass.darkTextOptional: newMessage ?AppThemeClass.darkTextOptional:AppThemeClass.primary,
                                   letterSpacing: 0,
                                   fontSize: ResponsiveText.getSize(context, 13),
                                   fontWeight: FontWeight.w500,
@@ -137,7 +146,22 @@ final String title;
                           ),
                         ),
                       ),
-                      if (time != null)  Icon(Icons.done_all,color: isMe?Colors.black26:Colors.blue),
+
+                      if (isIcon && isMe)  Icon(Icons.done_all,color: newMessage?Colors.blue:AppThemeClass.darkTextOptional),
+                      if(isIcon && !isMe &&!newMessage) Material(
+                        elevation: 4.0, // Adjust the elevation value as needed
+                        shape: CircleBorder(), // Ensures the material maintains circular shape
+                        color: Colors.transparent, // Keep the container's original color
+                        child: Container(
+                          padding: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppThemeClass.primary,
+                          ),
+                          child: CustomText(text: 1.toString(),isBold: true,color: AppThemeClass.whiteText,),
+                        ),
+                        
+                      )
 
                     ],
                   )

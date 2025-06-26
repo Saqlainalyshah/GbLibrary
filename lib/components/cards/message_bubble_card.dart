@@ -51,7 +51,7 @@ class MessageBubble extends StatelessWidget {
                   message,
                       color: isMe ?  Colors.black:Colors.white ,//fontSize: 15,
                       //isBold: true,
-                      isGoogleFont:true
+                      //isGoogleFont:true
                   ),
                   SizedBox(height: 5), // Space for timestamp & ticks
                   Row(

@@ -35,15 +35,17 @@ class CustomText extends StatelessWidget {
 
           ?GoogleFonts.robotoSerif(
               color: color,
-             letterSpacing: 0,
+             letterSpacing: -0.4,
               fontSize: fontSize!=null? ResponsiveText.getSize(context, fontSize??12):null,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w300,
             )
           : TextStyle(
-              letterSpacing: 0,
+
+       // fontSize: 12,
+               letterSpacing: -0.4,
               color: color,
               fontSize:fontSize!=null? ResponsiveText.getSize(context, fontSize??12):null,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
             ),
     );
   }

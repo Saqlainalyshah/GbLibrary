@@ -3,11 +3,13 @@ import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/model/post_model.dart';
 import 'package:booksexchange/screens/home/feed_portion.dart';
 import 'package:booksexchange/screens/home/uniform_feed.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../drawer/drawer.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
+import '../account/account.dart';
 import '../chat/chat.dart';
 import '../home/post_item.dart';
 import '../user_actions/post_books.dart';
@@ -31,10 +33,12 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   void initState() {
     // TODO: implement initState
     ref.read(getUserDocument);
+    ref.read(chats);
     ref.read(booksFeedProvider);
     ref.read(myBooksPosts);
     ref.read(myClothesPosts);
     ref.read(uniformFeedProvider);
+    ref.read(messageCountProvider);
 
     super.initState();
   }
@@ -44,7 +48,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     const UniformFeed(),
     const PostItem(),
     const ChatScreen(),
-     BookDetector(),
+    const AccountPage(),
   ];
 
   @override
@@ -70,46 +74,78 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           index: ref.watch(_bottomNavigationIndex),
           children: screens,
         ),
-        bottomNavigationBar: Container(
-                decoration: BoxDecoration(
-                color: AppThemeClass.whiteText, // Match your bottom bar background
-        boxShadow: [
-          BoxShadow(
-            color: AppThemeClass.primary.withOpacity(0.5), // or any subtle shadow color
-            blurRadius: 5,
-            offset: const Offset(0, -1), // Shadow appears above the bar
+        bottomNavigationBar: Stack(
+          alignment: Alignment.topRight,
+          children: [
+            Container(
+            padding: EdgeInsets.zero,
+                  decoration: BoxDecoration(
+                  color: AppThemeClass.whiteText, // Match your bottom bar background
+          boxShadow: [
+            BoxShadow(
+              color: AppThemeClass.primary.withOpacity(0.5), // or any subtle shadow color
+              blurRadius: 5,
+              offset: const Offset(0, -1), // Shadow appears above the bar
+            ),
+          ],
+                  ),
+                  child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: AppThemeClass.whiteText, // Needed to avoid transparency
+          selectedItemColor: AppThemeClass.primary,
+          unselectedItemColor: AppThemeClass.darkText,
+          unselectedIconTheme: IconThemeData(color: AppThemeClass.darkTextOptional),
+          currentIndex: ref.watch(_bottomNavigationIndex),
+          selectedIconTheme: const IconThemeData(size: 30),
+          showUnselectedLabels: true,
+          selectedLabelStyle: const TextStyle(
+            letterSpacing: -0.5,
+            fontWeight: FontWeight.bold,
           ),
-        ],
+          unselectedLabelStyle: const TextStyle(
+            letterSpacing: -0.5,
+            fontWeight: FontWeight.w500,
+          ),
+          onTap: (index) {
+            ref.read(_bottomNavigationIndex.notifier).state = index;
+          },
+          items:  [
+           const BottomNavigationBarItem(label: "Books", icon: Icon(Icons.feed)),
+            const BottomNavigationBarItem(label: "Clothes", icon: Icon(Icons.groups)),
+            const BottomNavigationBarItem(label: "Post", icon: Icon(Icons.add_circle)),
+            BottomNavigationBarItem(label: "Chat", icon:    Icon(Icons.chat,),
+            ),
+            const BottomNavigationBarItem(label: "Model", icon: Icon(Icons.model_training)),
+          ],
+                  ),
                 ),
-                child: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: AppThemeClass.whiteText, // Needed to avoid transparency
-        selectedItemColor: AppThemeClass.primary,
-        unselectedItemColor: AppThemeClass.darkText,
-        unselectedIconTheme: IconThemeData(color: AppThemeClass.darkTextOptional),
-        currentIndex: ref.watch(_bottomNavigationIndex),
-        selectedIconTheme: const IconThemeData(size: 30),
-        showUnselectedLabels: true,
-        selectedLabelStyle: const TextStyle(
-          letterSpacing: -0.5,
-          fontWeight: FontWeight.bold,
+            Consumer(builder:(context,ref,child){
+              if(ref.watch(messageCountProvider)>0){
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 100),
+                  child: Material(
+                    elevation: 4.0, // Adjust the elevation value as needed
+                    shape: CircleBorder(), // Ensures the material maintains circular shape
+                    color: Colors.transparent, // Keep the container's original color
+                    child: Container(
+                      padding: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppThemeClass.primary,
+                      ),
+                      child: CustomText(text: ref.watch(messageCountProvider).toString(),isBold: true,color:AppThemeClass.whiteText,),
+                    ),
+
+                  ),
+                );
+              }else{
+                return SizedBox.shrink();
+              }
+            }
+            )
+
+          ],
         ),
-        unselectedLabelStyle: const TextStyle(
-          letterSpacing: -0.5,
-          fontWeight: FontWeight.w500,
-        ),
-        onTap: (index) {
-          ref.read(_bottomNavigationIndex.notifier).state = index;
-        },
-        items: const [
-          BottomNavigationBarItem(label: "Books", icon: Icon(Icons.feed)),
-          BottomNavigationBarItem(label: "Clothes", icon: Icon(Icons.groups)),
-          BottomNavigationBarItem(label: "Post", icon: Icon(Icons.add_circle)),
-          BottomNavigationBarItem(label: "Chat", icon: Icon(Icons.chat)),
-          BottomNavigationBarItem(label: "Model", icon: Icon(Icons.model_training)),
-        ],
-                ),
-              ),
 
       ),
     );

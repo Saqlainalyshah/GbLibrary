@@ -93,8 +93,10 @@ class BuildPostColumn extends StatelessWidget {
         CustomText(
           text: title,
           isBold: true,
+          //isGoogleFont: true,
           //overflow: TextOverflow.ellipsis,
-          fontSize:14,
+          fontSize:18,
+          color: AppThemeClass.primary,
           maxLines: 1,
         ),
 

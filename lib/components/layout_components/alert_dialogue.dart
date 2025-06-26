@@ -18,7 +18,7 @@ class UiEventHandler{
     );
   }
 
-  static customAlertDialog(BuildContext context, String title,String message, String primaryButton,String secondaryButton, Function primary,) {
+  static customAlertDialog(BuildContext context, String title,String message, String primaryButton,String secondaryButton, Function primary,bool isCircle) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -33,8 +33,8 @@ class UiEventHandler{
             //  spacing: 10,
             children: [
               CustomText(text: title,fontSize: 14,color: AppThemeClass.primary,isBold: true,),
-              CustomText(text: message,maxLines: 1,),
-              Row(
+             isCircle? CircularProgressIndicator(color: AppThemeClass.primary,): CustomText(text: message,maxLines: 1,),
+             if(!isCircle) Row(
                 spacing: 25,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [

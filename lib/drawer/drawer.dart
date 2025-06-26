@@ -1,16 +1,15 @@
+import 'package:booksexchange/components/layout_components/alert_dialogue.dart';
 import 'package:booksexchange/components/text_widget.dart';
-import 'package:booksexchange/controller/firebase_crud_operations/firestore_crud_operations.dart';
 import 'package:booksexchange/drawer/subscreens/privacy_policy.dart';
 import 'package:booksexchange/drawer/subscreens/terms_services.dart';
-import 'package:booksexchange/model/user_profile.dart';
 import 'package:booksexchange/screens/user_actions/my_posts.dart';
 import 'package:booksexchange/screens/user_actions/profile.dart';
 import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../controller/authentication/auth_repository.dart';
 import '../controller/providers/global_providers.dart';
 import '../screens/user_actions/user_account_delete.dart';
-import '../screens/user_actions/user_logout.dart';
 import 'subscreens/faq.dart';
 import '../components/listtile_component.dart';
 
@@ -35,8 +34,6 @@ class DrawerWidget extends StatelessWidget {
                     height: MediaQuery.sizeOf(context).height * 0.15,
                     width: MediaQuery.sizeOf(context).height * 0.2,
                     decoration: BoxDecoration(
-                      //  color: Colors.blue,
-                      // shape: BoxShape.circle,
                       image: DecorationImage(
                         image: AssetImage("assets/splash/splash.png"),
                         fit: BoxFit.cover,
@@ -47,8 +44,6 @@ class DrawerWidget extends StatelessWidget {
                     text: "GBLibrary",
                     fontSize: 15,
                     isBold: true,
-
-                    //color: Colors.black
                   ),
                 ],
               ),
@@ -132,7 +127,13 @@ class DrawerWidget extends StatelessWidget {
                     );*/
                   }
                   else {
-                    showLogout(context);
+                    UiEventHandler.customAlertDialog(context, "Are you sure you want to logout?", "", "Logout", "Cancel", () async{
+                      Navigator.pop(context);
+                      AuthRepository auth=AuthRepository();
+                      await auth.signOut().whenComplete((){
+                      });
+                    },false);
+
                   }
                 },
                 leadingIconColor: index == 0

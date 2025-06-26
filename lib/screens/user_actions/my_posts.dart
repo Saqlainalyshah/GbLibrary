@@ -117,7 +117,7 @@ class _MyPostsState extends ConsumerState<MyPosts> {
                     if (data.isEmpty) {
                       return const Center(
                           child: CustomText(
-                              text: "No Book Posts",
+                              text: "No Clothes Posts",
                               isGoogleFont: true,
                               isBold: true));
                     }
@@ -134,7 +134,7 @@ class _MyPostsState extends ConsumerState<MyPosts> {
                         itemBuilder: (context, index) {
                           final post = data[index];
                           bool isTrue=post.clothesModel.isSchoolUniform=='Yes';
-                          return GridItem(  title: isTrue?'Donate School Uniform':'Donated Clothes', description: post.clothesModel.description,
+                          return GridItem(  title: isTrue?'Donated School Uniform':'Donated Clothes', description: post.clothesModel.description,
                             imageUrl: post.clothesModel.imageUrl, function: (){
                               ref.read(uniformSize.notifier).state= post.clothesModel.size;
                               ref.read(isSchoolUniform.notifier).state=  post.clothesModel.isSchoolUniform;

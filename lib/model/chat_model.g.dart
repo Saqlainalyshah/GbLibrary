@@ -25,6 +25,7 @@ _ChatRoomModel _$ChatRoomModelFromJson(Map<String, dynamic> json) =>
           const [],
       createdAt: DateTime.parse(json['createdAt'] as String),
       lastMessage: json['lastMessage'] as String? ?? '',
+      isRead: json['isRead'] as bool? ?? false,
       lastMessageFrom: json['lastMessageFrom'] as String? ?? '',
     );
 
@@ -35,5 +36,6 @@ Map<String, dynamic> _$ChatRoomModelToJson(_ChatRoomModel instance) =>
       'users': instance.users.map((user)=>user.toJson()).toList(),
       'createdAt': instance.createdAt.toIso8601String(),
       'lastMessage': instance.lastMessage,
+      'isRead': instance.isRead,
       'lastMessageFrom': instance.lastMessageFrom,
     };
