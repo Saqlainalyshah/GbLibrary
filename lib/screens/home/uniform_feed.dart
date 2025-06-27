@@ -33,9 +33,10 @@ class UniformFeed extends ConsumerWidget {
                     itemBuilder: (context,index){
                       // print("index");
                       return PostCard(
-                        title: "Donated Outfits",
+                        title: uniformPosts[index].isSchoolUniform=='Yes'?"Donated School Uniform":"Donated Outfits",
                         category: '',
                         grade: '',
+                        isClothes: true,
                         board: uniformPosts[index].size=='S'?'Small Size':uniformPosts[index].size=='M'?'Medium Size':uniformPosts[index].size=='L'?'Large Size':'Extra Large Size',
                         time: TimeFormater.timeAgo(uniformPosts[index].createdAt.toString()),
                         description: uniformPosts[index].description,

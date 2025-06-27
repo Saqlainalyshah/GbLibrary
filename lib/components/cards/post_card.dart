@@ -21,8 +21,10 @@ class PostCard extends StatelessWidget {
     required this.type,
     required this.imageUrl,
     required this.function,
-    required this.title
+    required this.title,
+    this.isClothes=false,
   });
+  final bool isClothes;
   final String category;
   final String grade;
   final String title;
@@ -55,6 +57,7 @@ class PostCard extends StatelessWidget {
               child: BuildPostColumn(
                 title: title,
                 board: board,
+                isClothes: isClothes,
                 type:type,
                 description: description,
               ),
@@ -71,7 +74,7 @@ class BuildPostColumn extends StatelessWidget {
   const BuildPostColumn({
     super.key,
     required this.type,
-
+    this.isClothes=false,
     required this.board,
     required this.description,
     required this.title,
@@ -80,7 +83,7 @@ class BuildPostColumn extends StatelessWidget {
       final String type;
       final String board;
       final String title;
-
+      final bool isClothes;
       final String description;
   @override
   Widget build(BuildContext context) {
@@ -100,7 +103,7 @@ class BuildPostColumn extends StatelessWidget {
           maxLines: 1,
         ),
 
-        buildIconTextRow( Icons.school, board,false),
+        buildIconTextRow(isClothes?Icons.person_outline :Icons.school, board,false),
         CustomText(
           text: description,
           //overflow: TextOverflow.ellipsis,s

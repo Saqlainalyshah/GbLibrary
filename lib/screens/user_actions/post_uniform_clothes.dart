@@ -198,17 +198,23 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                           location: location.text,
                           description: description.text,
                           imageUrl: widget.clothesIds.clothesModel.imageUrl,
-                          createdAt: DateTime.now(),
+                          createdAt: widget.clothesIds.clothesModel.createdAt,
                         );
-                        FirebaseFireStoreServices instance=FirebaseFireStoreServices();
-                        instance.updateDocument('outfits', widget.clothesIds.docId,clothe.toJson()).whenComplete((){
-                          if(context.mounted){
-                            invalidate();
-                            Navigator.pop(context);
-                            //  Navigator.pop(context);
-                            UiEventHandler.snackBarWidget(context, "Successfully updated");
-                          }
-                        });
+                        ClothesModel model=widget.clothesIds.clothesModel;
+                        bool isSame=clothe==model;
+                        if(isSame){
+                          Navigator.pop(context);
+                          UiEventHandler.snackBarWidget(context, "Make some changes and try again!");
+                        }else{
+                          FirebaseFireStoreServices instance=FirebaseFireStoreServices();
+                          instance.updateDocument('outfits', widget.clothesIds.docId,clothe.toJson()).whenComplete((){
+                            if(context.mounted){
+                              invalidate();
+                              Navigator.pop(context);
+                              UiEventHandler.snackBarWidget(context, "Successfully updated");
+                            }
+                          });
+                        }
 
                       } else {
                         UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
@@ -221,6 +227,9 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                       if(result){
                         instance.deleteDocument('outfits', widget.clothesIds.docId).then((onValue){
                           invalidate();
+                         if(context.mounted){
+                           UiEventHandler.snackBarWidget(context, "Post Deleted");
+                         }
                         });
                       }
                       if(context.mounted){

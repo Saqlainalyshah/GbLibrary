@@ -48,6 +48,16 @@ class TimeFormater{
     return false;
   }
   }
+  static bool isYesterday(String? timeString) {
+    if(timeString!=null){
+      final past = DateTime.parse(timeString);
+      final now = DateTime.now();
+      return now.difference(past).inHours >24;
+
+    }else{
+      return false;
+    }
+  }
   static String sortString(String input) {
     List<String> characters = input.split('');
     characters.sort();

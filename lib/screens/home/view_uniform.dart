@@ -98,7 +98,7 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
                       ),
                       CustomText(
                         text:
-                        "Donated Clothes",
+                        widget.clothesModel.isSchoolUniform=='Yes'? "Donated School Uniform":"Donated Clothes",
                         fontSize: ResponsiveText.getSize(context, 18),
                         isBold: true,
                       ),
@@ -117,6 +117,16 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
                       CustomText(
                         text: widget.clothesModel.description,
                         fontSize: 14,
+                      ),
+                      CustomText(
+                        text: "Size:",
+                        isBold: true,
+                        color: AppThemeClass.primary,
+                      ),
+                      buildIconTextRow(
+                        Icons.person_outline,
+                        widget.clothesModel.size=='S'?'Small Size':widget.clothesModel.size=='M'?'Medium Size':widget.clothesModel.size=='L'?'Large Size':'Extra Large Size',
+                        true,
                       ),
 
                       CustomText(

@@ -16,23 +16,6 @@ import '../../controller/providers/global_providers.dart';
 import '../../model/ui_models.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 final bookSubjectsList=StateProvider<List<String>>((ref)=>[]);
 final _item=StateProvider<String>((ref)=>'');
 final selectedImageProvider = StateProvider.autoDispose<File?>((ref) => null);
@@ -99,8 +82,6 @@ class _PostBooksState extends ConsumerState<PostBooks> {
     description.dispose();
   }
 
-
-
    invalidate(){
     location.clear();
     description.clear();
@@ -110,11 +91,7 @@ class _PostBooksState extends ConsumerState<PostBooks> {
     ref.invalidate(bookCategory);
     ref.invalidate(bookSubjectsList);
   }
-  /// model function
 
-
-
-  ///build function
   @override
   Widget build(BuildContext context) {
     print("Create Post Rebuilds.....");
@@ -271,19 +248,24 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                         if (_formKey.currentState!.validate() && ref.watch(bookCategory)!=null && ref.watch(bookSubjectsList).isNotEmpty ) {
                           // UiEventHandler.customAlertDialog(context, "Please wait it will takes few seconds! Uploading...", CircularProgressIndicator(color: AppThemeClass.primary,));
 
-                          uploadPost(ref).whenComplete((){
-                            BooksModel book=BooksModel(
-                              userID: widget.booksWithIds.booksModel.userID,
-                              category: ref.read(bookCategory)!,
-                              type: 'books',
-                              grade: ref.read(bookGrade)??'',
-                              location: location.text,
-                              description: description.text,
-                              board: ref.read(bookBoard)??'',
-                              subjects: ref.read(bookSubjectsList),
-                              createdAt: DateTime.now(),
-                              imageUrl: widget.booksWithIds.booksModel.imageUrl,
-                            );
+                          BooksModel book=BooksModel(
+                            userID: widget.booksWithIds.booksModel.userID,
+                            category: ref.read(bookCategory)!,
+                            type: 'books',
+                            grade: ref.read(bookGrade)??'',
+                            location: location.text,
+                            description: description.text,
+                            board: ref.read(bookBoard)??'',
+                            subjects: ref.read(bookSubjectsList),
+                            createdAt: widget.booksWithIds.booksModel.createdAt,
+                            imageUrl: widget.booksWithIds.booksModel.imageUrl,
+                          );
+                          BooksModel existingBook=widget.booksWithIds.booksModel;
+                          bool isSame=book==existingBook;
+                          if(isSame){
+                            Navigator.pop(context);
+                            UiEventHandler.snackBarWidget(context, "Make some changes and try again!");
+                          }else{
                             FirebaseFireStoreServices instance=FirebaseFireStoreServices();
                             instance.updateDocument('posts',widget.booksWithIds.docId,book.toJson()).whenComplete((){
                               invalidate();
@@ -291,8 +273,8 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                                 Navigator.pop(context);
                               }
                             });
-                          });
-                          UiEventHandler.snackBarWidget(context, "Successfully updated");
+                            UiEventHandler.snackBarWidget(context, "Successfully updated");
+                          }
                         } else {
                           UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
                         }
@@ -304,11 +286,14 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                       if(result){
                         instance.deleteDocument('posts', widget.booksWithIds.docId).then((onValue){
                           invalidate();
+                         if(context.mounted){
+                           UiEventHandler.snackBarWidget(context, "Post Deleted");
+                         }
                         });
                       }
-                   if(context.mounted){
-                     Navigator.pop(context);
-                   }
+                        if(context.mounted){
+                          Navigator.pop(context);
+                        }
                       },title: "Delete",fontSize: 15,isBold: true,))
                     ],
                   ):Consumer(

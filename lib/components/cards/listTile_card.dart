@@ -35,14 +35,13 @@ final bool newMessage;
     return  GestureDetector(
       onTap: function,
       child: Container(
-        height: 100,
+        //height: 80,
         decoration:BoxDecoration(
-         // color: AppThemeClass.secondary,
           borderRadius: BorderRadius.circular(5), // Rounded corners
           border: Border.all(color: AppThemeClass.secondary, width: 1.0), // Border properties
         ),
         margin:  EdgeInsets.only(bottom: 10),
-        //padding:  EdgeInsets.all( 0),
+        padding:  EdgeInsets.symmetric(vertical:  5),
         child: Row(
           // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -120,7 +119,7 @@ final bool newMessage;
                     children: [
                       Flexible(
                         child: RichText(
-                          maxLines: 2,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           text: TextSpan(
                             children: [
@@ -147,7 +146,7 @@ final bool newMessage;
                         ),
                       ),
 
-                      if (isIcon && isMe)  Icon(Icons.done_all,color: newMessage?Colors.blue:AppThemeClass.darkTextOptional),
+                      if (isIcon && isMe)  Icon(Icons.done_all,size: 20,color: newMessage?Colors.blue:AppThemeClass.darkTextOptional),
                       if(isIcon && !isMe &&!newMessage) Material(
                         elevation: 4.0, // Adjust the elevation value as needed
                         shape: CircleBorder(), // Ensures the material maintains circular shape

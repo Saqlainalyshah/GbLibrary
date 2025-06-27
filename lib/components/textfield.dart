@@ -21,7 +21,7 @@ class CustomTextField extends StatelessWidget {
     this.isRead=false,
     this.hintText = " ",
     this.isBorder = false,
-    this.isExpanded=false,
+    this.focusNode,
     this.onChanged,
     this.counterText,
     this.trailingFn,
@@ -34,7 +34,6 @@ class CustomTextField extends StatelessWidget {
   final int? maxLength;
   final String? counterText;
   final bool isRead;
-  final bool isExpanded;
   final bool isBorder;
   final bool isPhone;
   final String hintText;
@@ -48,6 +47,9 @@ class CustomTextField extends StatelessWidget {
   final Function? trailingFn;
   final String? Function(String?)? validator;
   final int? maxLines;
+  final FocusNode? focusNode;
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +61,8 @@ class CustomTextField extends StatelessWidget {
       readOnly: isRead,
       onChanged: onChanged,
       maxLines: maxLines,
-      expands: isExpanded,
+      minLines: 1,
+      focusNode: focusNode,
 
       style: GoogleFonts.robotoSerif(
         letterSpacing: -0.4

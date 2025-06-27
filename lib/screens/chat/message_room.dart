@@ -1,4 +1,3 @@
-import 'package:booksexchange/components/button.dart';
 import 'package:booksexchange/components/layout_components/alert_dialogue.dart';
 import 'package:booksexchange/controller/firebase_crud_operations/firestore_crud_operations.dart';
 import 'package:booksexchange/model/user_profile.dart';
@@ -56,7 +55,6 @@ class MessagesIDs {
   }
 }
 
-
 class MessageRoom extends ConsumerStatefulWidget {
   const MessageRoom({super.key, required this.userProfile});
   final UserProfile userProfile;
@@ -68,7 +66,8 @@ class MessageRoom extends ConsumerStatefulWidget {
 class _MessageRoomState extends ConsumerState<MessageRoom> {
   final TextEditingController controller = TextEditingController();
 
-  final List<String> list = [];
+
+  final FocusScopeNode focusScopeNode = FocusScopeNode();
 
   @override
   void initState() {
@@ -131,8 +130,8 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                return asyncMessages.when(
                   data: (data) {
                     if (data.isNotEmpty) {
-                      return Flexible(
-                        flex: 1,
+                    //  int length=data.length;
+                      return Expanded(
                         child: ListView.builder(
                           reverse: true,
                           padding: EdgeInsets.symmetric(vertical: 10),
@@ -199,6 +198,7 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                 children: [
                   Flexible(
                     child: CustomTextField(
+
                       controller: controller,
                       hintText: "Type something....",
                       maxLines: 3,
@@ -206,13 +206,12 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                   ),
                   Consumer(
                     builder: (context, ref, child) {
-                      //final stream=ref.watch(_chat);
-                      // stream.when(data: (data)=>print(data), error: (er,s)=>print(er), loading: ()=>print("loading"));
                       return IconButton(
                         onPressed: () async {
-                          String id =
+                          if (controller.text.trim().isNotEmpty && RegExp(r'[a-zA-Z0-9]').hasMatch(controller.text)) {
+                               String id =
                               ref.watch(userProfileProvider)!.uid +
-                              widget.userProfile.uid;
+                                  widget.userProfile.uid;
                           final roomID = TimeFormater.sortString(id);
                           ChatRoomModel chatRoomModel = ChatRoomModel(
                             users: [
@@ -243,27 +242,29 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                                 .profilePicUrl,
                           );
                           FirebaseFireStoreServices instance =
-                              FirebaseFireStoreServices();
+                          FirebaseFireStoreServices();
                           // print(chatRoomModel.toJson());
                           controller.clear();
                           instance
                               .createDocumentWithId(
-                                'chats',
-                                roomID,
-                                chatRoomModel.toJson(),
-                              )
+                            'chats',
+                            roomID,
+                            chatRoomModel.toJson(),
+                          )
                               .then((onValue) {
                             instance
-                                    .createSubCollectionDocument(
-                                      'chats',
-                                      roomID,
-                                      'messages',
-                                      messageModel.toJson(),
-                                    );
-                              });
+                                .createSubCollectionDocument(
+                              'chats',
+                              roomID,
+                              'messages',
+                              messageModel.toJson(),
+                            );
+                          });
+                          }
+
                         },
                         icon: Icon(
-                          Icons.send,
+                          Icons.send_rounded,
                           color: AppThemeClass.primary,
                           size: 40,
                         ),

@@ -244,13 +244,6 @@ class FAQNotifier extends StateNotifier<FilterList> {
     updatedList[index] = updatedItem;
     state = state.copyWith(filteredItems: updatedList);
   }
- /* void toggleIsReadByFilteredIndex(int index) {
-    final updatedList = List<FAQ>.from(state.filteredItems);
-    final currentItem = updatedList[index];
-    updatedList[index] = currentItem.copyWith(isRead: !currentItem.isRead);
-    state = state.copyWith(filteredItems: updatedList);
-  }*/
-
   void filterListByCategory(String type) {
     state = state.copyWith(
       search: type,
@@ -268,12 +261,6 @@ final faqProvider = StateNotifierProvider<FAQNotifier, FilterList>((ref) {
   return FAQNotifier();
 });
 
-/*
-final readStatusProvider = Provider.family<bool, int>((ref, index) {
-  final filtered = ref.watch(faqProvider.select((s) => s.filteredItems));
-  return filtered[index].isRead;
-});
-*/
 
 
 List<FAQ> faqList=[

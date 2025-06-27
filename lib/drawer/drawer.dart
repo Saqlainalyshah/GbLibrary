@@ -130,6 +130,7 @@ class DrawerWidget extends StatelessWidget {
                     UiEventHandler.customAlertDialog(context, "Are you sure you want to logout?", "", "Logout", "Cancel", () async{
                       Navigator.pop(context);
                       AuthRepository auth=AuthRepository();
+
                       await auth.signOut().whenComplete((){
                       });
                     },false);
