@@ -15,6 +15,7 @@ import '../../controller/firebase_Storage/crud_storage.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../model/ui_models.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
+import '../chat/message_room.dart';
 
 final bookSubjectsList=StateProvider<List<String>>((ref)=>[]);
 final _item=StateProvider<String>((ref)=>'');
@@ -53,17 +54,17 @@ class _PostBooksState extends ConsumerState<PostBooks> {
      }
    }
 
-   Future<void> uploadPost(WidgetRef ref) async {
+   Future<String?> uploadPost(WidgetRef ref) async {
      final fileName = '${ref.watch(userProfileProvider)!.uid}_${DateTime.now().millisecondsSinceEpoch}';
      final storageRef = FirebaseStorage.instance.ref().child('posts/books/$fileName');
      try {
        await storageRef.putFile(ref.watch(selectedImageProvider)!);
        final downloadUrl = await storageRef.getDownloadURL();
 
-       ref.read(_imageUrl.notifier).state=downloadUrl;
-       print('Download URL: $downloadUrl');
+       return downloadUrl;
      } catch (e) {
        print('Error uploading file: $e');
+       return null;
      }
    }
 
@@ -243,10 +244,11 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                   widget.isEdit==true? Row(
                     spacing: 20,
                     children: [
-                      Flexible(child:CustomButton(onPress: (){
-
-                        if (_formKey.currentState!.validate() && ref.watch(bookCategory)!=null && ref.watch(bookSubjectsList).isNotEmpty ) {
-                          // UiEventHandler.customAlertDialog(context, "Please wait it will takes few seconds! Uploading...", CircularProgressIndicator(color: AppThemeClass.primary,));
+                      Flexible(child:CustomButton(onPress: () async{
+                        final result = await NetworkChecker.hasInternetConnection();
+                        if (_formKey.currentState!.validate() && ref.watch(bookCategory)!=null
+                            && ref.watch(bookSubjectsList).isNotEmpty && result) {
+                           UiEventHandler.customAlertDialog(context, "Please wait few seconds! updating...",'','','',(){} ,true);
 
                           BooksModel book=BooksModel(
                             userID: widget.booksWithIds.booksModel.userID,
@@ -263,23 +265,30 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                           BooksModel existingBook=widget.booksWithIds.booksModel;
                           bool isSame=book==existingBook;
                           if(isSame){
-                            Navigator.pop(context);
-                            UiEventHandler.snackBarWidget(context, "Make some changes and try again!");
+                            if(context.mounted){
+                              Navigator.pop(context);
+                              UiEventHandler.snackBarWidget(context, "Make some changes and try again!");
+                              return;
+                            }
                           }else{
                             FirebaseFireStoreServices instance=FirebaseFireStoreServices();
                             instance.updateDocument('posts',widget.booksWithIds.docId,book.toJson()).whenComplete((){
                               invalidate();
                               if(context.mounted){
                                 Navigator.pop(context);
+                                UiEventHandler.snackBarWidget(context, "Successfully updated");
                               }
                             });
-                            UiEventHandler.snackBarWidget(context, "Successfully updated");
                           }
                         } else {
-                          UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
+                          if(context.mounted){
+                            UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
+                          }
                         }
                       },title: "Update",fontSize: 15,isBold: true,)),
                       Flexible(child: CustomButton(onPress: () async{
+                        UiEventHandler.customAlertDialog(context, "Please wait few seconds! Deleting...",'','','',(){} ,true);
+
                         FirebaseFireStoreServices instance=FirebaseFireStoreServices();
                         FirebaseStorageService storage =FirebaseStorageService();
                       bool result=await storage.deleteFile(widget.booksWithIds.booksModel.imageUrl);
@@ -288,42 +297,46 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                           invalidate();
                          if(context.mounted){
                            UiEventHandler.snackBarWidget(context, "Post Deleted");
+                           Navigator.pop(context);
                          }
                         });
                       }
                         if(context.mounted){
+                          UiEventHandler.snackBarWidget(context, "Try again!");
                           Navigator.pop(context);
+
                         }
                       },title: "Delete",fontSize: 15,isBold: true,))
                     ],
                   ):Consumer(
                     builder:(context,ref,child)=> CustomButton(onPress: () {
-                      if (_formKey.currentState!.validate() && ref.watch(bookCategory)!=null && ref.watch(bookSubjectsList).isNotEmpty && ref.watch(selectedImageProvider)!=null) {
-                      // UiEventHandler.customAlertDialog(context, "Please wait it will takes few seconds! Uploading...", CircularProgressIndicator(color: AppThemeClass.primary,));
-                         uploadPost(ref).whenComplete((){
-                           BooksModel book=BooksModel(
-                               userID: ref.watch(userProfileProvider)!.uid,
-                               type: 'books',
-                               category: ref.read(bookCategory)!,
-                               grade: ref.read(bookGrade)??'',
-                               location: location.text,
-                               description: description.text,
-                               board: ref.read(bookBoard)??'',
-                               subjects: ref.read(bookSubjectsList),
-                               imageUrl: ref.read(_imageUrl)??'',
-                             createdAt: DateTime.now(),
-                           );
-                          FirebaseFireStoreServices firestore=FirebaseFireStoreServices();
-                           firestore.createDocument('posts', book.toJson()).whenComplete((){
-                             invalidate();
-                           if(context.mounted){
-                             Navigator.pop(context);
-                           }
-                          });
-
+                      if (_formKey.currentState!.validate() && ref.watch(bookCategory)!=null
+                          && ref.watch(bookSubjectsList).isNotEmpty && ref.watch(selectedImageProvider)!=null) {
+                        UiEventHandler.customAlertDialog(context, "Please wait few seconds! Uploading...",'','','',(){} ,true);
+                        FirebaseFireStoreServices instance=FirebaseFireStoreServices();
+                        uploadPost(ref).then((val){
+                          if(val!=null){
+                            BooksModel book=BooksModel(
+                              userID: ref.watch(userProfileProvider)!.uid,
+                              type: 'books',
+                              category: ref.watch(bookCategory)!,
+                              grade: ref.watch(bookGrade)??'',
+                              location: location.text,
+                              description: description.text,
+                              board: ref.watch(bookBoard)??'',
+                              subjects: ref.watch(bookSubjectsList),
+                              imageUrl: val,
+                              createdAt: DateTime.now(),
+                            );
+                            instance.createDocument('posts', book.toJson()).whenComplete((){
+                              invalidate();
+                              if(context.mounted){
+                                UiEventHandler.snackBarWidget(context, "Successfully uploaded");
+                                Navigator.pop(context);
+                              }
+                            });
+                          }
                         });
-
-                        UiEventHandler.snackBarWidget(context, "Successfully updated");
                       } else {
                         UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
                       }

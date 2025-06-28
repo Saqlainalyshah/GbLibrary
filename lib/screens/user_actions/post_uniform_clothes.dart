@@ -190,6 +190,9 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                   children: [
                     Flexible(child:CustomButton(onPress: (){
                       if (_formKey.currentState!.validate() && ref.watch(isSchoolUniform)!=null && ref.watch(uniformSize)!=null) {
+
+                        UiEventHandler.customAlertDialog(context, "Please wait few seconds! Updating...",'','','',(){} ,true);
+
                         ClothesModel clothe=ClothesModel(
                           userID: widget.clothesIds.clothesModel.userID,
                           type: 'outfits',
@@ -205,6 +208,7 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                         if(isSame){
                           Navigator.pop(context);
                           UiEventHandler.snackBarWidget(context, "Make some changes and try again!");
+                          return;
                         }else{
                           FirebaseFireStoreServices instance=FirebaseFireStoreServices();
                           instance.updateDocument('outfits', widget.clothesIds.docId,clothe.toJson()).whenComplete((){
@@ -221,6 +225,7 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                       }
                     },title: "Update",fontSize: 15,isBold: true,)),
                     Flexible(child: CustomButton(onPress: () async{
+                      UiEventHandler.customAlertDialog(context, "Please wait few seconds! Deleting...",'','','',(){} ,true);
                       FirebaseFireStoreServices instance=FirebaseFireStoreServices();
                       FirebaseStorageService storage =FirebaseStorageService();
                       bool result=await storage.deleteFile(widget.clothesIds.clothesModel.imageUrl);
@@ -229,11 +234,14 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                           invalidate();
                          if(context.mounted){
                            UiEventHandler.snackBarWidget(context, "Post Deleted");
+                           Navigator.pop(context);
                          }
                         });
-                      }
-                      if(context.mounted){
-                        Navigator.pop(context);
+                      }else{
+                        if(context.mounted){
+                          UiEventHandler.snackBarWidget(context, 'Try again!');
+                          Navigator.pop(context);
+                        }
                       }
                     },title: "Delete",fontSize: 15,isBold: true,))
                   ],

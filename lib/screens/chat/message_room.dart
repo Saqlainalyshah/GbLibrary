@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/cards/message_bubble_card.dart';
 import '../../components/textfield.dart';
@@ -14,6 +15,32 @@ import '../../controller/time_format/time_format.dart';
 import '../../model/chat_model.dart';
 import '../../model/message_model.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
+
+
+
+
+
+import 'package:flutter/services.dart';
+
+class NetworkChecker {
+  static const platform = MethodChannel('com.example.network/check');
+
+  static Future<bool> hasInternetConnection() async {
+    try {
+      final String result = await platform
+          .invokeMethod('getNetworkStatus')
+          .timeout(const Duration(seconds: 2),onTimeout: ()=>'none');
+
+      print('Network status: $result');
+      return result == 'wifi_internet' || result == 'mobile_internet';
+    } on PlatformException catch (e) {
+      print("Failed to get network status: '${e.message}'.");
+      return false;
+    }
+  }
+
+}
+
 
 final _messages = StreamProvider.family<List<MessagesIDs>, String>((ref, roomID) {
   final data = FirebaseFirestore.instance
@@ -67,23 +94,32 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
   final TextEditingController controller = TextEditingController();
 
 
+
   final FocusScopeNode focusScopeNode = FocusScopeNode();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    String id = FirebaseAuth.instance.currentUser!.uid+widget.userProfile.uid;
-    final roomID = TimeFormater.sortString(id);
-    ref.read(_messages(roomID));
+    final user=FirebaseAuth.instance.currentUser;
+    if(user!=null){
+      String id = user.uid+widget.userProfile.uid;
+      final roomID = TimeFormater.sortString(id);
+      ref.read(_messages(roomID));
+    }
+
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
+
     controller.dispose();
+    focusScopeNode.dispose();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -122,10 +158,13 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
           children: [
             Consumer(
               builder: (context, ref, child) {
-                String id =
-                    ref.watch(userProfileProvider)!.uid +
-                    widget.userProfile.uid;
-                final roomID = TimeFormater.sortString(id);
+                //if(ref.watch(provider))
+
+                final user=FirebaseAuth.instance.currentUser;
+
+                String id =user!=null?user.uid+
+                    widget.userProfile.uid:"12345677uuu5ii4";
+               final roomID = TimeFormater.sortString(id);
                 final asyncMessages = ref.watch(_messages(roomID));
                return asyncMessages.when(
                   data: (data) {
@@ -198,7 +237,6 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                 children: [
                   Flexible(
                     child: CustomTextField(
-
                       controller: controller,
                       hintText: "Type something....",
                       maxLines: 3,
@@ -207,8 +245,10 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                   Consumer(
                     builder: (context, ref, child) {
                       return IconButton(
-                        onPressed: () async {
-                          if (controller.text.trim().isNotEmpty && RegExp(r'[a-zA-Z0-9]').hasMatch(controller.text)) {
+                        onPressed: ()  async{
+
+                         final result = await NetworkChecker.hasInternetConnection();
+                          if (controller.text.trim().isNotEmpty && RegExp(r'[a-zA-Z0-9]').hasMatch(controller.text)&&result) {
                                String id =
                               ref.watch(userProfileProvider)!.uid +
                                   widget.userProfile.uid;
@@ -245,23 +285,27 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                           FirebaseFireStoreServices();
                           // print(chatRoomModel.toJson());
                           controller.clear();
+                               instance
+                                   .createSubCollectionDocument(
+                                 'chats',
+                                 roomID,
+                                 'messages',
+                                 messageModel.toJson(),
+                               )
+                              .whenComplete(() {
                           instance
                               .createDocumentWithId(
-                            'chats',
-                            roomID,
-                            chatRoomModel.toJson(),
-                          )
-                              .then((onValue) {
-                            instance
-                                .createSubCollectionDocument(
-                              'chats',
-                              roomID,
-                              'messages',
-                              messageModel.toJson(),
-                            );
+                          'chats',
+                          roomID,
+                          chatRoomModel.toJson(),
+                          );
                           });
+                          }else{
+                            if(context.mounted){
+                              UiEventHandler.snackBarWidget(context, "No internet connection!");
+                            }
                           }
-
+                          print(DateTime.now());
                         },
                         icon: Icon(
                           Icons.send_rounded,

@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final firebaseCRUDProvider = Provider<FirebaseFireStoreServices>((ref) => FirebaseFireStoreServices());
 
 class FirebaseFireStoreServices {
-  final _fireStore = FirebaseFirestore.instance;
+ static final _fireStore = FirebaseFirestore.instance;
+
+
 
   Future<bool> documentExists(String collectionPath, String docId) async {
     try {

@@ -59,7 +59,7 @@ final chats = StreamProvider<List<ChatIds>>((ref) {
   if (user != null) {
     final data = FirebaseFirestore.instance
         .collection('chats')
-        .where('participants', arrayContains: user.uid)
+        .where('participants', arrayContains: user.uid )
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {

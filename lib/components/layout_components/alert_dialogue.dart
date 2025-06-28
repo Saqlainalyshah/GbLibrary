@@ -20,6 +20,7 @@ class UiEventHandler{
 
   static customAlertDialog(BuildContext context, String title,String message, String primaryButton,String secondaryButton, Function primary,bool isCircle) {
     showDialog(
+      barrierDismissible:false,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -29,7 +30,7 @@ class UiEventHandler{
           // content: Text("Please wait verification is in process"),
           content:  Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: isCircle?CrossAxisAlignment.center:CrossAxisAlignment.start,
             //  spacing: 10,
             children: [
               CustomText(text: title,fontSize: 14,color: AppThemeClass.primary,isBold: true,),

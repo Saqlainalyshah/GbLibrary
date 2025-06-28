@@ -55,7 +55,11 @@ final getUserDocument = FutureProvider<UserProfile?>((ref) async {
 });
 
 
-final userProfileProvider=StateProvider<UserProfile?>((ref)=>null);
+final userProfileProvider=StateProvider<UserProfile?>((ref){
+  final user=ref.watch(currentUserAuthStatus).asData?.value;
+  return null;
+
+});
 
 
 final booksFeedProvider = StreamProvider<List<BooksModel>>((ref) {
