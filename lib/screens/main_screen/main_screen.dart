@@ -1,4 +1,6 @@
 
+import 'dart:nativewrappers/_internal/vm/lib/typed_data_patch.dart';
+
 import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/model/post_model.dart';
 import 'package:booksexchange/screens/home/feed_portion.dart';
@@ -14,6 +16,12 @@ import '../chat/chat.dart';
 import '../home/post_item.dart';
 import '../user_actions/post_books.dart';
 import '../user_actions/post_uniform_clothes.dart';
+import 'package:tflite_flutter/tflite_flutter.dart';
+
+import 'dart:io';
+import 'package:image/image.dart' as Iamg;
+import 'package:image_picker/image_picker.dart';
+
 
 final _bottomNavigationIndex=StateProvider.autoDispose<int>((ref)=>0);
 
@@ -32,6 +40,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   @override
   void initState() {
     // TODO: implement initState
+    super.initState();
+    checkModelInput();
     ref.read(getUserDocument);
     ref.read(chats);
     ref.read(booksFeedProvider);
@@ -39,16 +49,31 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     ref.read(myClothesPosts);
     ref.read(uniformFeedProvider);
     ref.read(messageCountProvider);
-
-    super.initState();
   }
 
+
+  void checkModelInput() async {
+    final interpreter = await Interpreter.fromAsset('assets/model/best_float32.tflite');
+
+
+    // Get input tensor
+    var inputTensor = interpreter.getInputTensor(0);
+    var outputTensor=interpreter.getOutputTensor(0);
+
+    // Print input shape and type
+    print('Input shape: ${inputTensor.shape}');
+    print('Input type: ${inputTensor.type}');
+    print('outputTensor shape: ${outputTensor.shape}');
+    print('outputTensor type: ${outputTensor.type}');
+
+
+  }
   final List<Widget> screens=  [
     const FeedPortion(),
     const UniformFeed(),
     const PostItem(),
     const ChatScreen(),
-    const AccountPage(),
+     //InferencePage(),
   ];
 
   @override
@@ -151,6 +176,3 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     );
   }
 }
-
-
-
