@@ -13,61 +13,23 @@ import io.flutter.plugin.common.MethodChannel
 import org.tensorflow.lite.Interpreter
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.io.File
-import java.nio.channels.FileChannel
-import java.io.FileInputStream
-
-// Firebase ML dependencies
-import com.google.firebase.ml.modeldownloader.FirebaseModelDownloader
-import com.google.firebase.ml.modeldownloader.CustomModelDownloadConditions
-import com.google.firebase.ml.modeldownloader.DownloadType
 import com.google.firebase.ml.modeldownloader.CustomModel
+import com.google.firebase.ml.modeldownloader.CustomModelDownloadConditions
+import com.google.firebase.ml.modeldownloader.FirebaseModelDownloader
+import com.google.firebase.ml.modeldownloader.DownloadType
 
 class MainActivity : FlutterActivity() {
 
-    data class Detection(
-        val confidence: Float,
-        val x: Float,
-        val y: Float,
-        val w: Float,
-        val h: Float
-    )
-
-    private fun parseModelOutput(
-        output: Array<Array<FloatArray>>,
-        classIndex: Int,
-        threshold: Float
-    ): Detection? {
-        val detections = output[0]
-        var bestScore = 0f
-        var bestDetection: Detection? = null
-
-        for (i in 0 until detections[0].size) {
-            val x = output[0][0][i]
-            val y = output[0][1][i]
-            val w = output[0][2][i]
-            val h = output[0][3][i]
-            val objectConfidence = output[0][4][i]
-            val classConfidence = output[0][5 + classIndex][i]
-            val confidence = objectConfidence * classConfidence
-
-            if (confidence > threshold && confidence > bestScore) {
-                bestScore = confidence
-                bestDetection = Detection(confidence, x, y, w, h)
-            }
-        }
-
-        return bestDetection
-    }
-
     private val NETWORK_CHANNEL = "com.example.network/check"
-    private val DETECTION_CHANNEL = "book_detector"
-    private var interpreter: Interpreter? = null
+    private val TFLITE_CHANNEL = "com.example.tflite/inference"
+
+    private lateinit var tfliteInterpreter: Interpreter
+    private lateinit var inputShape: IntArray
+    private val labels = List(80) { "Class $it" }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
-        // 1. Set up network status channel
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, NETWORK_CHANNEL)
             .setMethodCallHandler { call, result ->
                 if (call.method == "getNetworkStatus") {
@@ -78,81 +40,99 @@ class MainActivity : FlutterActivity() {
                 }
             }
 
-        // 2. Load TFLite model from Firebase and then set up detection channel
-        FirebaseModelDownloader.getInstance()
-            .getModel(
-                "book-detector",
-                DownloadType.LOCAL_MODEL_UPDATE_IN_BACKGROUND,
-                CustomModelDownloadConditions.Builder().build()
-            )
-            .addOnSuccessListener { model: CustomModel? ->
-                val file = model?.file
-                if (file != null && file.exists()) {
-                    interpreter = Interpreter(file)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, TFLITE_CHANNEL)
+            .setMethodCallHandler { call, result ->
+                if (call.method == "runModel") {
+                    val imagePath = call.argument<String>("imagePath") ?: ""
+                    try {
+                        val bitmap = BitmapFactory.decodeFile(imagePath)
+                        val (className, confidence) = runModelInference(bitmap)
+                            ?: return@setMethodCallHandler result.error("ERR", "No result", null)
 
-                    MethodChannel(flutterEngine.dartExecutor.binaryMessenger, DETECTION_CHANNEL)
-                        .setMethodCallHandler { call, result ->
-                            if (call.method == "detectBook") {
-                                val imageBytes = call.argument<ByteArray>("image")!!
-                                val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-
-                                val prediction = runBookModel(bitmap)
-                                result.success(prediction)
-                            } else {
-                                result.notImplemented()
-                            }
-                        }
-
-                    Log.i("BookModel", "Model loaded successfully from Firebase")
+                        result.success(mapOf("class" to className, "confidence" to confidence))
+                    } catch (e: Exception) {
+                        result.error("ERR", "Inference failed: ${e.message}", null)
+                    }
                 } else {
-                    Log.e("BookModel", "Model file was null or missing")
+                    result.notImplemented()
                 }
             }
-            .addOnFailureListener { e ->
-                Log.e("BookModel", "Failed to load model: ${e.message}")
+
+        initModel()
+    }
+
+    private fun initModel() {
+        val conditions = CustomModelDownloadConditions.Builder()
+            .requireWifi()
+            .build()
+
+        FirebaseModelDownloader.getInstance()
+            .getModel("book-detector", DownloadType.LOCAL_MODEL, conditions)
+            .addOnSuccessListener { model: CustomModel ->
+                try {
+                    val modelFile = model.file!!
+                    tfliteInterpreter = Interpreter(modelFile)
+                    inputShape = tfliteInterpreter.getInputTensor(0).shape()
+
+                    Log.d("TFLite", "Model initialized from Firebase ML successfully.")
+                } catch (e: Exception) {
+                    Log.e("TFLite", "Error initializing model: ${e.message}")
+                }
+            }
+            .addOnFailureListener {
+                Log.e("TFLite", "Failed to download model: ${it.message}")
             }
     }
 
-    private fun runBookModel(bitmap: Bitmap): Boolean {
-        val input = preprocessBitmap(bitmap)
-        val output = Array(1) { Array(8) { FloatArray(8400) } }
+    private fun runModelInference(bitmap: Bitmap): Pair<String, Float>? {
+        val inputBuffer = preprocessImage(bitmap)
 
-        interpreter?.run(input as Any, output as Any)
+        val outputShape = tfliteInterpreter.getOutputTensor(0).shape()
+        val outputData = Array(1) { Array(outputShape[1]) { FloatArray(outputShape[2]) } }
 
-        val bestDetection = parseModelOutput(output, classIndex = 0, threshold = 0.02f)
-        return bestDetection != null
-    }
+        tfliteInterpreter.run(inputBuffer, outputData)
 
-    private fun preprocessBitmap(bitmap: Bitmap): ByteBuffer {
-       // Log.d("BufferSize", "Capacity: ${inputBuffer.capacity()}, Expected: ${4 * 640 * 640 * 3}")
-        val inputWidth = 640
-        val inputHeight = 640
-        val inputChannels = 3
-
-        val resized = Bitmap.createScaledBitmap(bitmap, inputWidth, inputHeight, true)
-
-        val inputBuffer = ByteBuffer.allocateDirect(4 * inputWidth * inputHeight * inputChannels)
-        inputBuffer.order(ByteOrder.nativeOrder())
-
-        val pixels = IntArray(inputWidth * inputHeight)
-        resized.getPixels(pixels, 0, inputWidth, 0, 0, inputWidth, inputHeight)
-
-        // Write in HWC format: [height][width][channels]
-        for (y in 0 until inputHeight) {
-            for (x in 0 until inputWidth) {
-                val pixel = pixels[y * inputWidth + x]
-                val r = ((pixel shr 16) and 0xFF) / 255.0f
-                val g = ((pixel shr 8) and 0xFF) / 255.0f
-                val b = (pixel and 0xFF) / 255.0f
-                inputBuffer.putFloat(r)
-                inputBuffer.putFloat(g)
-                inputBuffer.putFloat(b)
+        val transposed = Array(1) { Array(outputShape[2]) { FloatArray(outputShape[1]) } }
+        for (i in 0 until outputShape[1]) {
+            for (j in 0 until outputShape[2]) {
+                transposed[0][j][i] = outputData[0][i][j]
             }
         }
 
-        inputBuffer.rewind()
-        return inputBuffer
+        val scores: List<FloatArray> = transposed[0].map { it.copyOfRange(4, it.size) }
+        val flat: List<Float> = scores.flatMap { it.toList() }
+
+        if (flat.isEmpty()) return null
+
+        val maxIndex = flat.indices.maxByOrNull { flat[it] } ?: return null
+        val confidence = flat[maxIndex]
+        val classId = maxIndex % labels.size
+        val className = labels[classId]
+
+        return Pair(className, confidence)
     }
+
+    private fun preprocessImage(bitmap: Bitmap): ByteBuffer {
+        val height = inputShape[1]
+        val width = inputShape[2]
+        val resized = Bitmap.createScaledBitmap(bitmap, width, height, true)
+
+        val buffer = ByteBuffer.allocateDirect(4 * width * height * 3)
+        buffer.order(ByteOrder.nativeOrder())
+
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                val pixel = resized.getPixel(x, y)
+                buffer.putFloat((pixel shr 16 and 0xFF) / 255.0f) // R
+                buffer.putFloat((pixel shr 8 and 0xFF) / 255.0f)  // G
+                buffer.putFloat((pixel and 0xFF) / 255.0f)        // B
+            }
+        }
+
+        buffer.rewind()
+        return buffer
+    }
+
     private fun getNetworkStatus(): String {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork

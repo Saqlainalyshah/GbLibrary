@@ -14,22 +14,17 @@ class FirebaseStorageService {
     }
   }
 
-  Future<XFile?> pickImageAndCompress(XFile? pickedFile) async {
+  Future<XFile?> pickImageAndCompress(XFile pickedFile) async {
 
-
-    if (pickedFile != null) {
-      final file = File(pickedFile.path);
-      final targetPath = '${file.parent.path}/temp_${file.uri.pathSegments.last}';
-      final result = await FlutterImageCompress.compressAndGetFile(
-        file.absolute.path,
-        targetPath,
-        quality: 80,
-        //rotate: 180,
-      );
-      return result;
-    }else{
-      return null;
-    }
+    final file = File(pickedFile.path);
+    final targetPath = '${file.parent.path}/temp_${file.uri.pathSegments.last}';
+    final result = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path,
+      targetPath,
+      quality: 80,
+      //rotate: 180,
+    );
+    return result;
   }
   /// Get the download URL of a file
   Future<String?> getDownloadURL(String storagePath) async {

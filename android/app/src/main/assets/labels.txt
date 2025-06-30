@@ -1,0 +1,4 @@
+------------------------------
+Book Models - v5 2024-11-05 3-17am
+Roboflow is an end-to-end computer vision platform that helps you
+This dataset was exported via roboflow.com on January 5- 2025 at 6-21 PM GMT

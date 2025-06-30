@@ -182,39 +182,37 @@ class BookClassifier extends StatefulWidget {
 }
 
 class _BookClassifierState extends State<BookClassifier> {
-  static const platform = MethodChannel('book_detector');
+  String res='';
 
-  Uint8List? imageBytes;
-  String result = 'No image selected';
+  final MethodChannel channel = MethodChannel('com.example.tflite/inference');
 
-  Future<void> pickImage() async {
+  Future<void> pickAndSendImage() async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked == null) return;
+    final XFile? file = await picker.pickImage(source: ImageSource.gallery);
+    if (file != null) {
+      final Uint8List bytes = await file.readAsBytes();
 
-    final bytes = await picked.readAsBytes();
-    setState(() {
-      imageBytes = bytes;
-      result = 'Processing...';
-    });
+      final result = await channel.invokeMethod('runModelOnBytes', {
+        'imageBytes': bytes,
+      });
 
-    try {
-      final isBook = await platform.invokeMethod<bool>(
-        ' Book Models - v5 2024-11-05 3-17am',
-        {'image': bytes},
-      );
       setState(() {
-        result = isBook == true ? '✅ This is a book!' : '❌ Not a book';
+        res ="Prediction: ${result['class']} with confidence ${result['confidence']}";
       });
-    } catch (e) {
-      setState(() {
-        result = 'Error: ${e.toString()}';
-        print("=====================================================================================");
-        print("Error:${e.toString()}");
-        print("=====================================================================================");
-      });
+      print("Prediction: ${result['class']} with confidence ${result['confidence']}");
     }
   }
+
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+   // runModel();
+
+
+
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -225,16 +223,20 @@ class _BookClassifierState extends State<BookClassifier> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              ElevatedButton.icon(
-                onPressed: pickImage,
-                icon: const Icon(Icons.image_search),
-                label: const Text('Select Image'),
-              ),
+              ElevatedButton(onPressed: (){
+                 TFLiteService.runModelOnImage().then((onValue){
+                   print(onValue);
+                   setState(() {
+                     res=onValue.toString();
+                   });
+                 });
+                setState(() {
+
+                });
+              }, child: Text("Click")),
               const SizedBox(height: 20),
-              if (imageBytes != null)
-                Image.memory(imageBytes!, height: 200),
-              const SizedBox(height: 20),
-              Text(result, style: const TextStyle(fontSize: 20)),
+              Text(res, style: const TextStyle(fontSize: 20)),
+
             ],
           ),
         ),
@@ -242,7 +244,24 @@ class _BookClassifierState extends State<BookClassifier> {
     );
   }
 }
+class TFLiteService {
+  static const platform = MethodChannel("com.example.tflite/inference");
 
+  static Future<Map<String, dynamic>?> runModelOnImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile == null) return null;
+
+    final imagePath = pickedFile.path;
+
+    final result = await platform.invokeMethod("runModel", {
+      "imagePath": imagePath,
+    });
+
+    return Map<String, dynamic>.from(result);
+  }
+}
 /*
 const kModelName = "book-detector";
 

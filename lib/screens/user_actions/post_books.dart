@@ -3,6 +3,7 @@ import 'package:booksexchange/controller/firebase_crud_operations/firestore_crud
 import 'package:booksexchange/model/post_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../components/button.dart';
@@ -16,6 +17,7 @@ import '../../controller/providers/global_providers.dart';
 import '../../model/ui_models.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 import '../chat/message_room.dart';
+import '../main_screen/main_screen.dart';
 
 final bookSubjectsList=StateProvider<List<String>>((ref)=>[]);
 final _item=StateProvider<String>((ref)=>'');
@@ -40,17 +42,37 @@ class _PostBooksState extends ConsumerState<PostBooks> {
 
    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+   final MethodChannel channel = MethodChannel('com.example.tflite/inference');
 
+   Future<String> pickAndSendImage(XFile? file) async {
+     if (file != null) {
+       final Uint8List bytes = await file.readAsBytes();
+       final result = await channel.invokeMethod('runModelOnBytes', {
+         'imageBytes': bytes,
+       });
+       return result['confidence'];
+       print("Prediction: ${result['class']} with confidence ${result['confidence']}");
+     }else{
+       return '';
+     }
+   }
    Future<void> _pickImageAndCompress(WidgetRef ref) async{
      final picker = ImagePicker();
      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
      if(pickedFile!=null){
+
+     final res=  await pickAndSendImage(pickedFile);
+     final double val=double.parse(res);
+     if(val>0.5){
        FirebaseStorageService storage=FirebaseStorageService();
        final XFile? file= await storage.pickImageAndCompress(pickedFile);
        if(file!=null){
          final fileData = File(file.path);
          ref.read(selectedImageProvider.notifier).state = fileData;
        }
+     }
+     UiEventHandler.snackBarWidget(context, 'Only books image acceptable! Try again');
+
      }
    }
 
