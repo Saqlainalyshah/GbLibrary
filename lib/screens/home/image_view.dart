@@ -22,12 +22,12 @@ final String url;
               Navigator.pop(context);
             }, icon: Icon(Icons.arrow_back_ios,color: AppThemeClass.whiteText,)),
           ),
-      body: Container(color: Colors.black,
-      width: double.infinity,
-      child: Center(
-        child: InteractiveViewer(
-          minScale: 0.5,
-          maxScale: 4.0,
+      body: InteractiveViewer(
+        minScale: 0.5,
+        maxScale: 4.0,
+        child: Container(color: Colors.black,
+        width: double.infinity,
+        child: Center(
           child: CachedNetworkImage(fit: BoxFit.fill, imageUrl: url,
             width: double.infinity,
             progressIndicatorBuilder: (context, url, downloadProgress) =>
@@ -45,7 +45,7 @@ final String url;
             errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
           ),
         ),
-      ),
+        ),
       ),
     ));
   }

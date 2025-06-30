@@ -1,27 +1,20 @@
 
-import 'dart:nativewrappers/_internal/vm/lib/typed_data_patch.dart';
-
 import 'package:booksexchange/components/text_widget.dart';
-import 'package:booksexchange/model/post_model.dart';
 import 'package:booksexchange/screens/home/feed_portion.dart';
 import 'package:booksexchange/screens/home/uniform_feed.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../drawer/drawer.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
-import '../account/account.dart';
 import '../chat/chat.dart';
 import '../home/post_item.dart';
-import '../user_actions/post_books.dart';
-import '../user_actions/post_uniform_clothes.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
-
-import 'dart:io';
-import 'package:image/image.dart' as Iamg;
+import 'package:firebase_ml_model_downloader/firebase_ml_model_downloader.dart';
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-
 
 final _bottomNavigationIndex=StateProvider.autoDispose<int>((ref)=>0);
 
@@ -73,6 +66,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     const UniformFeed(),
     const PostItem(),
     const ChatScreen(),
+    const BookClassifier(),
+
      //InferencePage(),
   ];
 
@@ -176,3 +171,179 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     );
   }
 }
+
+
+
+class BookClassifier extends StatefulWidget {
+  const BookClassifier({super.key});
+
+  @override
+  State<BookClassifier> createState() => _BookClassifierState();
+}
+
+class _BookClassifierState extends State<BookClassifier> {
+  static const platform = MethodChannel('book_detector');
+
+  Uint8List? imageBytes;
+  String result = 'No image selected';
+
+  Future<void> pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+
+    final bytes = await picked.readAsBytes();
+    setState(() {
+      imageBytes = bytes;
+      result = 'Processing...';
+    });
+
+    try {
+      final isBook = await platform.invokeMethod<bool>(
+        ' Book Models - v5 2024-11-05 3-17am',
+        {'image': bytes},
+      );
+      setState(() {
+        result = isBook == true ? '✅ This is a book!' : '❌ Not a book';
+      });
+    } catch (e) {
+      setState(() {
+        result = 'Error: ${e.toString()}';
+        print("=====================================================================================");
+        print("Error:${e.toString()}");
+        print("=====================================================================================");
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Book Detector')),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              ElevatedButton.icon(
+                onPressed: pickImage,
+                icon: const Icon(Icons.image_search),
+                label: const Text('Select Image'),
+              ),
+              const SizedBox(height: 20),
+              if (imageBytes != null)
+                Image.memory(imageBytes!, height: 200),
+              const SizedBox(height: 20),
+              Text(result, style: const TextStyle(fontSize: 20)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/*
+const kModelName = "book-detector";
+
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    initWithLocalModel();
+  }
+
+  FirebaseCustomModel? model;
+
+  /// Initially get the lcoal model if found, and asynchronously get the latest one in background.
+  initWithLocalModel() async {
+    final newModel = await FirebaseModelDownloader.instance.getModel(
+        kModelName, FirebaseModelDownloadType.localModelUpdateInBackground);
+
+    setState(() {
+      model = newModel;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData(primarySwatch: Colors.amber),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Plugin example app'),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: Card(
+                    margin: EdgeInsets.zero,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: model != null
+                          ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Model name: ${model!.name}'),
+                          Text('Model size: ${model!.size}'),
+                        ],
+                      )
+                          : const Text("No local model found"),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final newModel =
+                          await FirebaseModelDownloader.instance.getModel(
+                              kModelName,
+                              FirebaseModelDownloadType.latestModel);
+
+                          setState(() {
+                            model = newModel;
+                          });
+                        },
+                        child: const Text('Get latest model'),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          await FirebaseModelDownloader.instance
+                              .deleteDownloadedModel(kModelName);
+
+                          setState(() {
+                            model = null;
+                          });
+                        },
+                        child: const Text('Delete local model'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}*/
