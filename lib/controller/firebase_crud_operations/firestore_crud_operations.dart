@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final firebaseCRUDProvider = Provider<FirebaseFireStoreServices>((ref) => FirebaseFireStoreServices());
+//final firebaseCRUDProvider = Provider<FirebaseFireStoreServices>((ref) => FirebaseFireStoreServices());
 
 class FirebaseFireStoreServices {
  static final _fireStore = FirebaseFirestore.instance;
@@ -28,16 +28,12 @@ class FirebaseFireStoreServices {
     }
   }
 
-  removeArrayElement(String path, String id, String attribute, dynamic data) async {
-    if (data is List) {
-      await _fireStore.collection(path).doc(id).update({
-        attribute: FieldValue.arrayRemove(data)
-      });
-    } else if (data is Map<String, dynamic>) {
+  removeArrayElement(String path, String id, String attribute, String data) async {
+    try{
       await _fireStore.collection(path).doc(id).update({
         attribute: FieldValue.arrayRemove([data])
       });
-    } else {
+    } catch (e) {
       throw ArgumentError('data must be either a List or a Map<String, dynamic>');
     }
   }

@@ -27,6 +27,7 @@ class UiEventHandler{
           surfaceTintColor: AppThemeClass.whiteText,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
           elevation: 10,
+
           // content: Text("Please wait verification is in process"),
           content:  Column(
             mainAxisSize: MainAxisSize.min,
@@ -34,19 +35,24 @@ class UiEventHandler{
             //  spacing: 10,
             children: [
               CustomText(text: title,fontSize: 14,color: AppThemeClass.primary,isBold: true,),
-             isCircle? CircularProgressIndicator(color: AppThemeClass.primary,): CustomText(text: message,maxLines: 1,),
+             isCircle? CircularProgressIndicator(color: AppThemeClass.primary,):message.length>1? CustomText(text: message,maxLines: 1,):SizedBox.shrink(),
              if(!isCircle) Row(
-                spacing: 25,
+                spacing: 5,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  InkWell(
-                      onTap: (){
-                        Navigator.pop(context);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: CustomText(text: "Cancel",isBold: true,fontSize: 15,color: AppThemeClass.primary,),
-                      )),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                     // backgroundColor:  AppThemeClass.primary ,
+                      side: BorderSide(width: 1, color: AppThemeClass.primary),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: CustomText(
+                        text: secondaryButton,
+                        color: AppThemeClass.primary
+                    ),
+                  ),
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       backgroundColor:  AppThemeClass.primary ,
@@ -66,15 +72,6 @@ class UiEventHandler{
             ],
           ),
 
-          /*Column(
-            mainAxisSize: MainAxisSize.min,
-           crossAxisAlignment: CrossAxisAlignment.start,
-           // spacing: 20,
-            children: [
-
-
-            ],
-          ),*/
         );
       },
     );

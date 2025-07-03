@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:booksexchange/components/cards/listTile_card.dart';
 import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/model/user_profile.dart';
@@ -12,35 +14,15 @@ import '../../controller/providers/global_providers.dart';
 import '../../model/chat_model.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
-final messageCountProvider = Provider<int>((ref) {
-  final user = ref.watch(currentUserAuthStatus).asData?.value;
-  if (user != null) {
-    final List<ChatIds> chatList = ref
-        .watch(chats)
-        .maybeWhen(
-          data: (value) => value.isNotEmpty ? value : [],
-          orElse: () => [],
-        );
-    final unreadCount = chatList
-        .where(
-          (chat) =>
-              chat.chatRoomModel.isRead == false &&
-              chat.chatRoomModel.lastMessageFrom != user.uid,
-        )
-        .length;
-    return unreadCount;
-  } else {
-    return 0;
-  }
-});
 
 class ChatIds {
   final ChatRoomModel chatRoomModel;
   final String docId;
-  ChatIds({required this.chatRoomModel, required this.docId});
+  final bool userNotFound;
+  ChatIds({required this.chatRoomModel, required this.docId, required this.userNotFound});
   // Convert to JSON
   Map<String, dynamic> toJson() {
-    return {'chatRoomModel': chatRoomModel.toJson(), 'docId': docId};
+    return {'chatRoomModel': chatRoomModel.toJson(), 'docId': docId, 'userNotFound':userNotFound};
   }
 
   // Construct from JSON
@@ -48,43 +30,92 @@ class ChatIds {
     return ChatIds(
       chatRoomModel: ChatRoomModel.fromJson(json['chatRoomModel']),
       docId: json['docId'],
+        userNotFound:json['userNotFound']
     );
   }
 }
 
 
-///  this is stream which gets data from firebase
-final chats = StreamProvider<List<ChatIds>>((ref) {
-  final user = ref.watch(currentUserAuthStatus).asData?.value;
-  if (user != null) {
-    final data = FirebaseFirestore.instance
+
+
+class FilterChats {
+  final List<ChatIds> allChats;
+  final List<ChatIds> filteredChats;
+  final int unreadMessageCount;
+
+  FilterChats({
+    required this.allChats,
+    required this.filteredChats,
+    required this.unreadMessageCount,
+  });
+
+  FilterChats copyWith({
+    List<ChatIds>? allChats,
+    List<ChatIds>? filteredChats,
+    int? unreadMessageCount,
+  }) {
+    return FilterChats(
+      allChats: allChats ?? this.allChats,
+      filteredChats: filteredChats ?? this.filteredChats,
+      unreadMessageCount: unreadMessageCount ?? this.unreadMessageCount,
+    );
+  }
+}
+
+class FilterFeedNotifier extends StateNotifier<FilterChats> {
+  late final StreamSubscription? _sub;
+
+  FilterFeedNotifier(String uid)
+      : super(FilterChats(allChats: [], filteredChats: [], unreadMessageCount: 0)) {
+    _sub = FirebaseFirestore.instance
         .collection('chats')
-        .where('participants', arrayContains: user.uid )
+        .where('participants', arrayContains: uid)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) {
-          final chatsData= snapshot.docs.map((doc) {
-            final data = doc.data();
-            return ChatIds(
-              chatRoomModel: ChatRoomModel.fromJson(data),
-              docId: doc.id,
-            );
-          }).toList();
-          ref.read(filterChatsProvider.notifier).setChats(chatsData);
-          return chatsData;
-        }
+        .listen((snapshot) {
+      final chatsData = snapshot.docs.map((doc) {
+        final data = doc.data();
+        final decoded=ChatRoomModel.fromJson(data);
+        return ChatIds(
+          chatRoomModel: decoded,
+          docId: doc.id,
+          userNotFound: decoded.participants.length==1?true:false
         );
-    return data;
-  } else {
-    return Stream.value([]); // Return an empty stream if not signed in
+      }).toList();
+
+      final unreadCount = chatsData.where((chat) =>
+      chat.chatRoomModel.isRead == false &&
+          chat.chatRoomModel.lastMessageFrom != uid,
+      ).length;
+
+      state = state.copyWith(
+        allChats: chatsData,
+        filteredChats: chatsData,
+        unreadMessageCount: unreadCount,
+      );
+    });
   }
-});
 
-class FilterChatsNotifier extends StateNotifier<FilterChats> {
-  FilterChatsNotifier() : super(FilterChats(allChats: [], filteredChats: []));
+  FilterFeedNotifier.empty()
+      : _sub = null,
+        super(FilterChats(allChats: [], filteredChats: [], unreadMessageCount: 0));
 
-  void setChats(List<ChatIds> chats) {
-    state = state.copyWith(allChats: chats, filteredChats: chats);
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+
+  void setChats(List<ChatIds> chats, String uid) {
+    final unreadCount = chats.where((chat) =>
+    chat.chatRoomModel.isRead == false &&
+        chat.chatRoomModel.lastMessageFrom != uid,
+    ).length;
+    state = state.copyWith(
+      allChats: chats,
+      filteredChats: chats,
+      unreadMessageCount: unreadCount,
+    );
   }
 
   void filterChatRoomsByUser(bool Function(UserProfile user) condition) {
@@ -108,23 +139,19 @@ class FilterChatsNotifier extends StateNotifier<FilterChats> {
 }
 
 
-class FilterChats{
-  final List<ChatIds> allChats;
-  final List<ChatIds> filteredChats;
+final filterChatProvider = StateNotifierProvider<FilterFeedNotifier, FilterChats>((ref) {
+  final authAsync = ref.watch(currentUserAuthStatus);
 
-  FilterChats({required this.allChats, required this.filteredChats});
-  FilterChats copyWith({
-    List<ChatIds>? allChats,
-    List<ChatIds>? filteredChats,
-}){
-    return FilterChats(allChats: allChats??this.allChats, filteredChats: filteredChats??this.filteredChats);
-}
-}
+  // Handle loading or error
+  if (authAsync is AsyncLoading || authAsync is AsyncError || authAsync.value == null) {
+    return FilterFeedNotifier.empty(); // fallback safe version
+  }
+
+  final uid = authAsync.value!.uid;
+  return FilterFeedNotifier(uid);
+});
 
 
-final filterChatsProvider = StateNotifierProvider<FilterChatsNotifier, FilterChats>(
-      (ref) => FilterChatsNotifier(),
-);
 
 
 class ChatScreen extends ConsumerStatefulWidget {
@@ -151,6 +178,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     controller.dispose();
   _searchFocusNode.dispose();
   }
+outside(){
+    _searchFocusNode.unfocus();
+}
 
   @override
   Widget build(BuildContext context) {
@@ -168,23 +198,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               children: [
                 CustomText(text: "Chat", isBold: true, fontSize: 20),
                 SizedBox(height: 20),
-                Consumer(builder: (context,ref,child)=>CustomTextField(
-                  controller: controller,
-                  focusNode: _searchFocusNode,
-                  hintText: "Search messages",
-                  leadingIcon: Icons.search,
-                  trailingIcon: Icons.close,
-                  onChanged: (String search){
-                    ref.read(filterChatsProvider.notifier).filterBySearch(search);
+                Consumer(
+                  builder: (context, ref, child) {
+                    return CustomTextField(
+                      controller: controller,
+                      hintText: "Search",
+                      leadingIcon: Icons.search,
+                      trailingIcon: Icons.close,
+                      onChanged: (String search) {
+                        ref.read(filterChatProvider.notifier).filterBySearch(search);
+                      },
+                      trailingFn: () {
+                        controller.clear();
+                        ref.read(filterChatProvider.notifier).resetFilters();
+                      },
+                    );
                   },
-                  trailingFn: () {
-
-                    final data=ref.watch(filterChatsProvider.select((state)=>state.allChats));
-                    ref.read(filterChatsProvider.notifier).setChats(data);
-                    controller.clear();
-                  _searchFocusNode.unfocus();
-                    },
-                )
                 ),
 
                 SizedBox(height: 10),
@@ -192,68 +221,66 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 SizedBox(height: 10),
                 Consumer(
                   builder: (context, ref, child) {
-                    final data = ref.watch(filterChatsProvider.select((state)=>state.filteredChats));
+                    final filterState = ref.watch(filterChatProvider);
+                    final isSearching = controller.text.isNotEmpty;
+                    final data = isSearching ? filterState.filteredChats : filterState.allChats;
                     if (data.isNotEmpty) {
-                      return ListView.builder(
+                      return ListView.separated(
                         physics: NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
-                        itemCount:controller.text.isNotEmpty? ref.watch(filterChatsProvider.select((state)=>state.filteredChats.length)): data.length,
+                        itemCount: data.length,
                         itemBuilder: (context, index) {
-                          final UserProfile user = data[index]
-                              .chatRoomModel
-                              .users
-                              .firstWhere(
-                                (user) =>
-                            user.uid !=
-                                FirebaseAuth.instance.currentUser!.uid,
+                          final UserProfile user = data[index].chatRoomModel.users.firstWhere(
+                                (user) => user.uid != FirebaseAuth.instance.currentUser!.uid,
                           );
-                          bool isMe =
-                              data[index].chatRoomModel.lastMessageFrom ==
-                                  FirebaseAuth.instance.currentUser!.uid;
-                          bool newMessage =
-                              data[index].chatRoomModel.isRead;
+
+                          bool isMe = data[index].chatRoomModel.lastMessageFrom ==
+                              FirebaseAuth.instance.currentUser!.uid;
+
+                          bool newMessage = data[index].chatRoomModel.isRead;
+
                           return ListTileCard(
                             isIcon: true,
                             newMessage: newMessage,
                             isMe: isMe,
-                            time: data[index].chatRoomModel.createdAt
-                                .toString(),
+                            time: data[index].chatRoomModel.createdAt.toString(),
                             title: user.name,
                             subTitle: data[index].chatRoomModel.lastMessage,
                             imageUrl: user.profilePicUrl,
                             function: () {
-                              ChatRoomModel model =
-                                  data[index].chatRoomModel;
-                              if (!isMe &&
-                                  !data[index].chatRoomModel.isRead) {
-                                final chatModel = model.copyWith(
-                                  isRead: true,
-                                );
-                                FirebaseFireStoreServices instance =
-                                FirebaseFireStoreServices();
+                              ChatRoomModel model = data[index].chatRoomModel;
+
+                              if (!isMe && !model.isRead) {
+                                final chatModel = model.copyWith(isRead: true);
+                                FirebaseFireStoreServices instance = FirebaseFireStoreServices();
                                 instance.createDocumentWithId(
                                   'chats',
                                   data[index].docId,
                                   chatModel.toJson(),
                                 );
                               }
+
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (builder) =>
-                                      MessageRoom(userProfile: user),
+                                  builder: (_) => MessageRoom(
+                                    userProfile: user,
+                                    chatIds: data[index],
+                                    userNotFound: data[index].userNotFound,
+                                  ),
                                 ),
                               );
                             },
                           );
                         },
+                        separatorBuilder: (_, __) => Padding(padding: EdgeInsets.all(5)),
                       );
                     } else {
                       return Padding(
                         padding: const EdgeInsets.only(top: 250.0),
                         child: Center(
                           child: CustomText(
-                            text: controller.text.isNotEmpty?"No user found":"No Messages!",
+                            text: isSearching ? "No user found" : "No Messages!",
                             fontSize: 15,
                           ),
                         ),

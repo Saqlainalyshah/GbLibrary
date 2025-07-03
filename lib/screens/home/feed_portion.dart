@@ -1,83 +1,204 @@
+import 'dart:async';
+
 import 'package:booksexchange/components/button.dart';
 import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/controller/time_format/time_format.dart';
 import 'package:booksexchange/screens/home/view_details.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/cards/post_card.dart';
+import '../../components/textfield.dart';
+import '../../controller/ads/banner_ad.dart';
 import '../../controller/providers/global_providers.dart';
+import '../../model/post_model.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
+class FilterFeedNotifier extends StateNotifier<FilterFeed> {
+  late final StreamSubscription? _sub;
+
+  // Normal constructor
+  FilterFeedNotifier(String uid) : super(FilterFeed(allFeeds: [], filteredFeeds: [])) {
+    _sub = FirebaseFirestore.instance
+        .collection('posts')
+        .where('userID', isNotEqualTo: uid)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .listen((snapshot) {
+      final books = snapshot.docs.map((doc) {
+        final data = doc.data();
+        return BooksModel.fromJson(data);
+      }).toList();
+
+      state = state.copyWith(allFeeds: books, filteredFeeds: books);
+    });
+  }
+
+  // Empty constructor for unauthenticated fallback
+  FilterFeedNotifier.empty() : _sub = null, super(FilterFeed(allFeeds: [], filteredFeeds: []));
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+
+  void filterByLocation(String search) {
+    final filtered = state.allFeeds.where((item) =>
+        item.location.toLowerCase().startsWith(search.toLowerCase())
+    ).toList();
+    state = state.copyWith(filteredFeeds: filtered);
+  }
+
+  void resetFilters() {
+    state = state.copyWith(filteredFeeds: state.allFeeds);
+  }
+}
+
+
+
+class FilterFeed{
+  final List<BooksModel> allFeeds;
+  final List<BooksModel>  filteredFeeds;
+
+  FilterFeed({required this.allFeeds, required this.filteredFeeds});
+  FilterFeed copyWith({
+    List<BooksModel> ? allFeeds,
+    List<BooksModel> ? filteredFeeds,
+  }){
+    return FilterFeed(allFeeds: allFeeds??this.allFeeds, filteredFeeds: filteredFeeds??this.filteredFeeds);
+  }
+}
+
+
+final filterFeedProvider = StateNotifierProvider<FilterFeedNotifier, FilterFeed>((ref) {
+  final authAsync = ref.watch(currentUserAuthStatus);
+
+  // Handle loading or error
+  if (authAsync is AsyncLoading || authAsync is AsyncError || authAsync.value == null) {
+    return FilterFeedNotifier.empty(); // fallback safe version
+  }
+
+  final uid = authAsync.value!.uid;
+  return FilterFeedNotifier(uid);
+});
 
 
 class FeedPortion extends ConsumerWidget {
-   const FeedPortion({super.key,});
+    FeedPortion({super.key,});
+   final TextEditingController controller=TextEditingController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     print("Feed Portion Screen Rebuilds");
-    final streamBooksPostData=ref.watch(booksFeedProvider);
-   return streamBooksPostData.when(
-        data: (bookPosts){
-          if(bookPosts.isNotEmpty){
-            return CustomScrollView(
-              // physics: BouncingScrollPhysics(),
-              slivers: [
-                SliverToBoxAdapter(
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: bookPosts.length,
-                    padding: EdgeInsets.all(5),
-                    itemBuilder: (context,index){
-                     // print("index");
-                      final type=bookPosts[index].category;
-                      return PostCard(
-                        title: type=="Exchange"? "I want to ${bookPosts[index].category} ${bookPosts[index].grade} Books":'I am donating ${bookPosts[index].grade} Books',
-                        category: bookPosts[index].category,
-                        grade: bookPosts[index].grade,
-                        board: bookPosts[index].board,
-                        time: TimeFormater.timeAgo(bookPosts[index].createdAt.toString()),
-                        description: bookPosts[index].description,
-                        location: bookPosts[index].location,
-                        type:bookPosts[index].type,
-                        imageUrl: bookPosts[index].imageUrl,
-                        function: (){
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (builder) => ViewDetails(booksModel: bookPosts[index],)),
-                          );
-                        },
-                      );
-                    }, separatorBuilder: (BuildContext context, int index) {
-                    return Divider(color: AppThemeClass.primary,);
-                  },),
-                ),
-              ],
-            );
-          }else{
-            return Center(
-              child:CustomText(text: "No Data Found!",fontSize: 18,isBold: true,color: AppThemeClass.primary,),
-            );
-          }
-        },
-        error: (error,track)=>Center(
-          child: Column(
-              spacing: 10,
-              mainAxisSize: MainAxisSize.min,
-              //crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.wifi_off,size: 50,color: AppThemeClass.primary,),
-                CustomText(text: "Oops! Unknown error occurred!",fontSize: 18,isBold: true,color: AppThemeClass.primary,),
-                CustomButton(width: 200,onPress: (){
-                  ref.invalidate(booksFeedProvider);
-                },title: "Refresh",),]
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: CustomScrollView(
+        slivers: [
+        /*  SliverAppBar(
 
+            surfaceTintColor: AppThemeClass.whiteText,
+            backgroundColor: AppThemeClass.whiteText,
+            floating: true,
+            pinned: true,
+            expandedHeight: 10,
+            automaticallyImplyLeading: false,
+            flexibleSpace: FlexibleSpaceBar(
+             // padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              background: BannerAdWidget(),
+            ),
+          ),*/
+
+          SliverAppBar(
+            surfaceTintColor: AppThemeClass.whiteText,
+            backgroundColor: AppThemeClass.whiteText,
+
+           expandedHeight: 60,
+
+            automaticallyImplyLeading: false,
+            flexibleSpace: FlexibleSpaceBar(
+              centerTitle: false,
+              background:   Consumer(
+                builder: (context, ref, child) {
+                  return CustomTextField(
+                    controller: controller,
+
+                    hintText: "Search by location",
+                    leadingIcon: Icons.search,
+                    trailingIcon: Icons.close,
+                    onChanged: (String search) {
+                      ref.read(filterFeedProvider.notifier).filterByLocation(search);
+                    },
+                    trailingFn: () {
+                      controller.clear();
+                      ref.read(filterFeedProvider.notifier).resetFilters();
+                    },
+                  );
+                },
+              ),
+
+            ),
           ),
-        ),
-        loading: ()=>Center(
-          child:  CustomText(text: "Loading....!",fontSize: 15,isBold: true,color: AppThemeClass.primary,),
-        )
+
+          // Posts List
+          Consumer(
+            builder: (context, ref, child) {
+              final all = ref.watch(filterFeedProvider.select((s) => s.allFeeds));
+              final filtered = ref.watch(filterFeedProvider.select((s) => s.filteredFeeds));
+              final posts = controller.text.isNotEmpty ? filtered : all;
+
+              if (posts.isNotEmpty) {
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                      final post = posts[index];
+                      final type = post.category;
+
+                      return Column(
+                        children: [
+                          PostCard(
+                            title: type == "Exchange"
+                                ? "I want to ${post.category} ${post.grade} Books"
+                                : "I am donating ${post.grade} Books",
+                            category: post.category,
+                            grade: post.grade,
+                            board: post.board,
+                            time: TimeFormater.timeAgo(post.createdAt.toString()),
+                            description: post.description,
+                            location: post.location,
+                            type: post.type,
+                            imageUrl: post.imageUrl,
+                            function: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => ViewDetails(booksModel: post),
+                                ),
+                              );
+                            },
+                          ),
+                          Divider(color: AppThemeClass.primary),
+                        ],
+                      );
+                    },
+                    childCount: posts.length,
+                  ),
+                );
+
+              }
+              else{
+                return SliverToBoxAdapter(
+                  child:Center(
+                    child:CustomText(text: "No Post Found!",fontSize: 15,isBold: true,color: AppThemeClass.primary,),
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
     );
+
+
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../screens/home/feed_portion.dart';
 import '../authentication/auth_repository.dart';
 import '../firebase_crud_operations/firestore_crud_operations.dart';
 import 'package:booksexchange/model/user_profile.dart';
@@ -56,36 +57,9 @@ final getUserDocument = FutureProvider<UserProfile?>((ref) async {
 
 
 final userProfileProvider=StateProvider<UserProfile?>((ref){
-  final user=ref.watch(currentUserAuthStatus).asData?.value;
+  ref.watch(currentUserAuthStatus).asData?.value;
   return null;
 
-});
-
-
-final booksFeedProvider = StreamProvider<List<BooksModel>>((ref) {
-  final user=ref.watch(currentUserAuthStatus).asData?.value;
-  if(user!=null){
-    return FirebaseFirestore.instance
-        .collection('posts')
-        .where('userID', isNotEqualTo:user.uid)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        return BooksModel.fromJson(data);
-      }).toList();
-    });
-  }else{
-    return FirebaseFirestore.instance
-        .collection('posts')
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        return BooksModel.fromJson(data);
-      }).toList();
-    });
-  }
 });
 
 
@@ -99,6 +73,7 @@ final uniformFeedProvider = StreamProvider<List<ClothesModel>>((ref) {
     return FirebaseFirestore.instance
         .collection('outfits')
         .where('userID', isNotEqualTo:user.uid)
+        .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {
@@ -109,6 +84,7 @@ final uniformFeedProvider = StreamProvider<List<ClothesModel>>((ref) {
   }else{
     return FirebaseFirestore.instance
         .collection('outfits')
+        .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {
@@ -126,6 +102,7 @@ final myBooksPosts = StreamProvider<List<BookIds>>((ref) {
     return FirebaseFirestore.instance
         .collection('posts')
         .where('userID', isEqualTo:user.uid)
+
         .snapshots()
         .map(
           (snapshot) => snapshot.docs.map(
@@ -188,6 +165,7 @@ final myClothesPosts = StreamProvider<List<ClothesIds>>((ref) {
     return FirebaseFirestore.instance
         .collection('outfits')
         .where('userID', isEqualTo:user.uid)
+
         .snapshots()
         .map(
           (snapshot) => snapshot.docs.map(

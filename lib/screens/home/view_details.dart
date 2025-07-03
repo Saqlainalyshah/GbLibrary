@@ -37,6 +37,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
   @override
   Widget build(BuildContext context) {
     print("View Details Screen builds");
+   final bookTitle= widget.booksModel.grade!="General Books"?"Books":'';
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -97,7 +98,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                         color: AppThemeClass.primary,
                       ),
                       CustomText(
-                        text: widget.booksModel.category=="Exchange"? "I want to ${widget.booksModel.category} ${widget.booksModel.grade} Books":'I am donating ${widget.booksModel.grade} Books',
+                        text: widget.booksModel.category=="Exchange"? "I want to ${widget.booksModel.category} ${widget.booksModel.grade} $bookTitle":'I am donating ${widget.booksModel.grade} $bookTitle',
                         fontSize: ResponsiveText.getSize(context, 18),
                         isBold: true,
                       ),

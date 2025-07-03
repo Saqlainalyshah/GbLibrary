@@ -22,6 +22,8 @@ import '../../utils/fontsize/app_theme/theme.dart';
 
 import 'package:flutter/services.dart';
 
+import 'chat.dart';
+
 class NetworkChecker {
   static const platform = MethodChannel('com.example.network/check');
 
@@ -83,8 +85,10 @@ class MessagesIDs {
 }
 
 class MessageRoom extends ConsumerStatefulWidget {
-  const MessageRoom({super.key, required this.userProfile});
+  const MessageRoom({super.key, required this.userProfile,this.chatIds,this.userNotFound=false});
   final UserProfile userProfile;
+  final ChatIds? chatIds;
+  final bool userNotFound;
 
   @override
   ConsumerState<MessageRoom> createState() => _MessageRoomState();
@@ -152,16 +156,87 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
             ),
             subtitle: CustomText(text: "Offline"),
           ),
-          actions: [IconButton(onPressed: () {}, icon: Icon(Icons.more_vert))],
+          actions: [
+            Consumer(builder: (context,ref,child){
+              final user=FirebaseAuth.instance.currentUser;
+
+              String id =user!=null?user.uid+
+                  widget.userProfile.uid:"12345677uuu5ii4";
+              final roomID = TimeFormater.sortString(id);
+              final allMessages=ref.watch(_messages(roomID));
+            return  allMessages.when(data: (messages){
+                if(messages.isNotEmpty){
+
+                 return PopupMenuButton<String>(
+                    icon: Icon(Icons.more_vert), // 'More' icon
+                    onSelected: (value){
+                      FirebaseFireStoreServices instance=FirebaseFireStoreServices();
+                      // Handle option selection
+                      print("Selected: $value");
+                      if(value=='1'){
+                        UiEventHandler.customAlertDialog(context, 'Do you want to block the user?', '', 'Block', 'Cancel', (){
+                          Navigator.of(context).pop();
+
+                          for(var item in messages){
+                            if(item.messageModel.userId==FirebaseAuth.instance.currentUser!.uid){
+                              instance.deleteDocument('chats/$roomID/messages', item.docId);
+                            }
+                          }
+                          instance.removeArrayElement('chats', roomID, 'participants', FirebaseAuth.instance.currentUser!.uid);
+                          if(widget.chatIds!=null){
+                            final result=widget.chatIds;
+                            if(result!.chatRoomModel.participants.length==1){
+                              instance.deleteDocument('chats', result.docId);
+                            }
+                          }
+                        }, false);
+                      }else if(value=='2'){
+                        UiEventHandler.customAlertDialog(context, 'Do you want to delete all messages?', '', 'Delete all', 'Cancel', (){
+                          Navigator.of(context).pop();
+                          for(var item in messages){
+                            if(item.messageModel.userId==FirebaseAuth.instance.currentUser!.uid){
+                             instance.deleteDocument('chats/$roomID/messages', item.docId);
+                            }
+                          }
+                          if(widget.userNotFound){
+                            instance.deleteDocument('chats', widget.chatIds!.docId);
+                          }
+                        }, false);
+                      }else{
+                        instance.deleteDocument('chats', widget.chatIds!.docId);
+                      }
+                    },
+                    color: AppThemeClass.whiteText,
+                    itemBuilder: (BuildContext context) => [
+                      PopupMenuItem(
+                        value: "1",
+                        child: CustomText(text: "Block",isBold: true,),
+                      ),
+                      PopupMenuItem(
+                        value: "2",
+                        child: CustomText(text: "Delete all messages",isBold: true,),
+                      ),
+                      if(widget.userNotFound) PopupMenuItem(
+                        value: "3",
+                        child: CustomText(text: "Delete conversation",isBold: true,),
+                      ),
+
+                    ],
+                  );
+                }
+                else{
+                 return popupWidget();
+                }
+              },
+                  error: (error,track)=>popupWidget(), loading:()=>popupWidget());
+            })
+          ],
         ),
         body: Column(
           children: [
             Consumer(
               builder: (context, ref, child) {
-                //if(ref.watch(provider))
-
                 final user=FirebaseAuth.instance.currentUser;
-
                 String id =user!=null?user.uid+
                     widget.userProfile.uid:"12345677uuu5ii4";
                final roomID = TimeFormater.sortString(id);
@@ -209,7 +284,7 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                       return Expanded(
                         child: Center(
                           child: CustomText(
-                            text: "Hello! ${widget.userProfile.name}👋!",
+                            text: "Say! Hello, ${widget.userProfile.name}👋!",
                             isBold: true,
                             fontSize: 15,
                           ),
@@ -231,7 +306,7 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                 );
               },
             ),
-            Padding(
+            !widget.userNotFound?Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
@@ -317,10 +392,34 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                   ),
                 ],
               ),
+            ):  Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CustomText(text: "This user is not available",fontSize: 13,isBold: true,),
             ),
           ],
         ),
       ),
     );
   }
+}
+
+Widget popupWidget(){
+  return  PopupMenuButton<String>(
+    icon: Icon(Icons.more_vert), // 'More' icon
+    onSelected: (value) {
+
+    },
+    color: AppThemeClass.whiteText,
+    itemBuilder: (BuildContext context) => [
+      PopupMenuItem(
+        value: "1",
+        child: Text("Block user"),
+      ),
+      PopupMenuItem(
+        value: "2",
+        child: Text("Delete all messages"),
+      ),
+
+    ],
+  );
 }

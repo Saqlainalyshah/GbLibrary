@@ -3,7 +3,6 @@ import 'package:booksexchange/controller/firebase_crud_operations/firestore_crud
 import 'package:booksexchange/model/post_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../components/button.dart';
@@ -12,12 +11,12 @@ import '../../components/layout_components/alert_dialogue.dart';
 import '../../components/layout_components/small_components.dart';
 import '../../components/text_widget.dart';
 import '../../components/textfield.dart';
+import '../../controller/book_detection/book_detection.dart';
 import '../../controller/firebase_Storage/crud_storage.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../model/ui_models.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 import '../chat/message_room.dart';
-import '../main_screen/main_screen.dart';
 
 final bookSubjectsList=StateProvider<List<String>>((ref)=>[]);
 final _item=StateProvider<String>((ref)=>'');
@@ -42,40 +41,51 @@ class _PostBooksState extends ConsumerState<PostBooks> {
 
    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-   final MethodChannel channel = MethodChannel('com.example.tflite/inference');
 
-   Future<String> pickAndSendImage(XFile? file) async {
-     if (file != null) {
-       final Uint8List bytes = await file.readAsBytes();
-       final result = await channel.invokeMethod('runModelOnBytes', {
-         'imageBytes': bytes,
-       });
-       return result['confidence'];
-       print("Prediction: ${result['class']} with confidence ${result['confidence']}");
-     }else{
-       return '';
-     }
-   }
-   Future<void> _pickImageAndCompress(WidgetRef ref) async{
+   Future<void> _pickImageAndCompress(WidgetRef ref) async {
      final picker = ImagePicker();
      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-     if(pickedFile!=null){
+     if (pickedFile != null) {
+       print("Image Picked Now show circular indicator");
+    if(mounted){
+      UiEventHandler.customAlertDialog(
+          context,
+          'Detecting book in the image...',
+          '',
+          '',
+          '', () {},
+          true);
+    }
+       // BookDetectorModel instance=BookDetectorModel();
+       final res = await TFLiteService.runModelOnImage(pickedFile);
 
-     final res=  await pickAndSendImage(pickedFile);
-     final double val=double.parse(res);
-     if(val>0.5){
-       FirebaseStorageService storage=FirebaseStorageService();
-       final XFile? file= await storage.pickImageAndCompress(pickedFile);
-       if(file!=null){
-         final fileData = File(file.path);
-         ref.read(selectedImageProvider.notifier).state = fileData;
+       if (res != null) {
+         print("Model output ==================== $res");
+
+         //TODO: Model threshold value is 0.5 you can change it up to 1
+         if (res > 0.5) {
+
+           FirebaseStorageService storage = FirebaseStorageService();
+           final XFile? file = await storage.pickImageAndCompress(pickedFile);
+           if (file != null) {
+             final fileData = File(file.path);
+             ref
+                 .read(selectedImageProvider.notifier)
+                 .state = fileData;
+           }
+         }else{
+           if(mounted){
+             UiEventHandler.snackBarWidget(context, 'Only books image acceptable! Try again');
+           }
+         }
+
        }
+       print("Now at the end pop circular indicator");
+     if(mounted){
+        Navigator.of(context).pop();
      }
-     UiEventHandler.snackBarWidget(context, 'Only books image acceptable! Try again');
-
      }
    }
-
    Future<String?> uploadPost(WidgetRef ref) async {
      final fileName = '${ref.watch(userProfileProvider)!.uid}_${DateTime.now().millisecondsSinceEpoch}';
      final storageRef = FirebaseStorage.instance.ref().child('posts/books/$fileName');
@@ -240,7 +250,7 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                       );
                     },
                   ),
-                  if(!widget.isEdit)   CustomText(text: "Only one image can be upload",isGoogleFont: true,fontSize: 9,color: AppThemeClass.primary,),
+                  if(!widget.isEdit)   CustomText(text: "Only one image can be upload. The image should be clear because our Book detection model is not 100% accurate",isGoogleFont: true,fontSize: 9,color: AppThemeClass.primary,),
                   RichText(
                     text: TextSpan(
                       children: [

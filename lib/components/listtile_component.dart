@@ -50,7 +50,8 @@ class CustomListTile extends StatelessWidget {
           : leadingWidget,
       title: CustomText(text: 
         title,
-
+      maxLines: 2,
+        fontSize: 13,
       ),
       trailing: Icon(
         trailingIcon,

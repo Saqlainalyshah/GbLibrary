@@ -28,6 +28,7 @@ class CustomTextField extends StatelessWidget {
     this.maxLength,
     this.maxLines,
     this.validator, // Added validator function
+    this.onTapOutside,
   });
 
   final bool secure;
@@ -48,6 +49,7 @@ class CustomTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final int? maxLines;
   final FocusNode? focusNode;
+  final void Function(PointerDownEvent)? onTapOutside;
 
 
 
@@ -63,6 +65,7 @@ class CustomTextField extends StatelessWidget {
       maxLines: maxLines,
       minLines: 1,
       focusNode: focusNode,
+      textCapitalization: TextCapitalization.sentences,
 
       style: GoogleFonts.robotoSerif(
         letterSpacing: -0.4

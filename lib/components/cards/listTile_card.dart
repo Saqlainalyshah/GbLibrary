@@ -17,6 +17,7 @@ class ListTileCard extends StatelessWidget {
     this.isIcon=false,
     this.newMessage=false,
     this.hint='You',
+    this.backgroundColor,
     this.function});
 
   final bool isMe;
@@ -29,6 +30,7 @@ final bool newMessage;
   final VoidCallback? function;
   final bool isError;
   final String? hint;
+  final Color? backgroundColor;
   @override
   Widget build(BuildContext context) {
 
@@ -37,11 +39,12 @@ final bool newMessage;
       child: Container(
         //height: 80,
         decoration:BoxDecoration(
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(5), // Rounded corners
           border: Border.all(color: AppThemeClass.secondary, width: 1.0), // Border properties
         ),
-        margin:  EdgeInsets.only(bottom: 10),
-        padding:  EdgeInsets.symmetric(vertical:  5),
+       // margin:  EdgeInsets.only(bottom: 5),
+        padding:  EdgeInsets.all(5),
         child: Row(
           // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -135,7 +138,7 @@ final bool newMessage;
                               TextSpan(
                                 text: subTitle,
                                 style: GoogleFonts.robotoSerif(
-                                  color:  isMe?AppThemeClass.darkTextOptional: newMessage ?AppThemeClass.darkTextOptional:AppThemeClass.primary,
+                                  color:  isMe?AppThemeClass.darkTextOptional: newMessage ?AppThemeClass.darkTextOptional: backgroundColor!=null?AppThemeClass.whiteText:AppThemeClass.primary,
                                   letterSpacing: 0,
                                   fontSize: ResponsiveText.getSize(context, 13),
                                   fontWeight: FontWeight.w500,
@@ -168,65 +171,6 @@ final bool newMessage;
               ),
             ),
           )
-
-           /* Expanded(
-              child: Padding(
-              //  color: Colors.black,
-                padding: const EdgeInsets.only(top: 15.0, left: 5),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                 // mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CustomText(
-                      text: isError ? "gblibrayuser" : title,
-                      maxLines: 1,
-                      fontSize: 16,
-                      isBold: true,
-                      //isGoogleFont: true,
-
-
-                    ),
-                    SizedBox(height: 4),
-                    RichText(
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      text: TextSpan(
-                        children: [
-                          if(isMe)TextSpan(
-                            text: '$hint: ',
-                            style: GoogleFonts.robotoSerif(
-                              color: AppThemeClass.primary,
-                              letterSpacing: 0,
-                              fontSize: ResponsiveText.getSize(context, 13),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextSpan(
-                            text: subTitle,
-                            style: GoogleFonts.robotoSerif(
-                              color: AppThemeClass.darkTextOptional,
-                              letterSpacing: 0,
-                              fontSize: ResponsiveText.getSize(context, 13),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            //Spacer(),
-            if (time != null)
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                Icon(Icons.done_all,color: isMe?Colors.black26:Colors.blue),
-                CustomText(text: TimeFormater.timeAgo(time!.toString()), maxLines: 1,fontSize: 10,isGoogleFont: true,color: AppThemeClass.primary,),
-              ],),
-            SizedBox(width: 3,),*/
-
           ],
         ),
       ),

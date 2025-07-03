@@ -6,6 +6,7 @@ import '../../components/button.dart';
 import '../../components/layout_components/small_components.dart';
 import '../../components/text_widget.dart';
 import '../../components/textfield.dart';
+import '../../controller/ads/interstitial_ad.dart';
 import '../../controller/firebase_crud_operations/firestore_crud_operations.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
@@ -36,10 +37,13 @@ class _ProfileState extends ConsumerState<Profile> {
   final TextEditingController whatsappNumber = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Added key
   late final UserProfile userProfile;
+
+  final InterstitialAdManager adInstance=InterstitialAdManager();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    adInstance.createInterstitialAd();
     userProfile= ref.read(userProfileProvider)!;
     name.text=userProfile.name;
     address.text=userProfile.address;
@@ -53,6 +57,7 @@ class _ProfileState extends ConsumerState<Profile> {
     name.dispose();
     address.dispose();
     whatsappNumber.dispose();
+    adInstance.disposeInterstitialAds();
   }
 
   @override
@@ -152,6 +157,7 @@ class _ProfileState extends ConsumerState<Profile> {
                     builder:(context,ref,child)=>ref.watch(_isReadOnly)!?SizedBox.shrink(): CustomButton(
                       isLoading: ref.watch(isLoading),
                       onPress: () async {
+                        FirebaseFireStoreServices instance=FirebaseFireStoreServices();
                         ref.read(isLoading.notifier).state=true;
                         UserProfile user=UserProfile(
                           createdAt: userProfile.createdAt,
@@ -171,13 +177,22 @@ class _ProfileState extends ConsumerState<Profile> {
                             ref.read(_isReadOnly.notifier).state=true;
                             return;
                           }else{
-                            await ref.read(firebaseCRUDProvider).updateDocument('users',userProfile.uid.toString(), user.toJson()).then((onValue){
-                              ref.read(userProfileProvider.notifier).state=user;
-                            });
+                             final result=await instance.updateDocument('users',userProfile.uid.toString(), user.toJson());
+                           if(result){
+                           final count = ref.read(userActionsTracker.select((state)=>state.numberOfProfileUpdate))+1;
+                             ref.read(userProfileProvider.notifier)
+                                 .state = user;
+                             ref.read(userActionsTracker.notifier).updateNumberOfProfileUpdate(count);
+
+                             if(ref.watch(userActionsTracker.select((state)=>state.numberOfProfileUpdate))==5 ){
+                               adInstance.showInterstitialAd((){
+                                 ref.read(userActionsTracker.notifier).clearNumberOfProfileUpdate();
+                               });
+                             }else{
+                               print("${ref.watch(userActionsTracker.select((state)=>state.numberOfProfileUpdate))}===================>");
+                             }
+                           }
                             ref.read(_isReadOnly.notifier).state=true;
-                            if(context.mounted){
-                              UiEventHandler.snackBarWidget(context, "Successfully updated");
-                            }
                           }
                         } else {
                           UiEventHandler.snackBarWidget(context, "Please fill all the required fields");

@@ -6,6 +6,7 @@ import 'package:booksexchange/screens/home/view_uniform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/cards/post_card.dart';
+import '../../controller/ads/native_ad.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
@@ -51,7 +52,13 @@ class UniformFeed extends ConsumerWidget {
                         },
                       );
                     }, separatorBuilder: (BuildContext context, int index) {
-                    return Divider(color: AppThemeClass.primary,);
+                    return Column(
+                      children: [
+                        Divider(color: AppThemeClass.primary,),
+                        NativeAdWidget(height: 300, container: SizedBox.shrink(),),
+                        Divider(color: AppThemeClass.primary,),
+                      ],
+                    );
                   },),
                 ),
               ],
@@ -69,9 +76,9 @@ class UniformFeed extends ConsumerWidget {
               //crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(Icons.wifi_off,size: 50,color: AppThemeClass.primary,),
-                CustomText(text: "Oops! Unknown error occurred!",fontSize: 18,isBold: true,color: AppThemeClass.primary,),
+                CustomText(text: "Oops! Unknown error occurred! $error",fontSize: 18,isBold: true,color: AppThemeClass.primary,),
                 CustomButton(width: 200,onPress: (){
-                  ref.invalidate(booksFeedProvider);
+                  //ref.invalidate(booksFeedProvider);
                 },title: "Refresh",),]
 
           ),
