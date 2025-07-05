@@ -44,7 +44,7 @@ class NetworkChecker {
 }
 
 
-final _messages = StreamProvider.family<List<MessagesIDs>, String>((ref, roomID) {
+final _messages = StreamProvider.family<List<MessageModel>, String>((ref, roomID) {
   final data = FirebaseFirestore.instance
       .collection('chats')
       .doc(roomID)
@@ -53,41 +53,22 @@ final _messages = StreamProvider.family<List<MessagesIDs>, String>((ref, roomID)
       .snapshots()
       .map(
         (snapshot) => snapshot.docs.map(
-          (doc) => MessagesIDs(
-        messageModel: MessageModel.fromJson(doc.data()),
-        docId: doc.id,
-      ),
+          (doc) {
+            final decoded=MessageModel.fromJson(doc.data());
+           final model= decoded.copyWith(messageDocId: doc.id);
+           return model;
+          },
     ).toList(),
   );
   return data;
 });
 
 
-class MessagesIDs {
-  final MessageModel messageModel;
-  final String docId;
-
-  MessagesIDs({required this.messageModel, required this.docId});
-
-  factory MessagesIDs.fromJson(Map<String, dynamic> json) {
-    return MessagesIDs(
-      messageModel: MessageModel.fromJson(json['messageModel']),
-      docId: json['docId'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'messageModel': messageModel.toJson(),
-      'docId': docId,
-    };
-  }
-}
 
 class MessageRoom extends ConsumerStatefulWidget {
-  const MessageRoom({super.key, required this.userProfile,this.chatIds,this.userNotFound=false});
+  const MessageRoom({super.key, required this.userProfile,this.chatRoomModel,this.userNotFound=false});
   final UserProfile userProfile;
-  final ChatIds? chatIds;
+  final ChatRoomModel? chatRoomModel;
   final bool userNotFound;
 
   @override
@@ -96,10 +77,6 @@ class MessageRoom extends ConsumerStatefulWidget {
 
 class _MessageRoomState extends ConsumerState<MessageRoom> {
   final TextEditingController controller = TextEditingController();
-
-
-
-  final FocusScopeNode focusScopeNode = FocusScopeNode();
 
   @override
   void initState() {
@@ -120,7 +97,10 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
     super.dispose();
 
     controller.dispose();
-    focusScopeNode.dispose();
+  }
+
+  clear(){
+    controller.clear();
   }
 
 
@@ -133,6 +113,8 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
       child: Scaffold(
         backgroundColor: AppThemeClass.whiteText,
         appBar: AppBar(
+          elevation: 2,
+          shadowColor: AppThemeClass.primary,
           surfaceTintColor: Colors.transparent,
           backgroundColor: AppThemeClass.whiteText,
           leading: IconButton(
@@ -178,15 +160,15 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                           Navigator.of(context).pop();
 
                           for(var item in messages){
-                            if(item.messageModel.userId==FirebaseAuth.instance.currentUser!.uid){
-                              instance.deleteDocument('chats/$roomID/messages', item.docId);
+                            if(item.userId==FirebaseAuth.instance.currentUser!.uid){
+                              instance.deleteDocument('chats/$roomID/messages', item.messageDocId);
                             }
                           }
                           instance.removeArrayElement('chats', roomID, 'participants', FirebaseAuth.instance.currentUser!.uid);
-                          if(widget.chatIds!=null){
-                            final result=widget.chatIds;
-                            if(result!.chatRoomModel.participants.length==1){
-                              instance.deleteDocument('chats', result.docId);
+                          if(widget.chatRoomModel!=null){
+                            final result=widget.chatRoomModel;
+                            if(result!.participants.length==1){
+                              instance.deleteDocument('chats', result.chatDocId);
                             }
                           }
                         }, false);
@@ -194,16 +176,16 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                         UiEventHandler.customAlertDialog(context, 'Do you want to delete all messages?', '', 'Delete all', 'Cancel', (){
                           Navigator.of(context).pop();
                           for(var item in messages){
-                            if(item.messageModel.userId==FirebaseAuth.instance.currentUser!.uid){
-                             instance.deleteDocument('chats/$roomID/messages', item.docId);
+                            if(item.userId==FirebaseAuth.instance.currentUser!.uid){
+                             instance.deleteDocument('chats/$roomID/messages', item.messageDocId);
                             }
                           }
                           if(widget.userNotFound){
-                            instance.deleteDocument('chats', widget.chatIds!.docId);
+                            instance.deleteDocument('chats', widget.chatRoomModel!.chatDocId);
                           }
                         }, false);
                       }else{
-                        instance.deleteDocument('chats', widget.chatIds!.docId);
+                        instance.deleteDocument('chats', widget.chatRoomModel!.chatDocId);
                       }
                     },
                     color: AppThemeClass.whiteText,
@@ -253,27 +235,31 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                           itemBuilder: (context, index) {
                             return GestureDetector(
                               onLongPress: (){
-                                String id = FirebaseAuth.instance.currentUser!.uid+widget.userProfile.uid;
+                                String id =  ref.watch(userProfileProvider)!.uid+widget.userProfile.uid;
                                 final roomID = TimeFormater.sortString(id);
-                               bool isMyMessage= data[index].messageModel.userId ==
-                                    FirebaseAuth.instance.currentUser!.uid;
+                               bool isMyMessage= data[index].userId ==
+                                    ref.watch(userProfileProvider)!.uid;
                                if(isMyMessage){
-                                 UiEventHandler.customAlertDialog(context, "Do you want to delete this message?",data[index].messageModel.message,'Delete','Cancel',()async {
+                                 UiEventHandler.customAlertDialog(context, "Do you want to delete this message?",data[index].message,'Delete','Cancel',()async {
                                    FirebaseFireStoreServices instance=FirebaseFireStoreServices();
-                                   await instance.deleteDocument('chats/$roomID/messages', data[index].docId);
                                    if(context.mounted){
                                      Navigator.pop(context);
                                    }
-                                 },false
+                                   instance.deleteDocument('chats/$roomID/messages', data[index].messageDocId);
+                                 },
+                                     false
                                  );
+
+                               }else{
+                                 print("Not users");
                                }
                               },
                               child: MessageBubble(
-                                messageModel: data[index].messageModel,
+                                messageModel: data[index],
                                 index: index,
-                                message: data[index].messageModel.message,
+                                message: data[index].message,
                                 isMe:
-                                    data[index].messageModel.userId ==
+                                    data[index].userId ==
                                     FirebaseAuth.instance.currentUser!.uid,
                               ),
                             );
@@ -282,11 +268,18 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                       );
                     } else {
                       return Expanded(
-                        child: Center(
-                          child: CustomText(
-                            text: "Say! Hello, ${widget.userProfile.name}👋!",
-                            isBold: true,
-                            fontSize: 15,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: Text(
+                               "Say! Hello ${widget.userProfile.name}👋! I am interested in your post",
+                             // isBold: true,
+                              style: TextStyle(
+                                fontSize: 15,
+
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ),
                       );
@@ -323,7 +316,7 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                         onPressed: ()  async{
 
                          final result = await NetworkChecker.hasInternetConnection();
-                          if (controller.text.trim().isNotEmpty && RegExp(r'[a-zA-Z0-9]').hasMatch(controller.text)&&result) {
+                          if (controller.text.trim().isNotEmpty && RegExp(r'[a-zA-Z0-9]').hasMatch(controller.text) && result) {
                                String id =
                               ref.watch(userProfileProvider)!.uid +
                                   widget.userProfile.uid;
@@ -359,7 +352,8 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                           FirebaseFireStoreServices instance =
                           FirebaseFireStoreServices();
                           // print(chatRoomModel.toJson());
-                          controller.clear();
+                              clear();
+
                                instance
                                    .createSubCollectionDocument(
                                  'chats',
@@ -367,20 +361,19 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                                  'messages',
                                  messageModel.toJson(),
                                )
-                              .whenComplete(() {
-                          instance
-                              .createDocumentWithId(
-                          'chats',
-                          roomID,
-                          chatRoomModel.toJson(),
-                          );
-                          });
+                                   .whenComplete(() {
+                                 instance
+                                     .createDocumentWithId(
+                                   'chats',
+                                   roomID,
+                                   chatRoomModel.toJson(),
+                                 );
+                               });
                           }else{
                             if(context.mounted){
                               UiEventHandler.snackBarWidget(context, "No internet connection!");
                             }
                           }
-                          print(DateTime.now());
                         },
                         icon: Icon(
                           Icons.send_rounded,

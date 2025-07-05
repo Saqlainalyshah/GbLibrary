@@ -20,14 +20,16 @@ class FilterFeedNotifier extends StateNotifier<FilterFeed> {
   // Normal constructor
   FilterFeedNotifier(String uid) : super(FilterFeed(allFeeds: [], filteredFeeds: [])) {
     _sub = FirebaseFirestore.instance
-        .collection('posts')
+        .collection('books')
         .where('userID', isNotEqualTo: uid)
         .orderBy('createdAt', descending: true)
         .snapshots()
         .listen((snapshot) {
       final books = snapshot.docs.map((doc) {
         final data = doc.data();
-        return BooksModel.fromJson(data);
+        final raw=BooksModel.fromJson(data);
+        final model=raw.copyWith(bookDocId: doc.id);
+        return model;
       }).toList();
 
       state = state.copyWith(allFeeds: books, filteredFeeds: books);
@@ -85,17 +87,18 @@ final filterFeedProvider = StateNotifierProvider<FilterFeedNotifier, FilterFeed>
 
 
 class FeedPortion extends ConsumerWidget {
-    FeedPortion({super.key,});
-   final TextEditingController controller=TextEditingController();
+  FeedPortion({super.key,});
+  final TextEditingController controller=TextEditingController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     print("Feed Portion Screen Rebuilds");
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 0),
       child: CustomScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         slivers: [
-        /*  SliverAppBar(
+          /*  SliverAppBar(
 
             surfaceTintColor: AppThemeClass.whiteText,
             backgroundColor: AppThemeClass.whiteText,
@@ -113,7 +116,7 @@ class FeedPortion extends ConsumerWidget {
             surfaceTintColor: AppThemeClass.whiteText,
             backgroundColor: AppThemeClass.whiteText,
 
-           expandedHeight: 60,
+            expandedHeight: 60,
 
             automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
@@ -153,7 +156,6 @@ class FeedPortion extends ConsumerWidget {
                         (context, index) {
                       final post = posts[index];
                       final type = post.category;
-
                       return Column(
                         children: [
                           PostCard(
@@ -188,8 +190,12 @@ class FeedPortion extends ConsumerWidget {
               }
               else{
                 return SliverToBoxAdapter(
-                  child:Center(
-                    child:CustomText(text: "No Post Found!",fontSize: 15,isBold: true,color: AppThemeClass.primary,),
+                  child:Column(
+                    children: [
+                      Center(
+                        child:CircularProgressIndicator(color: AppThemeClass.primary,),
+                      ),
+                    ],
                   ),
                 );
               }

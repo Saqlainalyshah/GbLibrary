@@ -20,8 +20,8 @@ final isSchoolUniform=StateProvider<String?>((ref)=>null);
 final selectedUniformImageProvider = StateProvider.autoDispose<File?>((ref) => null);
 
 class UniformClothesScreen extends ConsumerStatefulWidget {
- const  UniformClothesScreen({super.key,required this.clothesIds,required this.isEdit});
-final ClothesIds clothesIds;
+ const  UniformClothesScreen({super.key,required this.clothesModel,required this.isEdit});
+final ClothesModel clothesModel;
 final bool isEdit;
   @override
   ConsumerState<UniformClothesScreen> createState() => _UniformClothesScreenState();
@@ -61,8 +61,8 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    location.text=widget.clothesIds.clothesModel.location;
-    description.text=widget.clothesIds.clothesModel.description;
+    location.text=widget.clothesModel.location;
+    description.text=widget.clothesModel.description;
   }
 
   @override
@@ -194,16 +194,16 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                         UiEventHandler.customAlertDialog(context, "Please wait few seconds! Updating...",'','','',(){} ,true);
 
                         ClothesModel clothe=ClothesModel(
-                          userID: widget.clothesIds.clothesModel.userID,
+                          userID: widget.clothesModel.userID,
                           type: 'outfits',
                           size: ref.watch(uniformSize)??'M',
                           isSchoolUniform: ref.watch(isSchoolUniform)??'Yes',
                           location: location.text,
                           description: description.text,
-                          imageUrl: widget.clothesIds.clothesModel.imageUrl,
-                          createdAt: widget.clothesIds.clothesModel.createdAt,
+                          imageUrl: widget.clothesModel.imageUrl,
+                          createdAt: widget.clothesModel.createdAt,
                         );
-                        ClothesModel model=widget.clothesIds.clothesModel;
+                        ClothesModel model=widget.clothesModel;
                         bool isSame=clothe==model;
                         if(isSame){
                           Navigator.pop(context);
@@ -211,7 +211,7 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                           return;
                         }else{
                           FirebaseFireStoreServices instance=FirebaseFireStoreServices();
-                          instance.updateDocument('outfits', widget.clothesIds.docId,clothe.toJson()).whenComplete((){
+                          instance.updateDocument('outfits', widget.clothesModel.clothesDocId,clothe.toJson()).whenComplete((){
                             if(context.mounted){
                               invalidate();
                               Navigator.pop(context);
@@ -228,9 +228,9 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                       UiEventHandler.customAlertDialog(context, "Please wait few seconds! Deleting...",'','','',(){} ,true);
                       FirebaseFireStoreServices instance=FirebaseFireStoreServices();
                       FirebaseStorageService storage =FirebaseStorageService();
-                      bool result=await storage.deleteFile(widget.clothesIds.clothesModel.imageUrl);
+                      bool result=await storage.deleteFile(widget.clothesModel.imageUrl);
                       if(result){
-                        instance.deleteDocument('outfits', widget.clothesIds.docId).then((onValue){
+                        instance.deleteDocument('outfits', widget.clothesModel.clothesDocId).then((onValue){
                           invalidate();
                          if(context.mounted){
                            UiEventHandler.snackBarWidget(context, "Post Deleted");
@@ -246,38 +246,41 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                     },title: "Delete",fontSize: 15,isBold: true,))
                   ],
                 ):Consumer(
-                  builder:(context,ref,child)=> CustomButton(onPress: () {
+                  builder:(context,ref,child)=> CustomButton(onPress: () async{
                     if (_formKey.currentState!.validate() && ref.watch(isSchoolUniform)!=null && ref.watch(uniformSize)!=null && ref.watch(selectedUniformImageProvider)!=null) {
+                      UiEventHandler.customAlertDialog(context, "Please wait few seconds! Uploading...",'','','',(){} ,true);
+                      final result= await _upload(ref);
+                      if(result!=null){
+                        ClothesModel clothe=ClothesModel(
+                          userID: ref.watch(userProfileProvider)!.uid,
+                          type: 'outfits',
+                          size: ref.watch(uniformSize)??'M',
+                          isSchoolUniform: ref.watch(isSchoolUniform)??'Yes',
+                          location: location.text,
+                          description: description.text,
+                          imageUrl: result,
+                          createdAt: DateTime.now(),
+                        );
+                        FirebaseFireStoreServices instance=FirebaseFireStoreServices();
+                       final isUploaded= await instance.createDocument('outfits', clothe.toJson());
+                       if(isUploaded){
+                         description.clear();
+                         location.clear();
+                         ref.read(uniformSize.notifier).state='';
+                         ref.read(isSchoolUniform.notifier).state='';
+                         ref.read(selectedUniformImageProvider.notifier).state=null;
+                         //  Navigator.pop(context);
+                         if(context.mounted){
+                           UiEventHandler.snackBarWidget(context, "Successfully updated");
+                         }
+                       }
+                      }
 
-                      _upload(ref).then((val){
-                        if(val!=null){
-                          ClothesModel clothe=ClothesModel(
-                            userID: ref.watch(userProfileProvider)!.uid,
-                            type: 'outfits',
-                            size: ref.watch(uniformSize)??'M',
-                            isSchoolUniform: ref.watch(isSchoolUniform)??'Yes',
-                            location: location.text,
-                            description: description.text,
-                            imageUrl: val,
-                            createdAt: DateTime.now(),
-                          );
-                          FirebaseFireStoreServices instance=FirebaseFireStoreServices();
-                          instance.createDocument('outfits', clothe.toJson()).whenComplete((){
-                            if(context.mounted){
-                              Navigator.pop(context);
-                              description.clear();
-                              location.clear();
-                              //  Navigator.pop(context);
-                              UiEventHandler.snackBarWidget(context, "Successfully updated");
-                            }
-
-                          });
-                        }
-                      });
-
+                      Navigator.of(context).pop();
                     } else {
                       UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
                     }
+
                   },title: "Post",fontSize: 15,isBold: true,),
                 ),
               ],

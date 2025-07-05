@@ -78,6 +78,7 @@ class AuthRepository {
       // Delete Firestore user profile
       await _fireStore.collection('users').doc(user.uid).delete();
       // Delete Firebase account
+
       await user.delete();
       await signOut();
 

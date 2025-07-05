@@ -64,7 +64,7 @@ class CustomTextField extends StatelessWidget {
       onChanged: onChanged,
       maxLines: maxLines,
       minLines: 1,
-      focusNode: focusNode,
+     // focusNode: focusNode,
       textCapitalization: TextCapitalization.sentences,
 
       style: GoogleFonts.robotoSerif(

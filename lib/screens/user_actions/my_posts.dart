@@ -85,14 +85,14 @@ class _MyPostsState extends ConsumerState<MyPosts> {
                           childAspectRatio: 0.6,
                         ),
                         itemBuilder: (context, index) {
-                          final post = data[index];
-                          return GridItem(title: 'I want to ${post.booksModel.category} ${post.booksModel.grade} Books',
-                            description: post.booksModel.description, imageUrl: post.booksModel.imageUrl, function: (){
-                              ref.read(bookSubjectsList.notifier).state= post.booksModel.subjects;
-                              ref.read(bookCategory.notifier).state= post.booksModel.category;
-                              ref.read(bookGrade.notifier).state= post.booksModel.grade;
-                              ref.read(bookBoard.notifier).state= post.booksModel.board;
-                              Navigator.push(context,MaterialPageRoute(builder: (builder)=> PostBooks(isEdit: true,booksWithIds:  post,)));
+                          final book = data[index];
+                          return GridItem(title: 'I want to ${book.category} ${book.grade} Books',
+                            description: book.description, imageUrl: book.imageUrl, function: (){
+                              ref.read(bookSubjectsList.notifier).state= book.subjects;
+                              ref.read(bookCategory.notifier).state= book.category;
+                              ref.read(bookGrade.notifier).state= book.grade;
+                              ref.read(bookBoard.notifier).state= book.board;
+                              Navigator.push(context,MaterialPageRoute(builder: (builder)=> PostBooks(isEdit: true,booksModel:  book,)));
                             },);
                         },
                       ),
@@ -133,12 +133,12 @@ class _MyPostsState extends ConsumerState<MyPosts> {
                         ),
                         itemBuilder: (context, index) {
                           final post = data[index];
-                          bool isTrue=post.clothesModel.isSchoolUniform=='Yes';
-                          return GridItem(  title: isTrue?'Donated School Uniform':'Donated Clothes', description: post.clothesModel.description,
-                            imageUrl: post.clothesModel.imageUrl, function: (){
-                              ref.read(uniformSize.notifier).state= post.clothesModel.size;
-                              ref.read(isSchoolUniform.notifier).state=  post.clothesModel.isSchoolUniform;
-                              Navigator.push(context,MaterialPageRoute(builder: (builder)=> UniformClothesScreen(isEdit: true,clothesIds:  post,)));
+                          bool isTrue=post.isSchoolUniform=='Yes';
+                          return GridItem(  title: isTrue?'Donated School Uniform':'Donated Clothes', description: post.description,
+                            imageUrl: post.imageUrl, function: (){
+                              ref.read(uniformSize.notifier).state= post.size;
+                              ref.read(isSchoolUniform.notifier).state=  post.isSchoolUniform;
+                              Navigator.push(context,MaterialPageRoute(builder: (builder)=> UniformClothesScreen(isEdit: true,clothesModel:  post,)));
                             },);
                         },
                       ),
@@ -154,11 +154,6 @@ class _MyPostsState extends ConsumerState<MyPosts> {
                           color: AppThemeClass.primary)),
                 );
               }),
-              // You can replace this with another Consumer + provider like:
-              // Consumer(builder: (context, ref, _) {
-              //   final clothesPosts = ref.watch(myClothesPosts);
-              //   return ...
-              // })
             ],
           ),
         ),

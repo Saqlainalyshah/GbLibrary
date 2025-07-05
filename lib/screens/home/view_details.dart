@@ -1,5 +1,6 @@
 import 'package:booksexchange/components/button.dart';
 import 'package:booksexchange/components/cards/post_card.dart';
+import 'package:booksexchange/components/layout_components/alert_dialogue.dart';
 import 'package:booksexchange/components/layout_components/small_components.dart';
 import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/controller/time_format/time_format.dart';
@@ -12,6 +13,7 @@ import 'package:booksexchange/utils/fontsize/responsive_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../components/cards/listTile_card.dart';
 import '../../controller/providers/global_providers.dart';
 
@@ -46,6 +48,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
           surfaceTintColor: Colors.transparent,
           backgroundColor: Colors.transparent,
           leading: buildCustomBackButton(context),
+          title: CustomText(text: "Details"),
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -249,18 +252,24 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                             ),),
                           ),
                           Expanded(
-                            child: CustomButton(onPress: (){},widget: Row(
+                            child: CustomButton(color: AppThemeClass.whiteText,isBorder: true,onPress: (){
+                              if(tempData.number.length==11){
+                                launchPhoneCall(tempData.number);
+                              }else{
+                                UiEventHandler.snackBarWidget(context, "User doesn't provided number");
+                              }
+                            },widget: Row(
                               spacing: 5,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
                                   Icons.call,
-                                  color: AppThemeClass.whiteText,
+                                  color: AppThemeClass.darkText,
                                   size: 25,
                                 ),
                                 CustomText(
                                   text: "Call",
-                                  color: AppThemeClass.whiteText,
+                                  color: AppThemeClass.darkText,
                                   isBold: true,
                                   fontSize: 18,
                                 ),
@@ -280,5 +289,16 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
         ),
       ),
     );
+  }
+}
+
+
+Future<void> launchPhoneCall(String phoneNumber) async {
+  final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+
+  if (await canLaunchUrl(phoneUri)) {
+    await launchUrl(phoneUri);
+  } else {
+    throw 'Could not launch $phoneUri';
   }
 }

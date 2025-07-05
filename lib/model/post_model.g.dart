@@ -7,6 +7,7 @@ part of 'post_model.dart';
 // **************************************************************************
 
 _BooksModel _$BooksModelFromJson(Map<String, dynamic> json) => _BooksModel(
+  bookDocId: json['bookDocId'] as String? ?? '',
   userID: json['userID'] as String? ?? '',
   type: json['type'] as String? ?? '',
   createdAt: DateTime.parse(json['createdAt'] as String),
@@ -23,6 +24,7 @@ _BooksModel _$BooksModelFromJson(Map<String, dynamic> json) => _BooksModel(
 
 Map<String, dynamic> _$BooksModelToJson(_BooksModel instance) =>
     <String, dynamic>{
+      'bookDocId': instance.bookDocId,
       'userID': instance.userID,
       'type': instance.type,
       'createdAt': instance.createdAt.toIso8601String(),
@@ -37,6 +39,7 @@ Map<String, dynamic> _$BooksModelToJson(_BooksModel instance) =>
 
 _ClothesModel _$ClothesModelFromJson(Map<String, dynamic> json) =>
     _ClothesModel(
+      clothesDocId: json['clothesDocId'] as String? ?? '',
       userID: json['userID'] as String? ?? '',
       type: json['type'] as String? ?? '',
       size: json['size'] as String? ?? '',
@@ -49,6 +52,7 @@ _ClothesModel _$ClothesModelFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$ClothesModelToJson(_ClothesModel instance) =>
     <String, dynamic>{
+      'clothesDocId': instance.clothesDocId,
       'userID': instance.userID,
       'type': instance.type,
       'size': instance.size,

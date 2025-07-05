@@ -35,34 +35,17 @@ final currentUserAuthStatus = StreamProvider<User?>((ref) async* {
 });
 
 
-final getUserDocument = FutureProvider<UserProfile?>((ref) async {
-  final user=ref.watch(currentUserAuthStatus).asData?.value;
-  if(user!=null){
-    DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
-    await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-    if (documentSnapshot.exists) {
-      final data = documentSnapshot.data();
-      if(data!=null){
-        final temp=UserProfile.fromJson(data);
-        ref.read(userProfileProvider.notifier).state=temp;
-      }
-      return data != null ? UserProfile.fromJson(data) : null;
-    } else {
-      return null;
-    }
-  }else{
-    return null;
+
+class UserNotifier extends StateNotifier<UserProfile?> {
+  UserNotifier() : super(null);
+
+  Future<void> fetchUser(String uid) async {
+    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    state = UserProfile.fromJson(doc.data()!);
   }
-});
+}
 
-
-final userProfileProvider=StateProvider<UserProfile?>((ref){
-  ref.watch(currentUserAuthStatus).asData?.value;
-  return null;
-
-});
-
-
+final userProfileProvider = StateNotifierProvider<UserNotifier, UserProfile?>((ref) => UserNotifier());
 
 
 final uniformFeedProvider = StreamProvider<List<ClothesModel>>((ref) {
@@ -96,83 +79,43 @@ final uniformFeedProvider = StreamProvider<List<ClothesModel>>((ref) {
 });
 
 
-final myBooksPosts = StreamProvider<List<BookIds>>((ref) {
+final myBooksPosts = StreamProvider<List<BooksModel>>((ref) {
   final user=ref.watch(currentUserAuthStatus).asData?.value;
   if(user!=null){
     return FirebaseFirestore.instance
-        .collection('posts')
+        .collection('books')
         .where('userID', isEqualTo:user.uid)
 
         .snapshots()
         .map(
           (snapshot) => snapshot.docs.map(
-            (doc) => BookIds(
-          booksModel: BooksModel.fromJson(doc.data()),
-          docId: doc.id,
-        ),
+            (doc) {
+              final raw=BooksModel.fromJson(doc.data());
+             final model= raw.copyWith(bookDocId: doc.id);
+             return model;
+            },
       ).toList(),
     );
   }
   return Stream.value([]);
 });
 
-//TODO: Getting documents data with ids
-class BookIds {
-  final BooksModel booksModel;
-  final String docId;
 
-  BookIds({required this.booksModel, required this.docId});
 
-  factory BookIds.fromJson(Map<String, dynamic> json) {
-    return BookIds(
-      booksModel: BooksModel.fromJson(json['booksModel']),
-      docId: json['docId'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'booksModel': booksModel.toJson(),
-      'docId': docId,
-    };
-  }
-}
-//TODO: Getting documents data with ids
-class ClothesIds {
-  final ClothesModel clothesModel;
-  final String docId;
-
-  ClothesIds({required this.clothesModel, required this.docId});
-
-  factory ClothesIds.fromJson(Map<String, dynamic> json) {
-    return ClothesIds(
-      clothesModel: ClothesModel.fromJson(json['clothesModel']),
-      docId: json['docId'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'clothesModel': clothesModel.toJson(),
-      'docId': docId,
-    };
-  }
-}
-
-final myClothesPosts = StreamProvider<List<ClothesIds>>((ref) {
+final myClothesPosts = StreamProvider<List<ClothesModel>>((ref) {
   final user=ref.watch(currentUserAuthStatus).asData?.value;
   if(user!=null){
     return FirebaseFirestore.instance
         .collection('outfits')
         .where('userID', isEqualTo:user.uid)
-
         .snapshots()
         .map(
           (snapshot) => snapshot.docs.map(
-            (doc) => ClothesIds(
-            docId: doc.id,
-            clothesModel:ClothesModel.fromJson(doc.data())
-        ),
+            (doc) {
+              final raw=ClothesModel.fromJson(doc.data());
+              final model=raw.copyWith(clothesDocId: doc.id);
+              return model;
+            }
       ).toList(),
     );
   }else{

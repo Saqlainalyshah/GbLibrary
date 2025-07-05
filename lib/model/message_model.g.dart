@@ -8,6 +8,7 @@ part of 'message_model.dart';
 
 _MessageModel _$MessageModelFromJson(Map<String, dynamic> json) =>
     _MessageModel(
+      messageDocId: json['messageDocId'] as String? ?? '',
       userName: json['userName'] as String,
       userPic: json['userPic'] as String,
       reactions:
@@ -23,6 +24,7 @@ _MessageModel _$MessageModelFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$MessageModelToJson(_MessageModel instance) =>
     <String, dynamic>{
+      'messageDocId': instance.messageDocId,
       'userName': instance.userName,
       'userPic': instance.userPic,
       'reactions': instance.reactions,

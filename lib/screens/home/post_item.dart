@@ -39,9 +39,9 @@ class PostItem extends StatelessWidget {
                       ref.invalidate(bookCategory);
                       ref.invalidate(bookGrade);
                       ref.invalidate(bookBoard);
-                      Navigator.push(context, MaterialPageRoute(builder: (builder)=>PostBooks(isEdit: false, booksWithIds: BookIds(booksModel: BooksModel(createdAt: DateTime.now()), docId: 'docId'),)));
+                      Navigator.push(context, MaterialPageRoute(builder: (builder)=>PostBooks(isEdit: false, booksModel: BooksModel(createdAt: DateTime.now()),)));
                     }else{
-                      Navigator.push(context, MaterialPageRoute(builder: (builder)=>UniformClothesScreen(isEdit: false, clothesIds: ClothesIds(clothesModel: ClothesModel(createdAt: DateTime.now()), docId: ''),)));
+                      Navigator.push(context, MaterialPageRoute(builder: (builder)=>UniformClothesScreen(isEdit: false, clothesModel: ClothesModel(createdAt: DateTime.now()))));
                     }
                   },
                   title: Row(

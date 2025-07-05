@@ -6,6 +6,7 @@ import 'package:booksexchange/screens/home/uniform_feed.dart';
 import 'package:booksexchange/utils/fontsize/responsive_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../controller/firebase_crud_operations/fetch_data/fetch_books.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../drawer/drawer.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
@@ -31,9 +32,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    ref.read(getUserDocument);
-  
     ref.read(myBooksPosts);
+    ref.read(userProfileProvider.notifier).fetchUser(widget.id);
     ref.read(myClothesPosts);
     ref.read(uniformFeedProvider);
   }
@@ -41,7 +41,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   final List<Widget> screens=  [
      FeedPortion(),
-    const UniformFeed(),
+    //BooksPage(),
+    UniformFeed(),
     const PostItem(),
     const ChatScreen(),
     AccountSection()
@@ -61,23 +62,17 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           iconTheme: IconThemeData(color: AppThemeClass.primary),
           backgroundColor: Colors.transparent,
          // automaticallyImplyLeading: false,
-          centerTitle: true,
-          title: CustomText(text: "Gilgit Swap"),
-
+          //centerTitle: true,
+          title: BannerAdWidget()
         ),
-        drawer: const DrawerWidget(),
+       // drawer: const DrawerWidget(),
         body: Consumer(
           builder:(context,ref,child)=> IndexedStack(
             index: ref.watch(_bottomNavigationIndex),
             children: screens,
           ),
         ),
-        /*floatingActionButton: FloatingActionButton(backgroundColor: AppThemeClass.whiteText,elevation:0,shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),onPressed: (){},
-        child: Icon(Icons.add_circle,color: AppThemeClass.primary,size: 60,),
-
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar:  Container(
+        bottomNavigationBar: Container(
           padding: EdgeInsets.zero,
           //height: 100,
           decoration: BoxDecoration(
@@ -90,89 +85,55 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               ),
             ],
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-             Row(
-               spacing: 30,
-               //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-               children: [
-                 Column(
-                   mainAxisSize: MainAxisSize.min,
-                   children: [
-                     Icon(Icons.home),
-                     CustomText(text: 'Books'),
-                   ],
-                 ),
-                 Column(
-                   mainAxisSize: MainAxisSize.min,
-                   children: [
-                     Icon(Icons.card_giftcard),
-                     CustomText(text: 'Clothes'),
-                   ],
-                 ),
-               ],
-             ),
+          child: BottomAppBar(
+           //padding: EdgeInsets.zero,
+            surfaceTintColor: AppThemeClass.whiteText,
+            color: AppThemeClass.whiteText,
+            shape: CircularNotchedRectangle(),
+            notchMargin: 6.0,
+           // shadowColor: AppThemeClass.primary
 
-              Row(
-                spacing: 30,
+            //elevation: 20,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.chat),
-                      CustomText(text: 'Chat'),
-                    ],
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.person),
-                      CustomText(text: 'profile'),
-                    ],
-                  )
+                  _buildNavItem(Icons.home, 'Books', 0),
+                  _buildNavItem(Icons.card_giftcard, 'Clothes', 1),
+                  _buildNavItem(Icons.add_circle, 'Posts', 2),
+                  //SizedBox(width: 10), // Space for the FAB
+                 Stack(
+                   alignment: Alignment.topRight,
+                   //fit: StackFit.loose,
+                   children: [
+                     _buildNavItem(Icons.message, 'Messages', 3),
+                     Consumer(builder: (context,ref,child){
+                      final messages= ref.watch(filterChatProvider.select((state)=>state.unreadMessageCount));
+                      if(messages>0){
+                        return Positioned(
+                          bottom: ResponsiveBox.getSize(context, 25),
+                          right: ResponsiveBox.getSize(context, 10),
+                          child: Container(
+                            padding: EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.red
+
+                            ),
+                            child: CustomText(text: messages.toString(),color: AppThemeClass.whiteText,),
+                          ),
+                        );
+                      }else{
+                        return SizedBox.shrink();
+                      }
+                     })
+                   ],
+                 ),
+                  _buildNavItem(Icons.person_outline, 'Account', 4),
                 ],
-              )
-            ],
-          ),
-        ),*/
-      /*  floatingActionButton: Container(
-          height: 70,
-          width: 70,
-          child: Consumer(
-            builder:(context,ref,child)=> FloatingActionButton(
-              onPressed: () {
-             ref.read(_bottomNavigationIndex.notifier).state=2;
-                // Handle central button press
-              },
-              backgroundColor: AppThemeClass.primary ,
-              elevation: 4,
-              shape: CircleBorder(),
-              child: Icon(Icons.add, size: 50),
-            ),
-          ),
-        ),*/
-       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: BottomAppBar(
-          surfaceTintColor: AppThemeClass.whiteText,
-          color: AppThemeClass.whiteText,
-          shape: CircularNotchedRectangle(),
-          notchMargin: 8.0,
-          elevation: 8,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildNavItem(Icons.home, 'Books', 0),
-                _buildNavItem(Icons.card_giftcard, 'Clothes', 1),
-                _buildNavItem(Icons.add_circle, 'Posts', 2),
-                //SizedBox(width: 10), // Space for the FAB
-                _buildNavItem(Icons.message, 'Messages', 3),
-                _buildNavItem(Icons.person_outline, 'Account', 4),
-              ],
+              ),
             ),
           ),
         ),
@@ -210,7 +171,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
              .read(_bottomNavigationIndex.notifier)
              .state = index,
          child: Column(
-           // mainAxisSize: MainAxisSize.min,
+           mainAxisSize: MainAxisSize.min,
            mainAxisAlignment: MainAxisAlignment.start,
            children: [
              Icon(icon, color: isSelected ? AppThemeClass.primary : AppThemeClass

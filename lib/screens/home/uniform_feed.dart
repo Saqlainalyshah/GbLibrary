@@ -3,9 +3,11 @@ import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/controller/time_format/time_format.dart';
 import 'package:booksexchange/screens/home/view_details.dart';
 import 'package:booksexchange/screens/home/view_uniform.dart';
+import 'package:booksexchange/utils/fontsize/responsive_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/cards/post_card.dart';
+import '../../components/textfield.dart';
 import '../../controller/ads/native_ad.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
@@ -13,8 +15,8 @@ import '../../utils/fontsize/app_theme/theme.dart';
 
 
 class UniformFeed extends ConsumerWidget {
-  const UniformFeed({super.key,});
-
+   UniformFeed({super.key,});
+final TextEditingController controller =TextEditingController();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     print("Feed Portion Screen Rebuilds");
@@ -25,8 +27,35 @@ class UniformFeed extends ConsumerWidget {
             return CustomScrollView(
               // physics: BouncingScrollPhysics(),
               slivers: [
+                SliverAppBar(
+                  surfaceTintColor: AppThemeClass.whiteText,
+                  backgroundColor: AppThemeClass.whiteText,
+                  expandedHeight: 60,
+                  automaticallyImplyLeading: false,
+                  flexibleSpace: FlexibleSpaceBar(
+                    centerTitle: false,
+                    background:   Consumer(
+                      builder: (context, ref, child) {
+                        return CustomTextField(
+                          controller: controller,
+                          hintText: "Search by location",
+                          leadingIcon: Icons.search,
+                          trailingIcon: Icons.close,
+                          onChanged: (String search) {
+                            //ref.read(filterFeedProvider.notifier).filterByLocation(search);
+                          },
+                          trailingFn: () {
+                           /* controller.clear();
+                            ref.read(filterFeedProvider.notifier).resetFilters();*/
+                          },
+                        );
+                      },
+                    ),
+
+                  ),
+                ),
                 SliverToBoxAdapter(
-                  child: ListView.separated(
+                  child: ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
                     itemCount: uniformPosts.length,
@@ -51,15 +80,16 @@ class UniformFeed extends ConsumerWidget {
                           );
                         },
                       );
-                    }, separatorBuilder: (BuildContext context, int index) {
+                    }, /*separatorBuilder: (BuildContext context, int index) {
                     return Column(
                       children: [
                         Divider(color: AppThemeClass.primary,),
-                        NativeAdWidget(height: 300, container: SizedBox.shrink(),),
+                        NativeAdWidget(height: ResponsiveBox.getSize(context, 150), container: SizedBox.shrink(),),
                         Divider(color: AppThemeClass.primary,),
                       ],
                     );
-                  },),
+                  },*/
+                  ),
                 ),
               ],
             );

@@ -203,51 +203,41 @@ class _AccountSectionState extends State<AccountSection> {
                 Consumer(builder: (context, ref, child) {
                   final user = ref.watch(userProfileProvider);
                   if (user != null) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      child: ListTileCard(
-                        backgroundColor: AppThemeClass.primary,
-                        title: user.name,
-                        subTitle: 'Member Since ${TimeFormater.formatIsoDate(user.createdAt.toString())}',
-                        imageUrl: user.profilePicUrl,
-                      ),
-                    );
+                   return Column(
+                     children: [
+                    Padding(
+                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  child: ListTileCard(
+                  backgroundColor: AppThemeClass.primary,
+                  title: user.name,
+                  subTitle: 'Member Since ${TimeFormater.formatIsoDate(user.createdAt.toString())}',
+                  imageUrl: user.profilePicUrl,
+                  ),
+                  ),
+                       Divider(color: AppThemeClass.primary),
+                     ...List.generate(2, (index){
+                       List<String> list = ['Profile', 'My Posts'];
+                       return CustomListTile(
+                         onTap: () {
+                           Navigator.push(
+                             context,
+                             MaterialPageRoute(
+                               builder: (builder) => index == 0 ? Profile() : MyPosts(),
+                             ),
+                           );
+                         },
+                         leadingIconColor: index == 0 ? Colors.teal : Colors.redAccent,
+                         title: list[index],
+                         leadingIcon: index == 0 ? Icons.person_pin : Icons.post_add,
+                       );
+                     }),
+                     ],
+                   );
                   } else {
                     return SizedBox.shrink();
                   }
                 }),
-                Divider(color: AppThemeClass.primary),
 
-                // Profile and My Posts
-                Consumer(builder: (context, ref, child) {
-                  List<String> list = ['Profile', 'My Posts'];
-                  final user = ref.watch(userProfileProvider);
-                  if (user != null) {
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: list.length,
-                      padding: EdgeInsets.zero,
-                      itemBuilder: (context, index) {
-                        return CustomListTile(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (builder) => index == 0 ? Profile() : MyPosts(),
-                              ),
-                            );
-                          },
-                          leadingIconColor: index == 0 ? Colors.teal : Colors.redAccent,
-                          title: list[index],
-                          leadingIcon: index == 0 ? Icons.person_pin : Icons.post_add,
-                        );
-                      },
-                    );
-                  } else {
-                    return SizedBox.shrink();
-                  }
-                }),
 
                 // Other options
                 ...List.generate(6, (index) {
@@ -315,7 +305,7 @@ class _AccountSectionState extends State<AccountSection> {
         Container(
           width: double.infinity,
           padding: EdgeInsets.symmetric(vertical: 20,horizontal: 10),
-           color: AppThemeClass.primary,
+          // color: AppThemeClass.primary,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -323,11 +313,13 @@ class _AccountSectionState extends State<AccountSection> {
               CustomText(
                 text: " Made with ❤️ in Gilgit Baltistan",
                 color: AppThemeClass.darkText,
+                fontSize: 10,
               ),
               SizedBox(height: 8),
               CustomText(
                 text: "© 2025 Gilgit Swap. All rights reserved.",
                 color: AppThemeClass.darkText,
+                fontSize: 10,
                 // Optional: smaller font
               ),
             ],

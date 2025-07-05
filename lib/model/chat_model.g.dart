@@ -8,6 +8,7 @@ part of 'chat_model.dart';
 
 _ChatRoomModel _$ChatRoomModelFromJson(Map<String, dynamic> json) =>
     _ChatRoomModel(
+      chatDocId: json['chatDocId'] as String? ?? '',
       participants:
           (json['participants'] as List<dynamic>?)
               ?.map((e) => e as String)
@@ -31,9 +32,10 @@ _ChatRoomModel _$ChatRoomModelFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$ChatRoomModelToJson(_ChatRoomModel instance) =>
     <String, dynamic>{
+      'chatDocId': instance.chatDocId,
       'participants': instance.participants,
       'deleteChatFrom': instance.deleteChatFrom,
-      'users': instance.users.map((user)=>user.toJson()).toList(),
+      'users': instance.users.map((user)=>user.toJson()),
       'createdAt': instance.createdAt.toIso8601String(),
       'lastMessage': instance.lastMessage,
       'isRead': instance.isRead,

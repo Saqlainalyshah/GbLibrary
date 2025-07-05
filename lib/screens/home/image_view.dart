@@ -1,8 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import '../../components/layout_components/small_components.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
 class ImageView extends StatelessWidget {

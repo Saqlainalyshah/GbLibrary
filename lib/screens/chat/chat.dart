@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:booksexchange/components/cards/listTile_card.dart';
 import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/model/user_profile.dart';
@@ -8,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../components/layout_components/alert_dialogue.dart';
 import '../../components/textfield.dart';
 import '../../controller/firebase_crud_operations/firestore_crud_operations.dart';
 import '../../controller/providers/global_providers.dart';
@@ -15,32 +15,9 @@ import '../../model/chat_model.dart';
 import '../../utils/fontsize/app_theme/theme.dart';
 
 
-class ChatIds {
-  final ChatRoomModel chatRoomModel;
-  final String docId;
-  final bool userNotFound;
-  ChatIds({required this.chatRoomModel, required this.docId, required this.userNotFound});
-  // Convert to JSON
-  Map<String, dynamic> toJson() {
-    return {'chatRoomModel': chatRoomModel.toJson(), 'docId': docId, 'userNotFound':userNotFound};
-  }
-
-  // Construct from JSON
-  factory ChatIds.fromJson(Map<String, dynamic> json) {
-    return ChatIds(
-      chatRoomModel: ChatRoomModel.fromJson(json['chatRoomModel']),
-      docId: json['docId'],
-        userNotFound:json['userNotFound']
-    );
-  }
-}
-
-
-
-
 class FilterChats {
-  final List<ChatIds> allChats;
-  final List<ChatIds> filteredChats;
+  final List<ChatRoomModel> allChats;
+  final List<ChatRoomModel> filteredChats;
   final int unreadMessageCount;
 
   FilterChats({
@@ -50,8 +27,8 @@ class FilterChats {
   });
 
   FilterChats copyWith({
-    List<ChatIds>? allChats,
-    List<ChatIds>? filteredChats,
+    List<ChatRoomModel>? allChats,
+    List<ChatRoomModel>? filteredChats,
     int? unreadMessageCount,
   }) {
     return FilterChats(
@@ -76,16 +53,13 @@ class FilterFeedNotifier extends StateNotifier<FilterChats> {
       final chatsData = snapshot.docs.map((doc) {
         final data = doc.data();
         final decoded=ChatRoomModel.fromJson(data);
-        return ChatIds(
-          chatRoomModel: decoded,
-          docId: doc.id,
-          userNotFound: decoded.participants.length==1?true:false
-        );
+        final model=decoded.copyWith(chatDocId: doc.id);
+       return model;
       }).toList();
 
       final unreadCount = chatsData.where((chat) =>
-      chat.chatRoomModel.isRead == false &&
-          chat.chatRoomModel.lastMessageFrom != uid,
+      chat.isRead == false &&
+          chat.lastMessageFrom != uid,
       ).length;
 
       state = state.copyWith(
@@ -106,10 +80,10 @@ class FilterFeedNotifier extends StateNotifier<FilterChats> {
     super.dispose();
   }
 
-  void setChats(List<ChatIds> chats, String uid) {
+  void setChats(List<ChatRoomModel> chats, String uid) {
     final unreadCount = chats.where((chat) =>
-    chat.chatRoomModel.isRead == false &&
-        chat.chatRoomModel.lastMessageFrom != uid,
+    chat.isRead == false &&
+        chat.lastMessageFrom != uid,
     ).length;
     state = state.copyWith(
       allChats: chats,
@@ -120,7 +94,7 @@ class FilterFeedNotifier extends StateNotifier<FilterChats> {
 
   void filterChatRoomsByUser(bool Function(UserProfile user) condition) {
     final filtered = state.allChats.where((chatRoom) {
-      return chatRoom.chatRoomModel.users.any(condition);
+      return chatRoom.users.any(condition);
     }).toList();
     state = state.copyWith(filteredChats: filtered);
   }
@@ -230,47 +204,62 @@ outside(){
                         shrinkWrap: true,
                         itemCount: data.length,
                         itemBuilder: (context, index) {
-                          final UserProfile user = data[index].chatRoomModel.users.firstWhere(
+                          final UserProfile user = data[index].users.firstWhere(
                                 (user) => user.uid != FirebaseAuth.instance.currentUser!.uid,
                           );
 
-                          bool isMe = data[index].chatRoomModel.lastMessageFrom ==
+                          bool isMe = data[index].lastMessageFrom ==
                               FirebaseAuth.instance.currentUser!.uid;
 
-                          bool newMessage = data[index].chatRoomModel.isRead;
+                          bool newMessage = data[index].isRead;
 
-                          return ListTileCard(
-                            isIcon: true,
-                            newMessage: newMessage,
-                            isMe: isMe,
-                            time: data[index].chatRoomModel.createdAt.toString(),
-                            title: user.name,
-                            subTitle: data[index].chatRoomModel.lastMessage,
-                            imageUrl: user.profilePicUrl,
-                            function: () {
-                              ChatRoomModel model = data[index].chatRoomModel;
-
-                              if (!isMe && !model.isRead) {
-                                final chatModel = model.copyWith(isRead: true);
-                                FirebaseFireStoreServices instance = FirebaseFireStoreServices();
-                                instance.createDocumentWithId(
-                                  'chats',
-                                  data[index].docId,
-                                  chatModel.toJson(),
+                          return GestureDetector(
+                            onLongPress: (){
+                              if(data[index].participants.length==1){
+                                UiEventHandler.customAlertDialog(context, "Do you want to delete this Conversation?",'','Delete','Cancel',()async {
+                                  FirebaseFireStoreServices instance=FirebaseFireStoreServices();
+                                  if(context.mounted){
+                                    Navigator.pop(context);
+                                  }
+                                  instance.deleteDocument('chats', data[index].chatDocId);
+                                },
+                                    false
                                 );
                               }
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => MessageRoom(
-                                    userProfile: user,
-                                    chatIds: data[index],
-                                    userNotFound: data[index].userNotFound,
-                                  ),
-                                ),
-                              );
                             },
+                            child: ListTileCard(
+                              isIcon: true,
+                              newMessage: newMessage,
+                              isMe: isMe,
+                              time: data[index].createdAt.toString(),
+                              title: user.name,
+                              subTitle: data[index].lastMessage,
+                              imageUrl: user.profilePicUrl,
+                              function: () {
+                                ChatRoomModel model = data[index];
+
+                                if (!isMe && !model.isRead) {
+                                  final chatModel = model.copyWith(isRead: true);
+                                  FirebaseFireStoreServices instance = FirebaseFireStoreServices();
+                                  instance.createDocumentWithId(
+                                    'chats',
+                                    data[index].chatDocId,
+                                    chatModel.toJson(),
+                                  );
+                                }
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MessageRoom(
+                                      userProfile: user,
+                                      chatRoomModel: data[index],
+                                      userNotFound: data[index].participants.length==1?true:false,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                           );
                         },
                         separatorBuilder: (_, __) => Padding(padding: EdgeInsets.all(5)),

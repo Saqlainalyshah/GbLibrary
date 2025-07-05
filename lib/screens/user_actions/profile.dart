@@ -177,8 +177,8 @@ class _ProfileState extends ConsumerState<Profile> {
                             ref.read(_isReadOnly.notifier).state=true;
                             return;
                           }else{
-                             final result=await instance.updateDocument('users',userProfile.uid.toString(), user.toJson());
-                           if(result){
+                             await instance.updateDocument('users',userProfile.uid.toString(), user.toJson());
+                          /* if(result){
                            final count = ref.read(userActionsTracker.select((state)=>state.numberOfProfileUpdate))+1;
                              ref.read(userProfileProvider.notifier)
                                  .state = user;
@@ -191,7 +191,7 @@ class _ProfileState extends ConsumerState<Profile> {
                              }else{
                                print("${ref.watch(userActionsTracker.select((state)=>state.numberOfProfileUpdate))}===================>");
                              }
-                           }
+                           }*/
                             ref.read(_isReadOnly.notifier).state=true;
                           }
                         } else {

@@ -16,7 +16,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MessageModel {
 
- String get userName; String get userPic; List<String> get reactions; String get userId; DateTime get createdAt; String get message; bool get isRead;
+ String get messageDocId; String get userName; String get userPic; List<String> get reactions; String get userId; DateTime get createdAt;//  @TimestampSerializer() required DateTime createdAt,
+ String get message; bool get isRead;
 /// Create a copy of MessageModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +30,16 @@ $MessageModelCopyWith<MessageModel> get copyWith => _$MessageModelCopyWithImpl<M
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MessageModel&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.userPic, userPic) || other.userPic == userPic)&&const DeepCollectionEquality().equals(other.reactions, reactions)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.message, message) || other.message == message)&&(identical(other.isRead, isRead) || other.isRead == isRead));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MessageModel&&(identical(other.messageDocId, messageDocId) || other.messageDocId == messageDocId)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.userPic, userPic) || other.userPic == userPic)&&const DeepCollectionEquality().equals(other.reactions, reactions)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.message, message) || other.message == message)&&(identical(other.isRead, isRead) || other.isRead == isRead));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userName,userPic,const DeepCollectionEquality().hash(reactions),userId,createdAt,message,isRead);
+int get hashCode => Object.hash(runtimeType,messageDocId,userName,userPic,const DeepCollectionEquality().hash(reactions),userId,createdAt,message,isRead);
 
 @override
 String toString() {
-  return 'MessageModel(userName: $userName, userPic: $userPic, reactions: $reactions, userId: $userId, createdAt: $createdAt, message: $message, isRead: $isRead)';
+  return 'MessageModel(messageDocId: $messageDocId, userName: $userName, userPic: $userPic, reactions: $reactions, userId: $userId, createdAt: $createdAt, message: $message, isRead: $isRead)';
 }
 
 
@@ -49,7 +50,7 @@ abstract mixin class $MessageModelCopyWith<$Res>  {
   factory $MessageModelCopyWith(MessageModel value, $Res Function(MessageModel) _then) = _$MessageModelCopyWithImpl;
 @useResult
 $Res call({
- String userName, String userPic, List<String> reactions, String userId, DateTime createdAt, String message, bool isRead
+ String messageDocId, String userName, String userPic, List<String> reactions, String userId, DateTime createdAt, String message, bool isRead
 });
 
 
@@ -66,9 +67,10 @@ class _$MessageModelCopyWithImpl<$Res>
 
 /// Create a copy of MessageModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userName = null,Object? userPic = null,Object? reactions = null,Object? userId = null,Object? createdAt = null,Object? message = null,Object? isRead = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? messageDocId = null,Object? userName = null,Object? userPic = null,Object? reactions = null,Object? userId = null,Object? createdAt = null,Object? message = null,Object? isRead = null,}) {
   return _then(_self.copyWith(
-userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
+messageDocId: null == messageDocId ? _self.messageDocId : messageDocId // ignore: cast_nullable_to_non_nullable
+as String,userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
 as String,userPic: null == userPic ? _self.userPic : userPic // ignore: cast_nullable_to_non_nullable
 as String,reactions: null == reactions ? _self.reactions : reactions // ignore: cast_nullable_to_non_nullable
 as List<String>,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
@@ -86,9 +88,10 @@ as bool,
 @JsonSerializable()
 
 class _MessageModel implements MessageModel {
-  const _MessageModel({required this.userName, required this.userPic, final  List<String> reactions = const [], required this.userId, required this.createdAt, required this.message, this.isRead = false}): _reactions = reactions;
+  const _MessageModel({this.messageDocId = '', required this.userName, required this.userPic, final  List<String> reactions = const [], required this.userId, required this.createdAt, required this.message, this.isRead = false}): _reactions = reactions;
   factory _MessageModel.fromJson(Map<String, dynamic> json) => _$MessageModelFromJson(json);
 
+@override@JsonKey() final  String messageDocId;
 @override final  String userName;
 @override final  String userPic;
  final  List<String> _reactions;
@@ -100,6 +103,7 @@ class _MessageModel implements MessageModel {
 
 @override final  String userId;
 @override final  DateTime createdAt;
+//  @TimestampSerializer() required DateTime createdAt,
 @override final  String message;
 @override@JsonKey() final  bool isRead;
 
@@ -116,16 +120,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MessageModel&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.userPic, userPic) || other.userPic == userPic)&&const DeepCollectionEquality().equals(other._reactions, _reactions)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.message, message) || other.message == message)&&(identical(other.isRead, isRead) || other.isRead == isRead));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MessageModel&&(identical(other.messageDocId, messageDocId) || other.messageDocId == messageDocId)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.userPic, userPic) || other.userPic == userPic)&&const DeepCollectionEquality().equals(other._reactions, _reactions)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.message, message) || other.message == message)&&(identical(other.isRead, isRead) || other.isRead == isRead));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userName,userPic,const DeepCollectionEquality().hash(_reactions),userId,createdAt,message,isRead);
+int get hashCode => Object.hash(runtimeType,messageDocId,userName,userPic,const DeepCollectionEquality().hash(_reactions),userId,createdAt,message,isRead);
 
 @override
 String toString() {
-  return 'MessageModel(userName: $userName, userPic: $userPic, reactions: $reactions, userId: $userId, createdAt: $createdAt, message: $message, isRead: $isRead)';
+  return 'MessageModel(messageDocId: $messageDocId, userName: $userName, userPic: $userPic, reactions: $reactions, userId: $userId, createdAt: $createdAt, message: $message, isRead: $isRead)';
 }
 
 
@@ -136,7 +140,7 @@ abstract mixin class _$MessageModelCopyWith<$Res> implements $MessageModelCopyWi
   factory _$MessageModelCopyWith(_MessageModel value, $Res Function(_MessageModel) _then) = __$MessageModelCopyWithImpl;
 @override @useResult
 $Res call({
- String userName, String userPic, List<String> reactions, String userId, DateTime createdAt, String message, bool isRead
+ String messageDocId, String userName, String userPic, List<String> reactions, String userId, DateTime createdAt, String message, bool isRead
 });
 
 
@@ -153,9 +157,10 @@ class __$MessageModelCopyWithImpl<$Res>
 
 /// Create a copy of MessageModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userName = null,Object? userPic = null,Object? reactions = null,Object? userId = null,Object? createdAt = null,Object? message = null,Object? isRead = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? messageDocId = null,Object? userName = null,Object? userPic = null,Object? reactions = null,Object? userId = null,Object? createdAt = null,Object? message = null,Object? isRead = null,}) {
   return _then(_MessageModel(
-userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
+messageDocId: null == messageDocId ? _self.messageDocId : messageDocId // ignore: cast_nullable_to_non_nullable
+as String,userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
 as String,userPic: null == userPic ? _self.userPic : userPic // ignore: cast_nullable_to_non_nullable
 as String,reactions: null == reactions ? _self._reactions : reactions // ignore: cast_nullable_to_non_nullable
 as List<String>,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable

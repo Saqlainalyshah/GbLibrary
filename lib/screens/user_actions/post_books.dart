@@ -27,9 +27,9 @@ final _imageUrl=StateProvider.autoDispose<String?>((ref)=>null);
 final bookBoard=StateProvider<String?>((ref)=>null);
 
 class PostBooks extends ConsumerStatefulWidget {
-   const PostBooks({super.key, required this.isEdit,  required this.booksWithIds});
+   const PostBooks({super.key, required this.isEdit,  required this.booksModel});
   final bool isEdit;
-  final BookIds booksWithIds;
+  final BooksModel booksModel;
 
   @override
   ConsumerState<PostBooks> createState() => _PostBooksState();
@@ -104,8 +104,8 @@ class _PostBooksState extends ConsumerState<PostBooks> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    location.text=widget.booksWithIds.booksModel.location;
-    description.text=widget.booksWithIds.booksModel.description;
+    location.text=widget.booksModel.location;
+    description.text=widget.booksModel.description;
   }
   @override
   void dispose() {
@@ -283,7 +283,7 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                            UiEventHandler.customAlertDialog(context, "Please wait few seconds! updating...",'','','',(){} ,true);
 
                           BooksModel book=BooksModel(
-                            userID: widget.booksWithIds.booksModel.userID,
+                            userID: widget.booksModel.userID,
                             category: ref.read(bookCategory)!,
                             type: 'books',
                             grade: ref.read(bookGrade)??'',
@@ -291,10 +291,10 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                             description: description.text,
                             board: ref.read(bookBoard)??'',
                             subjects: ref.read(bookSubjectsList),
-                            createdAt: widget.booksWithIds.booksModel.createdAt,
-                            imageUrl: widget.booksWithIds.booksModel.imageUrl,
+                            createdAt: widget.booksModel.createdAt,
+                            imageUrl: widget.booksModel.imageUrl,
                           );
-                          BooksModel existingBook=widget.booksWithIds.booksModel;
+                          BooksModel existingBook=widget.booksModel;
                           bool isSame=book==existingBook;
                           if(isSame){
                             if(context.mounted){
@@ -304,7 +304,7 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                             }
                           }else{
                             FirebaseFireStoreServices instance=FirebaseFireStoreServices();
-                            instance.updateDocument('posts',widget.booksWithIds.docId,book.toJson()).whenComplete((){
+                            instance.updateDocument('books',widget.booksModel.bookDocId,book.toJson()).whenComplete((){
                               invalidate();
                               if(context.mounted){
                                 Navigator.pop(context);
@@ -323,9 +323,9 @@ class _PostBooksState extends ConsumerState<PostBooks> {
 
                         FirebaseFireStoreServices instance=FirebaseFireStoreServices();
                         FirebaseStorageService storage =FirebaseStorageService();
-                      bool result=await storage.deleteFile(widget.booksWithIds.booksModel.imageUrl);
+                      bool result=await storage.deleteFile(widget.booksModel.imageUrl);
                       if(result){
-                        instance.deleteDocument('posts', widget.booksWithIds.docId).then((onValue){
+                        instance.deleteDocument('books', widget.booksModel.bookDocId).then((onValue){
                           invalidate();
                          if(context.mounted){
                            UiEventHandler.snackBarWidget(context, "Post Deleted");
@@ -360,7 +360,7 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                               imageUrl: val,
                               createdAt: DateTime.now(),
                             );
-                            instance.createDocument('posts', book.toJson()).whenComplete((){
+                            instance.createDocument('books', book.toJson()).whenComplete((){
                               invalidate();
                               if(context.mounted){
                                 UiEventHandler.snackBarWidget(context, "Successfully uploaded");

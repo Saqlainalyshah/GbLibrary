@@ -37,12 +37,22 @@ class FirebaseStorageService {
 
   /// Delete a file from Firebase Storage
   Future<bool> deleteFile(String storagePath) async {
+    final storageRef = FirebaseStorage.instance.ref();
+    String path=extractFirebasePath(storagePath);
     try {
-      await _storage.ref(storagePath).delete();
+      final desertRef = storageRef.child(path);
+      await desertRef.delete();
       return true;
     } catch (e) {
       return false;
     }
+  }
+
+  String extractFirebasePath(String url) {
+    final uri = Uri.parse(url);
+    final segments = uri.pathSegments;
+    final encodedPath = segments.contains('o') ? segments[segments.indexOf('o') + 1] : '';
+    return Uri.decodeFull(encodedPath);
   }
 
   /// Check if a file exists (no direct method, uses try-catch)

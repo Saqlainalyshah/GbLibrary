@@ -7,12 +7,14 @@ import 'package:booksexchange/model/post_model.dart';
 import 'package:booksexchange/model/user_profile.dart';
 import 'package:booksexchange/screens/chat/message_room.dart';
 import 'package:booksexchange/screens/home/image_view.dart';
+import 'package:booksexchange/screens/home/view_details.dart';
 import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
 import 'package:booksexchange/utils/fontsize/responsive_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/cards/listTile_card.dart';
+import '../../components/layout_components/alert_dialogue.dart';
 import '../../controller/providers/global_providers.dart';
 
 class SchoolUniformScreen extends ConsumerStatefulWidget {
@@ -45,6 +47,7 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
           surfaceTintColor: Colors.transparent,
           backgroundColor: Colors.transparent,
           leading: buildCustomBackButton(context),
+          title: CustomText(text: "Details"),
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -208,18 +211,24 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
                             ),),
                           ),
                           Expanded(
-                            child: CustomButton(onPress: (){},widget: Row(
+                            child: CustomButton(color: AppThemeClass.whiteText,isBorder: true,onPress: (){
+                              if(tempData.number.length==11){
+                                launchPhoneCall(tempData.number);
+                              }else{
+                                UiEventHandler.snackBarWidget(context, "User doesn't provided number");
+                              }
+                            },widget: Row(
                               spacing: 5,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
                                   Icons.call,
-                                  color: AppThemeClass.whiteText,
+                                  color: AppThemeClass.darkText,
                                   size: 25,
                                 ),
                                 CustomText(
                                   text: "Call",
-                                  color: AppThemeClass.whiteText,
+                                  color: AppThemeClass.darkText,
                                   isBold: true,
                                   fontSize: 18,
                                 ),

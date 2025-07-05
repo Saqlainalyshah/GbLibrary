@@ -16,7 +16,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserProfile {
 
- String get uid; String get profilePicUrl; String get name; DateTime get createdAt; String get gender; String get address; String get number; String get email;
+ String get userDocId; String get uid; String get profilePicUrl; String get name; DateTime get createdAt;//  @TimestampSerializer() required DateTime createdAt,
+ String get gender; String get address; String get number; String get email;
 /// Create a copy of UserProfile
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +30,16 @@ $UserProfileCopyWith<UserProfile> get copyWith => _$UserProfileCopyWithImpl<User
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserProfile&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.profilePicUrl, profilePicUrl) || other.profilePicUrl == profilePicUrl)&&(identical(other.name, name) || other.name == name)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.address, address) || other.address == address)&&(identical(other.number, number) || other.number == number)&&(identical(other.email, email) || other.email == email));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserProfile&&(identical(other.userDocId, userDocId) || other.userDocId == userDocId)&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.profilePicUrl, profilePicUrl) || other.profilePicUrl == profilePicUrl)&&(identical(other.name, name) || other.name == name)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.address, address) || other.address == address)&&(identical(other.number, number) || other.number == number)&&(identical(other.email, email) || other.email == email));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,uid,profilePicUrl,name,createdAt,gender,address,number,email);
+int get hashCode => Object.hash(runtimeType,userDocId,uid,profilePicUrl,name,createdAt,gender,address,number,email);
 
 @override
 String toString() {
-  return 'UserProfile(uid: $uid, profilePicUrl: $profilePicUrl, name: $name, createdAt: $createdAt, gender: $gender, address: $address, number: $number, email: $email)';
+  return 'UserProfile(userDocId: $userDocId, uid: $uid, profilePicUrl: $profilePicUrl, name: $name, createdAt: $createdAt, gender: $gender, address: $address, number: $number, email: $email)';
 }
 
 
@@ -49,7 +50,7 @@ abstract mixin class $UserProfileCopyWith<$Res>  {
   factory $UserProfileCopyWith(UserProfile value, $Res Function(UserProfile) _then) = _$UserProfileCopyWithImpl;
 @useResult
 $Res call({
- String uid, String profilePicUrl, String name, DateTime createdAt, String gender, String address, String number, String email
+ String userDocId, String uid, String profilePicUrl, String name, DateTime createdAt, String gender, String address, String number, String email
 });
 
 
@@ -66,9 +67,10 @@ class _$UserProfileCopyWithImpl<$Res>
 
 /// Create a copy of UserProfile
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? uid = null,Object? profilePicUrl = null,Object? name = null,Object? createdAt = null,Object? gender = null,Object? address = null,Object? number = null,Object? email = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? userDocId = null,Object? uid = null,Object? profilePicUrl = null,Object? name = null,Object? createdAt = null,Object? gender = null,Object? address = null,Object? number = null,Object? email = null,}) {
   return _then(_self.copyWith(
-uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
+userDocId: null == userDocId ? _self.userDocId : userDocId // ignore: cast_nullable_to_non_nullable
+as String,uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
 as String,profilePicUrl: null == profilePicUrl ? _self.profilePicUrl : profilePicUrl // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
@@ -87,13 +89,15 @@ as String,
 @JsonSerializable()
 
 class _UserProfile implements UserProfile {
-  const _UserProfile({required this.uid, this.profilePicUrl = '', required this.name, required this.createdAt, this.gender = '', this.address = '', this.number = '', required this.email});
+  const _UserProfile({this.userDocId = '', required this.uid, this.profilePicUrl = '', required this.name, required this.createdAt, this.gender = '', this.address = '', this.number = '', required this.email});
   factory _UserProfile.fromJson(Map<String, dynamic> json) => _$UserProfileFromJson(json);
 
+@override@JsonKey() final  String userDocId;
 @override final  String uid;
 @override@JsonKey() final  String profilePicUrl;
 @override final  String name;
 @override final  DateTime createdAt;
+//  @TimestampSerializer() required DateTime createdAt,
 @override@JsonKey() final  String gender;
 @override@JsonKey() final  String address;
 @override@JsonKey() final  String number;
@@ -112,16 +116,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserProfile&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.profilePicUrl, profilePicUrl) || other.profilePicUrl == profilePicUrl)&&(identical(other.name, name) || other.name == name)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.address, address) || other.address == address)&&(identical(other.number, number) || other.number == number)&&(identical(other.email, email) || other.email == email));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserProfile&&(identical(other.userDocId, userDocId) || other.userDocId == userDocId)&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.profilePicUrl, profilePicUrl) || other.profilePicUrl == profilePicUrl)&&(identical(other.name, name) || other.name == name)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.address, address) || other.address == address)&&(identical(other.number, number) || other.number == number)&&(identical(other.email, email) || other.email == email));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,uid,profilePicUrl,name,createdAt,gender,address,number,email);
+int get hashCode => Object.hash(runtimeType,userDocId,uid,profilePicUrl,name,createdAt,gender,address,number,email);
 
 @override
 String toString() {
-  return 'UserProfile(uid: $uid, profilePicUrl: $profilePicUrl, name: $name, createdAt: $createdAt, gender: $gender, address: $address, number: $number, email: $email)';
+  return 'UserProfile(userDocId: $userDocId, uid: $uid, profilePicUrl: $profilePicUrl, name: $name, createdAt: $createdAt, gender: $gender, address: $address, number: $number, email: $email)';
 }
 
 
@@ -132,7 +136,7 @@ abstract mixin class _$UserProfileCopyWith<$Res> implements $UserProfileCopyWith
   factory _$UserProfileCopyWith(_UserProfile value, $Res Function(_UserProfile) _then) = __$UserProfileCopyWithImpl;
 @override @useResult
 $Res call({
- String uid, String profilePicUrl, String name, DateTime createdAt, String gender, String address, String number, String email
+ String userDocId, String uid, String profilePicUrl, String name, DateTime createdAt, String gender, String address, String number, String email
 });
 
 
@@ -149,9 +153,10 @@ class __$UserProfileCopyWithImpl<$Res>
 
 /// Create a copy of UserProfile
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? uid = null,Object? profilePicUrl = null,Object? name = null,Object? createdAt = null,Object? gender = null,Object? address = null,Object? number = null,Object? email = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? userDocId = null,Object? uid = null,Object? profilePicUrl = null,Object? name = null,Object? createdAt = null,Object? gender = null,Object? address = null,Object? number = null,Object? email = null,}) {
   return _then(_UserProfile(
-uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
+userDocId: null == userDocId ? _self.userDocId : userDocId // ignore: cast_nullable_to_non_nullable
+as String,uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
 as String,profilePicUrl: null == profilePicUrl ? _self.profilePicUrl : profilePicUrl // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
