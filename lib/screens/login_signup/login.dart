@@ -1,5 +1,7 @@
 import 'package:booksexchange/screens/user_actions/profile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../components/button.dart';
@@ -7,7 +9,7 @@ import '../../components/layout_components/alert_dialogue.dart';
 import '../../components/text_widget.dart';
 import '../../components/textfield.dart';
 import '../../controller/authentication/auth_repository.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 import 'otp_screen.dart';
 
 class Login extends ConsumerWidget {
@@ -99,11 +101,11 @@ class Login extends ConsumerWidget {
                       print("rebuilds $index");
                       return CustomButton(
                         loadingColor: AppThemeClass.primary,
-                        isLoading: index==0?ref.watch(isLoading):false,
+                        isLoading: index==0?ref.watch(isLoading):ref.watch(isFacebookLogin),
                       onPress: ()async{
                         AuthRepository auth=AuthRepository();
-                          ref.watch(isLoading.notifier).state=true;
                         if(index==0){
+                          ref.watch(isLoading.notifier).state=true;
                          final result= await auth.signInWithGoogle();
                         if(context.mounted){
                           if(result==false){
@@ -111,9 +113,21 @@ class Login extends ConsumerWidget {
                               UiEventHandler.snackBarWidget(context, "Failed! Try again", );
                             }
                           }
-                          ref.watch(isLoading.notifier).state=false;
-
                         }
+                          ref.watch(isLoading.notifier).state=false;
+                        }else{
+                         AuthRepository auth=AuthRepository();
+                         ref.watch(isFacebookLogin.notifier).state=true;
+                         final res=await auth.signInWithFacebook();
+                         if(context.mounted){
+                           if(res==false){
+                             if(context.mounted){
+                               UiEventHandler.snackBarWidget(context, "Failed! Try again", );
+                             }
+                           }
+
+                         }
+                         ref.watch(isFacebookLogin.notifier).state=false;
                         }
                       },
                         isBorder: true,

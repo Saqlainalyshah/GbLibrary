@@ -7,11 +7,11 @@ import 'package:booksexchange/controller/providers/global_providers.dart';
 import 'package:booksexchange/model/chat_model.dart';
 import 'package:booksexchange/model/message_model.dart';
 import 'package:booksexchange/model/post_model.dart';
-import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../controller/authentication/auth_repository.dart';
+import '../../utils/app_theme/theme.dart';
 import '../chat/chat.dart';
 
 class AccountSecurity extends StatelessWidget {

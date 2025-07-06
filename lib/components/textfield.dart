@@ -2,7 +2,7 @@
 import 'package:booksexchange/components/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../utils/fontsize/app_theme/theme.dart';
+import '../utils/app_theme/theme.dart';
 
 /// Text Field Widget
 class CustomTextField extends StatelessWidget {
@@ -55,6 +55,7 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return TextFormField(
       maxLength: maxLength,
       keyboardType: textInputType,
@@ -74,7 +75,7 @@ class CustomTextField extends StatelessWidget {
         //fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
       ),// maxLines:maxLines,
       validator: validator, // Pass the function as an argument
-      cursorColor: AppThemeClass.primary,
+    //  cursorColor: AppThemeClass.primary,
       decoration: InputDecoration(
         contentPadding: EdgeInsets.symmetric(horizontal: 5),
         counterText: counterText,
@@ -102,7 +103,7 @@ class CustomTextField extends StatelessWidget {
         ),
 
         filled: true,
-        fillColor: fillColor,
+       // fillColor: isDark?AppThemeClass.darkText:fillColor,
         prefixIcon: leadingIcon == null
             ? null
             : Icon(leadingIcon, color: AppThemeClass.primary, size: 25.0),
@@ -116,7 +117,7 @@ class CustomTextField extends StatelessWidget {
           child: Icon(trailingIcon, color: AppThemeClass.primary, size: 25.0),
         ) : null,
         hintText: hintText,
-        hintStyle:GoogleFonts.robotoSerif(color: AppThemeClass.darkTextOptional,fontSize: 13),
+        hintStyle:GoogleFonts.robotoSerif(color:isDark?Colors.white70: AppThemeClass.darkText,fontSize: 13),
       ),
     );
   }

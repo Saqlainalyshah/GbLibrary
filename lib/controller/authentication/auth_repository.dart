@@ -2,6 +2,7 @@ import 'package:booksexchange/controller/firebase_crud_operations/firestore_crud
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../model/user_profile.dart';
@@ -57,6 +58,48 @@ class AuthRepository {
       return false; // Sign-in failed
     }
   }
+  /// ✅ Sign in with Facebook
+  Future<bool> signInWithFacebook() async {
+    try {
+      final LoginResult result = await FacebookAuth.instance.login();
+
+      if (result.status == LoginStatus.success) {
+        final accessToken = result.accessToken;
+        final AuthCredential credential = FacebookAuthProvider.credential(accessToken!.token);
+
+        final UserCredential userCredential = await auth.signInWithCredential(credential);
+        final User? user = userCredential.user;
+
+        if (user != null) {
+          final doc = await _fireStore.collection('users').doc(user.uid).get();
+          final exists = doc.exists;
+
+          if (!exists) {
+            final userdata = UserProfile(
+              createdAt: DateTime.now(),
+              uid: user.uid,
+              profilePicUrl: user.photoURL ?? '',
+              name: user.displayName ?? '',
+              email: user.email ?? '',
+              gender: '',
+              address: '',
+              number: user.phoneNumber ?? '',
+            );
+
+            await _fireStore.collection('users').doc(user.uid).set(userdata.toJson());
+          }
+
+          return true;
+        }
+      } else {
+        debugPrint("Facebook login failed: ${result.status}");
+      }
+    } catch (e) {
+      debugPrint("Facebook Sign-In error: $e");
+    }
+
+    return false;
+  }
 
   /// ✅ Sign out (Firebase + Google)
   Future<void> signOut() async {
@@ -95,9 +138,19 @@ class AuthRepository {
       return false;
     }
   }
+}
+
+class AuthException implements Exception {
+  final String message;
+  AuthException(this.message);
+
+  @override
+  String toString() => message;
+}
 
 
-  /*Future<bool> deleteAccount() async {
+
+/*Future<bool> deleteAccount() async {
     FirebaseAuth.instance.currentUser;
     try {
       if ( FirebaseAuth.instance.currentUser == null) return false;
@@ -119,14 +172,3 @@ class AuthRepository {
       return false;
     }
   }*/
-
-
-}
-
-class AuthException implements Exception {
-  final String message;
-  AuthException(this.message);
-
-  @override
-  String toString() => message;
-}

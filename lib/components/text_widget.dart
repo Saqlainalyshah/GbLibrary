@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 class CustomText extends StatelessWidget {
   final String text;
   final double? fontSize;
-  final Color color;
+  final Color? color;
   final bool isBold;
   final int? maxLines;
   final TextAlign? textAlign;
@@ -19,7 +19,7 @@ class CustomText extends StatelessWidget {
     this.textAlign = TextAlign.start,
     this.maxLines = 300,
     this.fontSize,
-    this.color = Colors.black,
+    this.color,
     this.isBold = false,
   });
 
@@ -34,7 +34,7 @@ class CustomText extends StatelessWidget {
       style: isGoogleFont
 
           ?GoogleFonts.robotoSerif(
-              color: color,
+              color:color,
              letterSpacing: -0.4,
               fontSize: fontSize!=null? ResponsiveText.getSize(context, fontSize??12):null,
               fontWeight: isBold ? FontWeight.bold : FontWeight.w300,

@@ -8,14 +8,13 @@ import 'package:booksexchange/screens/user_actions/post_uniform_clothes.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 import 'package:booksexchange/components/layout_components/small_components.dart';
 import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/controller/providers/global_providers.dart';
 import 'package:booksexchange/model/post_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
 
 class MyPosts extends ConsumerStatefulWidget {
   const MyPosts({super.key});

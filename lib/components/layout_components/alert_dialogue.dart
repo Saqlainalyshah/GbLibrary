@@ -1,6 +1,6 @@
 import 'package:booksexchange/utils/fontsize/responsive_text.dart';
 import 'package:flutter/material.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 import '../text_widget.dart';
 
 

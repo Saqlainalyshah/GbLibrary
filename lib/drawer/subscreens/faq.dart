@@ -1,9 +1,10 @@
 import 'package:booksexchange/components/layout_components/small_components.dart';
 import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/components/textfield.dart';
-import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../utils/app_theme/theme.dart';
 
 class FAQScreen extends StatelessWidget {
   FAQScreen({super.key});

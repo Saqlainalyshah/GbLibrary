@@ -9,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../controller/firebase_crud_operations/fetch_data/fetch_books.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../drawer/drawer.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 import '../chat/chat.dart';
 import '../home/post_item.dart';
 
@@ -55,10 +55,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     return SafeArea(
       top: false,
       child: Scaffold(
-        backgroundColor: AppThemeClass.whiteText,
+        //backgroundColor: Colors.black,
        // drawerScrimColor: AppThemeClass.primary,
         appBar: AppBar(
-          surfaceTintColor: AppThemeClass.whiteText,
           iconTheme: IconThemeData(color: AppThemeClass.primary),
           backgroundColor: Colors.transparent,
          // automaticallyImplyLeading: false,
@@ -76,7 +75,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           padding: EdgeInsets.zero,
           //height: 100,
           decoration: BoxDecoration(
-            color: AppThemeClass.whiteText, // Match your bottom bar background
+           // color: AppThemeClass.whiteText, // Match your bottom bar background
             boxShadow: [
               BoxShadow(
                 color: AppThemeClass.primary.withOpacity(0.5), // or any subtle shadow color
@@ -87,8 +86,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           ),
           child: BottomAppBar(
            //padding: EdgeInsets.zero,
-            surfaceTintColor: AppThemeClass.whiteText,
-            color: AppThemeClass.whiteText,
             shape: CircularNotchedRectangle(),
             notchMargin: 6.0,
            // shadowColor: AppThemeClass.primary
@@ -143,7 +140,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   }
   Widget _buildNavItem(IconData? icon, String label, int index) {
    return Consumer(builder: (context,ref,child){
-     print("Rebuilds");
+     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+     print("Rebuilds $index");
      final isSelected = ref.watch(_bottomNavigationIndex) == index;
      if(index==2){
        return  GestureDetector(
@@ -174,13 +173,12 @@ class _MainScreenState extends ConsumerState<MainScreen> {
            mainAxisSize: MainAxisSize.min,
            mainAxisAlignment: MainAxisAlignment.start,
            children: [
-             Icon(icon, color: isSelected ? AppThemeClass.primary : AppThemeClass
+             Icon(icon, color: isSelected ? AppThemeClass.primary : isDark? AppThemeClass.whiteText:AppThemeClass
                  .darkTextOptional,
                size: ResponsiveBox.getSize(context, 30),
              ),
              CustomText(text: label,
-               color: isSelected ? AppThemeClass.primary : AppThemeClass
-                   .darkTextOptional,
+               color: isSelected ? AppThemeClass.primary : isDark? AppThemeClass.whiteText:Colors.black54,
              ),
            ],
          ),

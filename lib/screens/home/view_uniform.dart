@@ -8,7 +8,6 @@ import 'package:booksexchange/model/user_profile.dart';
 import 'package:booksexchange/screens/chat/message_room.dart';
 import 'package:booksexchange/screens/home/image_view.dart';
 import 'package:booksexchange/screens/home/view_details.dart';
-import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
 import 'package:booksexchange/utils/fontsize/responsive_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +15,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/cards/listTile_card.dart';
 import '../../components/layout_components/alert_dialogue.dart';
 import '../../controller/providers/global_providers.dart';
+import '../../utils/app_theme/theme.dart';
 
 class SchoolUniformScreen extends ConsumerStatefulWidget {
   const SchoolUniformScreen({super.key, required this.clothesModel});
@@ -110,7 +110,7 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
                         isBold: true,
                         color: AppThemeClass.primary,
                       ),
-                      buildIconTextRow(
+                      buildIconTextRow(context,
                         Icons.access_time,
                         TimeFormater.timeAgo(
                           widget.clothesModel.createdAt.toString(),
@@ -126,7 +126,7 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
                         isBold: true,
                         color: AppThemeClass.primary,
                       ),
-                      buildIconTextRow(
+                      buildIconTextRow(context,
                         Icons.person_outline,
                         widget.clothesModel.size=='S'?'Small Size':widget.clothesModel.size=='M'?'Medium Size':widget.clothesModel.size=='L'?'Large Size':'Extra Large Size',
                         true,
@@ -137,7 +137,7 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
                         isBold: true,
                         color: AppThemeClass.primary,
                       ),
-                      buildIconTextRow(
+                      buildIconTextRow(context,
                         Icons.location_on,
                         widget.clothesModel.location,
                         true,

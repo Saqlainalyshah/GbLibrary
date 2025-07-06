@@ -4,7 +4,7 @@ import 'package:booksexchange/utils/fontsize/responsive_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 import '../button.dart';
 import '../text_widget.dart';
 
@@ -87,6 +87,7 @@ class BuildPostColumn extends StatelessWidget {
       final String description;
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       // mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,10 +104,11 @@ class BuildPostColumn extends StatelessWidget {
           maxLines: 1,
         ),
 
-        buildIconTextRow(isClothes?Icons.person_outline :Icons.school, board,false),
+        buildIconTextRow(context,isClothes?Icons.person_outline :Icons.school, board,false),
         CustomText(
           text: description,
           //overflow: TextOverflow.ellipsis,s
+          color: isDark?Colors.white70:AppThemeClass.darkText,
           fontSize: 13,
           maxLines: 5,
         ),
@@ -121,10 +123,11 @@ _buildBottomRow(BuildContext context, String location, String time, Function fun
     spacing: 5,
     //mainAxisSize: MainAxisSize.min,
     children: [
-      Flexible(child: buildIconTextRow( Icons.location_on, location,false)),
-      Flexible(child: buildIconTextRow( Icons.access_time, time,false),),
+      Flexible(child: buildIconTextRow( context,Icons.location_on, location,false)),
+      Flexible(child: buildIconTextRow( context,Icons.access_time, time,false),),
       CustomButton(
        // isBorder: false,
+        //color: AppThemeClass.primary,
         radius: 5,
         onPress: () {
          function();
@@ -174,12 +177,14 @@ buildContainerImage(
   );
 }
 ///row widget wrapped in a container with a app secondary color which contains icon and text
-buildIconTextRow(IconData icon, String text,bool isExpend) {
+buildIconTextRow(BuildContext context,IconData icon, String text,bool isExpend, ) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
   return Container(
    // width: double.infinity,
     padding: EdgeInsets.all(5),
     decoration: BoxDecoration(
-      color: AppThemeClass.secondary,
+      color: isDark?AppThemeClass.primaryOptional:AppThemeClass.secondary,
+      //color: AppThemeClass.primary,
       borderRadius: BorderRadius.circular(3),
     ),
     child: Row(
@@ -196,6 +201,7 @@ buildIconTextRow(IconData icon, String text,bool isExpend) {
           child: CustomText(
             text: text,
             maxLines:isExpend? 4:1,
+            color: isDark?Colors.white70:AppThemeClass.darkText,
             fontSize: 12,
           ),
         ),

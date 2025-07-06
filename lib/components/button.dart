@@ -1,7 +1,8 @@
 import 'package:booksexchange/components/text_widget.dart';
-import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../utils/app_theme/theme.dart';
 
 
 ///Button widget
@@ -17,9 +18,9 @@ class CustomButton extends StatelessWidget {
     this.radius = 10.0,
     this.width = double.infinity,
     this.height = 50.0,
-    this.loadingColor=AppThemeClass.whiteText,
-    this.color = const Color(0xff00a67e),
-    this.titleColor = Colors.white,
+    this.loadingColor,
+    this.color,
+    this.titleColor,
     required this.onPress,
   });
   final bool isLoading;
@@ -30,17 +31,17 @@ class CustomButton extends StatelessWidget {
   final double fontSize;
   final double height;
   final double width;
-  final Color titleColor;
-  final Color loadingColor;
+  final Color? titleColor;
+  final Color? loadingColor;
   final double radius;
-  final Color color;
+  final Color? color;
   final Function onPress;
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoButton(
-      padding: const EdgeInsets.all(0),
-      onPressed: () {
+   bool isDark= Theme.of(context).brightness == Brightness.dark;
+    return GestureDetector(
+      onTap: () {
         onPress();
       },
       child: Container(
@@ -48,7 +49,7 @@ class CustomButton extends StatelessWidget {
         height: height,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(radius),
-            color: color,
+            color:isDark && color==null?AppThemeClass.primaryOptional:color,
             border: isBorder?Border.all(
                 color: AppThemeClass.primary
             ):null),
@@ -57,13 +58,16 @@ class CustomButton extends StatelessWidget {
                 ? CircularProgressIndicator(
               color: loadingColor,
             )
-                : title != null? CustomText(
-              text: title.toString(),
-              color: titleColor,
+                : title != null? Text(
+               title.toString(),
+              style: TextStyle(
+              color: !isDark? AppThemeClass.whiteText:titleColor,
               fontSize: fontSize,
-              isBold: isBold,
+              fontWeight: FontWeight.bold
+             )
             ):widget),
       ),
     );
   }
 }
+

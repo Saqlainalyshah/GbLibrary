@@ -14,7 +14,7 @@ import '../../controller/providers/global_providers.dart';
 import '../../controller/time_format/time_format.dart';
 import '../../model/chat_model.dart';
 import '../../model/message_model.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 
 
 
@@ -111,12 +111,12 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
     return SafeArea(
       top: false,
       child: Scaffold(
-        backgroundColor: AppThemeClass.whiteText,
+       // backgroundColor: AppThemeClass.whiteText,
         appBar: AppBar(
           elevation: 2,
           shadowColor: AppThemeClass.primary,
-          surfaceTintColor: Colors.transparent,
-          backgroundColor: AppThemeClass.whiteText,
+          //surfaceTintColor: Colors.transparent,
+          //backgroundColor: ,
           leading: IconButton(
             onPressed: () {
               Navigator.pop(context);
@@ -150,7 +150,7 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                 if(messages.isNotEmpty){
 
                  return PopupMenuButton<String>(
-                    icon: Icon(Icons.more_vert), // 'More' icon
+//                    icon: Icon(Icons.more_vert), // 'More' icon
                     onSelected: (value){
                       FirebaseFireStoreServices instance=FirebaseFireStoreServices();
                       // Handle option selection
@@ -188,7 +188,7 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                         instance.deleteDocument('chats', widget.chatRoomModel!.chatDocId);
                       }
                     },
-                    color: AppThemeClass.whiteText,
+                   // color: AppThemeClass.whiteText,
                     itemBuilder: (BuildContext context) => [
                       PopupMenuItem(
                         value: "1",

@@ -12,7 +12,7 @@ import '../../controller/firebase_Storage/crud_storage.dart';
 import '../../controller/firebase_crud_operations/firestore_crud_operations.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../model/post_model.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 
 
 final uniformSize = StateProvider<String?>((ref)=>null);

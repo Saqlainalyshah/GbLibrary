@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/text_widget.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../model/post_model.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 import '../user_actions/post_books.dart';
 import '../user_actions/post_uniform_clothes.dart';
 

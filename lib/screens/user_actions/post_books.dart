@@ -15,7 +15,7 @@ import '../../controller/book_detection/book_detection.dart';
 import '../../controller/firebase_Storage/crud_storage.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../model/ui_models.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 import '../chat/message_room.dart';
 
 final bookSubjectsList=StateProvider<List<String>>((ref)=>[]);

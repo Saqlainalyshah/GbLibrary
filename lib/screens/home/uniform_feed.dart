@@ -10,7 +10,7 @@ import '../../components/cards/post_card.dart';
 import '../../components/textfield.dart';
 import '../../controller/ads/native_ad.dart';
 import '../../controller/providers/global_providers.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 
 
 

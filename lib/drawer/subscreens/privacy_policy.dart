@@ -1,8 +1,9 @@
 
 import 'package:booksexchange/components/layout_components/small_components.dart';
 import 'package:booksexchange/components/text_widget.dart';
-import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
 import 'package:flutter/material.dart';
+
+import '../../utils/app_theme/theme.dart';
 
 class PrivacyPolicy extends StatelessWidget {
   const PrivacyPolicy({super.key});

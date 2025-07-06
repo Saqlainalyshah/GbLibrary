@@ -8,7 +8,6 @@ import 'package:booksexchange/model/post_model.dart';
 import 'package:booksexchange/model/user_profile.dart';
 import 'package:booksexchange/screens/chat/message_room.dart';
 import 'package:booksexchange/screens/home/image_view.dart';
-import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
 import 'package:booksexchange/utils/fontsize/responsive_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +15,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../components/cards/listTile_card.dart';
 import '../../controller/providers/global_providers.dart';
+import '../../utils/app_theme/theme.dart';
 
 class ViewDetails extends ConsumerStatefulWidget {
   const ViewDetails({super.key, required this.booksModel});
@@ -43,10 +43,10 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
     return SafeArea(
       top: false,
       child: Scaffold(
-        backgroundColor: AppThemeClass.whiteText,
+      //  backgroundColor: AppThemeClass.whiteText,
         appBar: AppBar(
-          surfaceTintColor: Colors.transparent,
-          backgroundColor: Colors.transparent,
+         // surfaceTintColor: Colors.transparent,
+          //backgroundColor: Colors.transparent,
           leading: buildCustomBackButton(context),
           title: CustomText(text: "Details"),
         ),
@@ -110,7 +110,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                         isBold: true,
                         color: AppThemeClass.primary,
                       ),
-                      buildIconTextRow(
+                      buildIconTextRow(context,
                         Icons.access_time,
                         TimeFormater.timeAgo(
                           widget.booksModel.createdAt.toString(),
@@ -159,7 +159,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                         isBold: true,
                         color: AppThemeClass.primary,
                       ),
-                      buildIconTextRow(
+                      buildIconTextRow(context,
                         Icons.house_outlined,
                         widget.booksModel.board,
                         true,
@@ -169,7 +169,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                         isBold: true,
                         color: AppThemeClass.primary,
                       ),
-                      buildIconTextRow(
+                      buildIconTextRow(context,
                         Icons.location_on,
                         widget.booksModel.location,
                         true,
@@ -179,7 +179,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                         isBold: true,
                         color: AppThemeClass.primary,
                       ),
-                      buildIconTextRow(
+                      buildIconTextRow(context,
                         Icons.school_outlined,
                         widget.booksModel.grade,
                         true,
@@ -252,7 +252,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                             ),),
                           ),
                           Expanded(
-                            child: CustomButton(color: AppThemeClass.whiteText,isBorder: true,onPress: (){
+                            child: CustomButton(color: AppThemeClass.darkText,isBorder: true,onPress: (){
                               if(tempData.number.length==11){
                                 launchPhoneCall(tempData.number);
                               }else{
@@ -264,12 +264,12 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                               children: [
                                 Icon(
                                   Icons.call,
-                                  color: AppThemeClass.darkText,
+                                //  color: AppThemeClass.darkText,
                                   size: 25,
                                 ),
                                 CustomText(
                                   text: "Call",
-                                  color: AppThemeClass.darkText,
+                                //  color: AppThemeClass.darkText,
                                   isBold: true,
                                   fontSize: 18,
                                 ),

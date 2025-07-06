@@ -12,7 +12,7 @@ import '../../components/textfield.dart';
 import '../../controller/ads/banner_ad.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../model/post_model.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 
 class FilterFeedNotifier extends StateNotifier<FilterFeed> {
   late final StreamSubscription? _sub;
@@ -113,11 +113,7 @@ class FeedPortion extends ConsumerWidget {
           ),*/
 
           SliverAppBar(
-            surfaceTintColor: AppThemeClass.whiteText,
-            backgroundColor: AppThemeClass.whiteText,
-
             expandedHeight: 60,
-
             automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: false,

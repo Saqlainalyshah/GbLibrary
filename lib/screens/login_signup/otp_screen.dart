@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../components/button.dart';
 import '../../components/text_widget.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 import '../main_screen/main_screen.dart';
 
 class OTPScreen extends StatelessWidget {

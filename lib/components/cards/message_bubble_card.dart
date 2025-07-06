@@ -1,8 +1,7 @@
 import 'package:booksexchange/controller/time_format/time_format.dart';
 import 'package:booksexchange/model/message_model.dart';
 import 'package:flutter/material.dart';
-
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 import '../../utils/fontsize/responsive_text.dart';
 import '../text_widget.dart';
 

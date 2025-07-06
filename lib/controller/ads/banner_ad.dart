@@ -1,10 +1,10 @@
 import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/controller/providers/global_providers.dart';
-import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
 import 'package:booksexchange/utils/fontsize/responsive_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../../utils/app_theme/theme.dart';
 import 'ads_ids.dart';
 
 class BannerAdWidget extends ConsumerStatefulWidget {

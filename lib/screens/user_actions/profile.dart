@@ -9,9 +9,10 @@ import '../../components/textfield.dart';
 import '../../controller/ads/interstitial_ad.dart';
 import '../../controller/firebase_crud_operations/firestore_crud_operations.dart';
 import '../../controller/providers/global_providers.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 
 final isLoading=StateProvider.autoDispose<bool>((ref)=>false);
+final isFacebookLogin=StateProvider.autoDispose<bool>((ref)=>false);
 final _isReadOnly=StateProvider.autoDispose<bool>((ref)=>true);
 final gender = StateProvider<String>((ref) {
   final temp=ref.watch(userProfileProvider);

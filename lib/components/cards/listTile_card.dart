@@ -3,7 +3,7 @@ import 'package:booksexchange/utils/fontsize/responsive_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 import '../text_widget.dart';
 
 class ListTileCard extends StatelessWidget {
@@ -33,15 +33,16 @@ final bool newMessage;
   final Color? backgroundColor;
   @override
   Widget build(BuildContext context) {
+    bool isDark= Theme.of(context).brightness == Brightness.dark;
 
     return  GestureDetector(
       onTap: function,
       child: Container(
         //height: 80,
         decoration:BoxDecoration(
-          color: backgroundColor,
+          color:isDark && backgroundColor==null?AppThemeClass.primaryOptional: backgroundColor,
           borderRadius: BorderRadius.circular(5), // Rounded corners
-          border: Border.all(color: AppThemeClass.secondary, width: 1.0), // Border properties
+          border: Border.all(color:isDark?AppThemeClass.primary:AppThemeClass.secondary, width: 1.0), // Border properties
         ),
        // margin:  EdgeInsets.only(bottom: 5),
         padding:  EdgeInsets.all(5),
@@ -138,7 +139,7 @@ final bool newMessage;
                               TextSpan(
                                 text: subTitle,
                                 style: GoogleFonts.robotoSerif(
-                                  color:  isMe?AppThemeClass.darkTextOptional: newMessage ?AppThemeClass.darkTextOptional: backgroundColor!=null?AppThemeClass.whiteText:AppThemeClass.primary,
+                                  color:  isMe?AppThemeClass.darkTextOptional: newMessage ?AppThemeClass.primary: backgroundColor!=null?AppThemeClass.whiteText:AppThemeClass.primary,
                                   letterSpacing: 0,
                                   fontSize: ResponsiveText.getSize(context, 13),
                                   fontWeight: FontWeight.w500,

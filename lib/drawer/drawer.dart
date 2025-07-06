@@ -5,13 +5,13 @@ import 'package:booksexchange/drawer/subscreens/privacy_policy.dart';
 import 'package:booksexchange/drawer/subscreens/terms_services.dart';
 import 'package:booksexchange/screens/user_actions/my_posts.dart';
 import 'package:booksexchange/screens/user_actions/profile.dart';
-import 'package:booksexchange/utils/fontsize/app_theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../components/cards/listTile_card.dart';
 import '../controller/authentication/auth_repository.dart';
 import '../controller/providers/global_providers.dart';
 import '../screens/user_actions/user_account_delete.dart';
+import '../utils/app_theme/theme.dart';
 import 'subscreens/faq.dart';
 import '../components/listtile_component.dart';
 
@@ -208,7 +208,7 @@ class _AccountSectionState extends State<AccountSection> {
                     Padding(
                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   child: ListTileCard(
-                  backgroundColor: AppThemeClass.primary,
+                 // backgroundColor: AppThemeClass.primary,
                   title: user.name,
                   subTitle: 'Member Since ${TimeFormater.formatIsoDate(user.createdAt.toString())}',
                   imageUrl: user.profilePicUrl,
@@ -249,51 +249,56 @@ class _AccountSectionState extends State<AccountSection> {
                     "Share",
                     "Logout",
                   ];
-                  return CustomListTile(
-                    onTap: () async {
-                      if (index == 0) {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => AccountSecurity()));
-                      } else if (index == 1) {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => FAQScreen()));
-                      } else if (index == 2) {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => PrivacyPolicy()));
-                      } else if (index == 3) {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => TermsServices()));
-                      } else if (index == 4) {
-                        // Implement share logic
-                      } else {
-                        UiEventHandler.customAlertDialog(
-                          context,
-                          "Are you sure you want to logout?",
-                          "",
-                          "Logout",
-                          "Cancel",
-                              () async {
-                            Navigator.pop(context);
-                            AuthRepository auth = AuthRepository();
-                            await auth.signOut();
-                          },
-                          false,
-                        );
-                      }
-                    },
-                    leadingIconColor: [
-                      Colors.green,
-                      Colors.blueAccent,
-                      Colors.pinkAccent,
-                      Colors.deepPurple,
-                      Colors.orange,
-                      Colors.red
-                    ][index],
-                    title: list1[index],
-                    leadingIcon: [
-                      Icons.lock_clock,
-                      Icons.question_answer_outlined,
-                      Icons.privacy_tip,
-                      Icons.help,
-                      Icons.share,
-                      Icons.logout
-                    ][index],
+                  return Consumer(
+                    builder:(context,ref,child) =>CustomListTile(
+                      onTap: () async {
+                        if (index == 0) {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => AccountSecurity()));
+                        } else if (index == 1) {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => FAQScreen()));
+                        } else if (index == 2) {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => PrivacyPolicy()));
+                        } else if (index == 3) {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => TermsServices()));
+                        } else if (index == 4) {
+                          final themeNotifier = ref.read(themeNotifierProvider.notifier);
+                          themeNotifier.toggleTheme();
+
+                          // Implement share logic
+                        } else {
+                          UiEventHandler.customAlertDialog(
+                            context,
+                            "Are you sure you want to logout?",
+                            "",
+                            "Logout",
+                            "Cancel",
+                                () async {
+                              Navigator.pop(context);
+                              AuthRepository auth = AuthRepository();
+                              await auth.signOut();
+                            },
+                            false,
+                          );
+                        }
+                      },
+                      leadingIconColor: [
+                        Colors.green,
+                        Colors.blueAccent,
+                        Colors.pinkAccent,
+                        Colors.deepPurple,
+                        Colors.orange,
+                        Colors.red
+                      ][index],
+                      title: list1[index],
+                      leadingIcon: [
+                        Icons.lock_clock,
+                        Icons.question_answer_outlined,
+                        Icons.privacy_tip,
+                        Icons.help,
+                        Icons.share,
+                        Icons.logout
+                      ][index],
+                    ),
                   );
                 }),
               ],
@@ -312,13 +317,13 @@ class _AccountSectionState extends State<AccountSection> {
             children: [
               CustomText(
                 text: " Made with ❤️ in Gilgit Baltistan",
-                color: AppThemeClass.darkText,
+               // color: AppThemeClass.darkText,
                 fontSize: 10,
               ),
               SizedBox(height: 8),
               CustomText(
                 text: "© 2025 Gilgit Swap. All rights reserved.",
-                color: AppThemeClass.darkText,
+               // color: AppThemeClass.darkText,
                 fontSize: 10,
                 // Optional: smaller font
               ),

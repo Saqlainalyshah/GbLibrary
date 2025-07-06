@@ -12,7 +12,7 @@ import '../../components/textfield.dart';
 import '../../controller/firebase_crud_operations/firestore_crud_operations.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../model/chat_model.dart';
-import '../../utils/fontsize/app_theme/theme.dart';
+import '../../utils/app_theme/theme.dart';
 
 
 class FilterChats {
@@ -80,17 +80,6 @@ class FilterFeedNotifier extends StateNotifier<FilterChats> {
     super.dispose();
   }
 
-  void setChats(List<ChatRoomModel> chats, String uid) {
-    final unreadCount = chats.where((chat) =>
-    chat.isRead == false &&
-        chat.lastMessageFrom != uid,
-    ).length;
-    state = state.copyWith(
-      allChats: chats,
-      filteredChats: chats,
-      unreadMessageCount: unreadCount,
-    );
-  }
 
   void filterChatRoomsByUser(bool Function(UserProfile user) condition) {
     final filtered = state.allChats.where((chatRoom) {
@@ -163,7 +152,7 @@ outside(){
     return SafeArea(
       top: false,
       child: Scaffold(
-        backgroundColor: AppThemeClass.whiteText,
+        //backgroundColor: AppThemeClass.whiteText,
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
