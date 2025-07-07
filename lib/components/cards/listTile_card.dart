@@ -14,16 +14,18 @@ class ListTileCard extends StatelessWidget {
      this.time,
     this.isError=false,
     this.isMe=false,
-    this.isIcon=false,
-    this.newMessage=false,
+    this.isRead=false,
     this.hint='You',
+    this.isBorder=true,
+    this.isMessage=true,
     this.backgroundColor,
     this.function});
 
   final bool isMe;
 final String title;
-final bool isIcon;
-final bool newMessage;
+final bool isBorder;
+final bool isRead;
+final bool isMessage;
   final String subTitle;
   final String imageUrl;
   final String? time;
@@ -40,9 +42,8 @@ final bool newMessage;
       child: Container(
         //height: 80,
         decoration:BoxDecoration(
-          color:isDark && backgroundColor==null?AppThemeClass.primaryOptional: backgroundColor,
           borderRadius: BorderRadius.circular(5), // Rounded corners
-          border: Border.all(color:isDark?AppThemeClass.primary:AppThemeClass.secondary, width: 1.0), // Border properties
+        border: Border.all(color:isBorder?AppThemeClass.primary:Colors.transparent, width: 1.0), // Border properties
         ),
        // margin:  EdgeInsets.only(bottom: 5),
         padding:  EdgeInsets.all(5),
@@ -71,7 +72,7 @@ final bool newMessage;
                   errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
                 ),
               ),
-                if (isIcon && !isMe && TimeFormater.isLessThanTenMinutesAgo(time))
+                if (TimeFormater.isLessThanTenMinutesAgo(time))
                   Positioned(
                     right: 5,
                     bottom: 5,
@@ -121,37 +122,9 @@ final bool newMessage;
                    // mainAxisSize: MainAxisSize.min,
                     spacing: 5,
                     children: [
-                      Flexible(
-                        child: RichText(
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          text: TextSpan(
-                            children: [
-                              if(isMe)TextSpan(
-                                text: '$hint: ',
-                                style: GoogleFonts.robotoSerif(
-                                  color: AppThemeClass.primary,
-                                  letterSpacing: 0,
-                                  fontSize: ResponsiveText.getSize(context, 13),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              TextSpan(
-                                text: subTitle,
-                                style: GoogleFonts.robotoSerif(
-                                  color:  isMe?AppThemeClass.darkTextOptional: newMessage ?AppThemeClass.primary: backgroundColor!=null?AppThemeClass.whiteText:AppThemeClass.primary,
-                                  letterSpacing: 0,
-                                  fontSize: ResponsiveText.getSize(context, 13),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      if (isIcon && isMe)  Icon(Icons.done_all,size: 20,color: newMessage?Colors.blue:AppThemeClass.darkTextOptional),
-                      if(isIcon && !isMe &&!newMessage) Material(
+                      Flexible(child: CustomText(text: isMe?'$hint: $subTitle':subTitle,maxLines: 1,isGoogleFont: true,)),
+                      if(isMe &&isMessage)Icon(Icons.done_all,size: 20,color:  isRead?Colors.blueAccent:Theme.of(context).colorScheme.onSurface,),
+                      if (!isMe && !isRead && isMessage)Material(
                         elevation: 4.0, // Adjust the elevation value as needed
                         shape: CircleBorder(), // Ensures the material maintains circular shape
                         color: Colors.transparent, // Keep the container's original color
@@ -159,12 +132,13 @@ final bool newMessage;
                           padding: EdgeInsets.all(5),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppThemeClass.primary,
+                            color: Colors.redAccent,
                           ),
                           child: CustomText(text: 1.toString(),isBold: true,color: AppThemeClass.whiteText,),
                         ),
-                        
+
                       )
+
 
                     ],
                   )

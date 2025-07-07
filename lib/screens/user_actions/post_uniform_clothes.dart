@@ -88,10 +88,7 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
     return SafeArea(
         top: false,
         child: Scaffold(
-          backgroundColor: AppThemeClass.whiteText,
       appBar: AppBar(
-        surfaceTintColor: AppThemeClass.whiteText,
-        backgroundColor: Colors.transparent,
         title: CustomText(text: "Post Uniform & Clothes",isBold: true,fontSize: 20,),
         leading: buildCustomBackButton(context),
       ),
@@ -281,7 +278,7 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                       UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
                     }
 
-                  },title: "Post",fontSize: 15,isBold: true,),
+                  },title: "Post",fontSize: 18,isBold: true,),
                 ),
               ],
             ),

@@ -58,10 +58,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         //backgroundColor: Colors.black,
        // drawerScrimColor: AppThemeClass.primary,
         appBar: AppBar(
-          iconTheme: IconThemeData(color: AppThemeClass.primary),
-          backgroundColor: Colors.transparent,
-         // automaticallyImplyLeading: false,
-          //centerTitle: true,
+
           title: BannerAdWidget()
         ),
        // drawer: const DrawerWidget(),

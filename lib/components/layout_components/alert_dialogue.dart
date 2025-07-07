@@ -25,11 +25,7 @@ class UiEventHandler{
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          surfaceTintColor: AppThemeClass.whiteText,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-          elevation: 10,
 
-          // content: Text("Please wait verification is in process"),
           content:  Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: isCircle?CrossAxisAlignment.center:CrossAxisAlignment.start,

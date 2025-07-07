@@ -23,7 +23,6 @@ final _item=StateProvider<String>((ref)=>'');
 final selectedImageProvider = StateProvider.autoDispose<File?>((ref) => null);
 final bookGrade=StateProvider<String?>((ref)=>null);
 final bookCategory = StateProvider<String?>((ref)=>null);
-final _imageUrl=StateProvider.autoDispose<String?>((ref)=>null);
 final bookBoard=StateProvider<String?>((ref)=>null);
 
 class PostBooks extends ConsumerStatefulWidget {
@@ -131,10 +130,7 @@ class _PostBooksState extends ConsumerState<PostBooks> {
     return  SafeArea(
         top: false,
         child: Scaffold(
-          backgroundColor: AppThemeClass.whiteText,
           appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            surfaceTintColor: Colors.transparent,
             title: CustomText(text: "Post Books",fontSize: 20,isBold: true,),
             leading: buildCustomBackButton(context),
           ),
@@ -372,7 +368,7 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                       } else {
                         UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
                       }
-                    },title: "Post",fontSize: 15,isBold: true,),
+                    },title: "Post",fontSize: 18,isBold: true,),
                   ),
                 ],
               )),
@@ -394,7 +390,7 @@ class ButtonSubjects extends ConsumerWidget {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
         backgroundColor: isSelected ? AppThemeClass.primary : null,
-        side: BorderSide(width: 1, color: AppThemeClass.primary),
+
       ),
       onPressed: () {
         final list = [...ref.read(bookSubjectsList)];
@@ -407,7 +403,6 @@ class ButtonSubjects extends ConsumerWidget {
       },
       child: CustomText(
         text: item,
-        color: isSelected ? AppThemeClass.whiteText : AppThemeClass.darkText,
       ),
     );
   }

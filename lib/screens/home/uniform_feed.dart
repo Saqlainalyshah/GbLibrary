@@ -28,8 +28,7 @@ final TextEditingController controller =TextEditingController();
               // physics: BouncingScrollPhysics(),
               slivers: [
                 SliverAppBar(
-                  surfaceTintColor: AppThemeClass.whiteText,
-                  backgroundColor: AppThemeClass.whiteText,
+
                   expandedHeight: 60,
                   automaticallyImplyLeading: false,
                   flexibleSpace: FlexibleSpaceBar(

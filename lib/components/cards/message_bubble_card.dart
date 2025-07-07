@@ -18,6 +18,9 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final background=isMe && isDark? Colors.white12: isMe &&!isDark?AppThemeClass.secondary: !isMe &&isDark?AppThemeClass.primaryOptional: AppThemeClass.primary;
+
     return Align(
       alignment: isMe ? Alignment.topRight:Alignment.topLeft,
       child: Padding(
@@ -34,7 +37,7 @@ class MessageBubble extends StatelessWidget {
               ),
               padding: EdgeInsets.symmetric(horizontal: 15,vertical: 3),
               decoration: BoxDecoration(
-                color: isMe ? AppThemeClass.secondary:AppThemeClass.primary ,
+                color: background ,
                 borderRadius: BorderRadius.only(
                   topLeft:  Radius.circular(isMe?30:0) ,
                   topRight:  Radius.circular(30),
@@ -48,7 +51,7 @@ class MessageBubble extends StatelessWidget {
                 children: [
                   CustomText(text:
                   message,
-                      color: isMe ?  Colors.black:Colors.white ,
+                      color: isMe &&isDark ?Colors.white: isMe &&!isDark? Colors.black:Colors.white ,
                     fontSize: 15,
                       //isBold: true,
                       //isGoogleFont:true

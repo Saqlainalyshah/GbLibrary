@@ -60,14 +60,14 @@ class _BannerAdWidgetState extends ConsumerState<BannerAdWidget> {
                   text: "Hello👋! ",
                   style: TextStyle(
                     fontWeight: FontWeight.w400,
-                    color: AppThemeClass.darkText,
-                    fontSize: ResponsiveText.getSize(context, 18)
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: ResponsiveText.getSize(context, 18)
                   )
                 ),
                 TextSpan(text: user.name,style: TextStyle(
                   fontWeight: FontWeight.w900,
-                  color: AppThemeClass.primary,
-                    fontSize: ResponsiveText.getSize(context, 20),
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: ResponsiveText.getSize(context, 20),
                 ),
 
                 )

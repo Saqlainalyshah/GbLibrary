@@ -82,16 +82,13 @@ class _ProfileState extends ConsumerState<Profile> {
     return SafeArea(
       top: false,
       child: Scaffold(
-        backgroundColor: AppThemeClass.whiteText,
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: Colors.transparent,
-          surfaceTintColor: Colors.transparent,
           leading: buildCustomBackButton(context),
           title: CustomText(text: "Profile", isBold: true, fontSize: 20),
           actions: [
             Container(
-              margin: EdgeInsets.all(10),
+              margin: EdgeInsets.all(5),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: AppThemeClass.primary
@@ -99,9 +96,9 @@ class _ProfileState extends ConsumerState<Profile> {
                 child: Consumer(
                   builder:(context,ref,child)=> ref.watch(_isReadOnly)!? IconButton(onPressed: (){
                     ref.read(_isReadOnly.notifier).state=false;
-                  }, icon: Icon(Icons.edit_rounded,color: AppThemeClass.whiteText,)):IconButton(onPressed: (){
+                  }, icon: Icon(Icons.edit_rounded,color: AppThemeClass.whiteText,size: 30)):IconButton(onPressed: (){
                     ref.read(_isReadOnly.notifier).state=true;
-                  }, icon: Icon(Icons.cancel,color: AppThemeClass.whiteText,)),
+                  }, icon: Icon(Icons.cancel,color: AppThemeClass.whiteText,size: 30,)),
                 ))],
         ),
         body: SingleChildScrollView(
@@ -200,7 +197,7 @@ class _ProfileState extends ConsumerState<Profile> {
                         }
                         ref.read(isLoading.notifier).state=false;
                       },
-                      title: "Update",
+                      title: "Update",fontSize: 18,
                     ),
                   )
                 ],

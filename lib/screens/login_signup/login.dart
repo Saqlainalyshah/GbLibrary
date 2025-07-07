@@ -28,17 +28,14 @@ class Login extends ConsumerWidget {
     return  SafeArea(
       top: false,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        appBar: AppBar(),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               spacing: 10,
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: MediaQuery.sizeOf(context).height*0.1,),
-                //Text('data',style: GoogleFonts.roboto,),
                 RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
@@ -47,7 +44,7 @@ class Login extends ConsumerWidget {
                       TextSpan(
                           text: "Let's Educate ",
                           style:GoogleFonts.asapCondensed(
-                            fontSize: 33,fontWeight: FontWeight.bold,color:AppThemeClass.darkText,
+                            fontSize: 33,fontWeight: FontWeight.bold
                           )
                       ),
                       TextSpan(
@@ -60,7 +57,7 @@ class Login extends ConsumerWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: MediaQuery.sizeOf(context).height*0.1,),
+                /*SizedBox(height:10,),
                 Text("Phone Number",style: GoogleFonts.robotoSerif(color: AppThemeClass.darkText),),
                 Consumer(
                     builder:(context,ref,child){
@@ -92,8 +89,8 @@ class Login extends ConsumerWidget {
                     CustomText(text: "   or   "),
                     Expanded(child: Divider()),
                   ],
-                ),
-
+                ),*/
+                SizedBox(height: MediaQuery.sizeOf(context).height*0.3,),
                 ...List.generate(2, (index){
                   List<String> list=["Continue with Google","Continue with Facebook"];
                   return   Consumer(
@@ -131,7 +128,7 @@ class Login extends ConsumerWidget {
                         }
                       },
                         isBorder: true,
-                        color: AppThemeClass.whiteText,
+                       // color: AppThemeClass.whiteText,
                         widget: Row(
                           spacing: 60,
                           children: [

@@ -18,10 +18,7 @@ class FAQScreen extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Scaffold(
-        backgroundColor: AppThemeClass.whiteText,
         appBar: AppBar(
-          backgroundColor: AppThemeClass.whiteText,
-          surfaceTintColor:AppThemeClass.whiteText,
           leading: buildCustomBackButton(context),
           centerTitle: true,
           title: Text( "FAQ",style:TextStyle(fontWeight: FontWeight.w900,)),
@@ -66,8 +63,12 @@ class FAQScreen extends StatelessWidget {
                       print("build only single $index");
                       return OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                          side: isSelected ? BorderSide.none : null,
-                          backgroundColor: isSelected ? AppThemeClass.primary  : null,
+                          backgroundColor: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
+                          foregroundColor: isSelected? AppThemeClass.whiteText: Theme.of(context).colorScheme.onSurface,
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary,
+                            width: 1,
+                          ),
                         ),
                         onPressed: () {
                           ref.read(_selectedIndex.notifier).state = index;
@@ -75,7 +76,7 @@ class FAQScreen extends StatelessWidget {
                         },
                         child: CustomText(
                           text: _categoriesList[index],
-                          color: isSelected ? AppThemeClass.whiteText : Colors.black,
+                          //color: isSelected ? AppThemeClass.whiteText : Colors.black,
                         ),
                       );
                     },
@@ -106,7 +107,7 @@ class FAQScreen extends StatelessWidget {
                        // final isRead = ref.watch(readStatusProvider(index));
                         final item= ref.watch(faqProvider.select((itemVal)=>itemVal.filteredItems[index]));
 
-
+                        final isDark = Theme.of(context).brightness == Brightness.dark;
                         return GestureDetector(
                           key: ValueKey(index),
                           onTap: (){
@@ -115,10 +116,10 @@ class FAQScreen extends StatelessWidget {
                           child: Container(
                             padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: AppThemeClass.whiteText,
+                             // color: AppThemeClass.whiteText,
                               //   borderRadius: BorderRadius.circular(10)
                               borderRadius: BorderRadius.circular(10), // Rounded corners
-                              border: Border.all(color: AppThemeClass.secondary, width: 1.0),
+                              border: isDark?null:Border.all(color: AppThemeClass.secondary, width: 1.0),
                             ),
                             child: Column(
                               spacing: 10,
@@ -128,7 +129,7 @@ class FAQScreen extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Flexible(child: CustomText(text: item.question,isBold: true,)),
-                                    Icon(item.isRead? Icons.keyboard_arrow_down_outlined: Icons.keyboard_arrow_up,color: Colors.grey.shade700,)
+                                    Icon(item.isRead? Icons.keyboard_arrow_down_outlined: Icons.keyboard_arrow_up,)
                                   ],
                                 ),
                                 if(item.isRead)Divider(),

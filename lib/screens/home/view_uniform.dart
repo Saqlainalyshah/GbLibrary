@@ -42,10 +42,8 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
     return SafeArea(
       top: false,
       child: Scaffold(
-        backgroundColor: AppThemeClass.whiteText,
         appBar: AppBar(
-          surfaceTintColor: Colors.transparent,
-          backgroundColor: Colors.transparent,
+
           leading: buildCustomBackButton(context),
           title: CustomText(text: "Details"),
         ),
@@ -110,12 +108,12 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
                         isBold: true,
                         color: AppThemeClass.primary,
                       ),
-                      buildIconTextRow(context,
+                      buildIconTextRowWithoutBackground(
                         Icons.access_time,
                         TimeFormater.timeAgo(
                           widget.clothesModel.createdAt.toString(),
                         ),
-                        true,
+
                       ),
                       CustomText(
                         text: widget.clothesModel.description,
@@ -126,10 +124,10 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
                         isBold: true,
                         color: AppThemeClass.primary,
                       ),
-                      buildIconTextRow(context,
+                      buildIconTextRowWithoutBackground(
                         Icons.person_outline,
                         widget.clothesModel.size=='S'?'Small Size':widget.clothesModel.size=='M'?'Medium Size':widget.clothesModel.size=='L'?'Large Size':'Extra Large Size',
-                        true,
+
                       ),
 
                       CustomText(
@@ -137,10 +135,9 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
                         isBold: true,
                         color: AppThemeClass.primary,
                       ),
-                      buildIconTextRow(context,
+                      buildIconTextRowWithoutBackground(
                         Icons.location_on,
                         widget.clothesModel.location,
-                        true,
                       ),
 
                       Divider(color: AppThemeClass.primary),
@@ -156,6 +153,7 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
                           if (temp != null) {
                             final user = UserProfile.fromJson(temp);
                             return ListTileCard(
+                              isMessage:  false,
                               title: user.name,
                               subTitle:
                               "Member since ${TimeFormater.formatIsoDate(user.createdAt.toString())}",
@@ -223,12 +221,10 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
                               children: [
                                 Icon(
                                   Icons.call,
-                                  color: AppThemeClass.darkText,
                                   size: 25,
                                 ),
                                 CustomText(
                                   text: "Call",
-                                  color: AppThemeClass.darkText,
                                   isBold: true,
                                   fontSize: 18,
                                 ),
@@ -249,4 +245,27 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
       ),
     );
   }
+}
+
+
+
+buildIconTextRowWithoutBackground(IconData icon, String text,) {
+  return Row(
+    spacing: 3,
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Icon(
+        icon,
+        color: AppThemeClass.primary,
+        size: 20,
+      ),
+      Flexible(
+        child: CustomText(
+          text: text,
+          fontSize: 12,
+        ),
+      ),
+    ],
+  );
 }

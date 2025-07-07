@@ -32,7 +32,6 @@ class CustomText extends StatelessWidget {
       maxLines: maxLines,
       textAlign: textAlign,
       style: isGoogleFont
-
           ?GoogleFonts.robotoSerif(
               color:color,
              letterSpacing: -0.4,

@@ -126,6 +126,8 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
           title: ListTile(
             leading: ClipOval(
               child: CachedNetworkImage(
+                width: 45,
+                height: 45,
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.high,
                 imageUrl: widget.userProfile.profilePicUrl,
@@ -134,7 +136,7 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
             title: CustomText(
               text: widget.userProfile.name,
               isBold: true,
-              maxLines: 2,
+              maxLines: 1,
             ),
             subtitle: CustomText(text: "Offline"),
           ),
@@ -353,7 +355,6 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
                           FirebaseFireStoreServices();
                           // print(chatRoomModel.toJson());
                               clear();
-
                                instance
                                    .createSubCollectionDocument(
                                  'chats',
@@ -400,9 +401,7 @@ Widget popupWidget(){
   return  PopupMenuButton<String>(
     icon: Icon(Icons.more_vert), // 'More' icon
     onSelected: (value) {
-
     },
-    color: AppThemeClass.whiteText,
     itemBuilder: (BuildContext context) => [
       PopupMenuItem(
         value: "1",

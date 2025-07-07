@@ -19,10 +19,7 @@ class OTPScreen extends StatelessWidget {
     return SafeArea(
         top: false,
         child: Scaffold(
-          backgroundColor: AppThemeClass.whiteText,
           appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            surfaceTintColor: Colors.transparent,
             leading: buildCustomBackButton(context),
           ),
           body: Padding(
@@ -31,9 +28,8 @@ class OTPScreen extends StatelessWidget {
               spacing: 10,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
-                CustomText(text: "Verification",color: AppThemeClass.darkText,fontSize: 30,isBold: true,),
-                CustomText(textAlign: TextAlign.center,text: "A 6 digit verification code has been sent on your number 0313******33",color: AppThemeClass.darkText,fontSize: 15),
+                CustomText(text: "Verification",fontSize: 30,isBold: true,),
+                CustomText(textAlign: TextAlign.center,text: "A 6 digit verification code has been sent on your number 0313******33",fontSize: 15),
                 TextFormField(
                   maxLength: 6,
                   textAlign: TextAlign.center,
@@ -53,10 +49,8 @@ class OTPScreen extends StatelessWidget {
                             width: 2.0
                         )
                     ),
-                    filled: true,
-                    fillColor: AppThemeClass.whiteText,
                     hintText: "232322",
-                    hintStyle:GoogleFonts.robotoSerif(color: AppThemeClass.darkTextOptional,fontSize: 13),
+                    hintStyle:GoogleFonts.robotoSerif(fontSize: 13),
                   ),
                 ),
                 CustomButton( title: 'Verify Number', onPress: (){

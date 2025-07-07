@@ -8,6 +8,7 @@ import 'package:booksexchange/model/post_model.dart';
 import 'package:booksexchange/model/user_profile.dart';
 import 'package:booksexchange/screens/chat/message_room.dart';
 import 'package:booksexchange/screens/home/image_view.dart';
+import 'package:booksexchange/screens/home/view_uniform.dart';
 import 'package:booksexchange/utils/fontsize/responsive_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -110,12 +111,11 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                         isBold: true,
                         color: AppThemeClass.primary,
                       ),
-                      buildIconTextRow(context,
+                      buildIconTextRowWithoutBackground(
                         Icons.access_time,
                         TimeFormater.timeAgo(
                           widget.booksModel.createdAt.toString(),
                         ),
-                        true,
                       ),
                       CustomText(
                         text: widget.booksModel.description,
@@ -142,14 +142,8 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                               buttonText,
                               ) {
                             return OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(
-                                  width: 1,
-                                  color: AppThemeClass.primary,
-                                ),
-                              ),
                               onPressed: () {},
-                              child: CustomText(text: buttonText),
+                              child: Text(buttonText,),
                             );
                           }).toList(),
                         ),
@@ -159,30 +153,28 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                         isBold: true,
                         color: AppThemeClass.primary,
                       ),
-                      buildIconTextRow(context,
+                      buildIconTextRowWithoutBackground(
                         Icons.house_outlined,
                         widget.booksModel.board,
-                        true,
                       ),
                       CustomText(
                         text: "Address:",
                         isBold: true,
                         color: AppThemeClass.primary,
                       ),
-                      buildIconTextRow(context,
+                      buildIconTextRowWithoutBackground(
                         Icons.location_on,
                         widget.booksModel.location,
-                        true,
                       ),
                       CustomText(
                         text: "Class:",
                         isBold: true,
                         color: AppThemeClass.primary,
                       ),
-                      buildIconTextRow(context,
+                      buildIconTextRowWithoutBackground(
                         Icons.school_outlined,
                         widget.booksModel.grade,
-                        true,
+
                       ),
                       Divider(color: AppThemeClass.primary),
                       CustomText(
@@ -197,6 +189,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                           if (temp != null) {
                             final user = UserProfile.fromJson(temp);
                             return ListTileCard(
+                              isMessage:  false,
                               title: user.name,
                               subTitle:
                               "Member since ${TimeFormater.formatIsoDate(user.createdAt.toString())}",
@@ -209,7 +202,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                                 size: 50,
                                 color: AppThemeClass.primaryOptional,
                               ),
-                              title: Text('gblibraryuser'),
+                              title: Text('gilgitswap user'),
                               subtitle: Text("User Not Found"),
                             );
                           }
@@ -224,6 +217,8 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                 padding: const EdgeInsets.all(8.0),
                 child: Consumer(
                   builder:(context,ref,child){
+                    bool isDark= Theme.of(context).brightness == Brightness.dark;
+
                     final data=ref.watch(mapDataProvider);
                     if(data!=null){
                       final tempData=UserProfile.fromJson(data);
@@ -231,7 +226,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                         spacing: 50,
                         children: [
                           Expanded(
-                            child:CustomButton(onPress: (){
+                            child:CustomButton(isBorder: isDark,onPress: (){
                               Navigator.push(context, MaterialPageRoute(builder: (builder)=>MessageRoom(userProfile:tempData ,)));
                             },widget: Row(
                               spacing: 5,
@@ -252,7 +247,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                             ),),
                           ),
                           Expanded(
-                            child: CustomButton(color: AppThemeClass.darkText,isBorder: true,onPress: (){
+                            child: CustomButton(isBorder: true,onPress: (){
                               if(tempData.number.length==11){
                                 launchPhoneCall(tempData.number);
                               }else{
@@ -264,12 +259,12 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                               children: [
                                 Icon(
                                   Icons.call,
-                                //  color: AppThemeClass.darkText,
+                                  color: AppThemeClass.whiteText,
                                   size: 25,
                                 ),
                                 CustomText(
                                   text: "Call",
-                                //  color: AppThemeClass.darkText,
+                                  color: AppThemeClass.whiteText,
                                   isBold: true,
                                   fontSize: 18,
                                 ),

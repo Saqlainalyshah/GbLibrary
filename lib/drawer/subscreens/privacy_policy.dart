@@ -35,10 +35,7 @@ class PrivacyPolicy extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Scaffold(
-        backgroundColor: AppThemeClass.whiteText,
         appBar: AppBar(
-          backgroundColor: AppThemeClass.whiteText,
-          surfaceTintColor: AppThemeClass.whiteText,
           leading: buildCustomBackButton(context),
           title: CustomText(text: "Privacy Policy",isBold: true,fontSize: 20,),
         ),

@@ -108,7 +108,6 @@ class BuildPostColumn extends StatelessWidget {
         CustomText(
           text: description,
           //overflow: TextOverflow.ellipsis,s
-          color: isDark?Colors.white70:AppThemeClass.darkText,
           fontSize: 13,
           maxLines: 5,
         ),
@@ -118,6 +117,8 @@ class BuildPostColumn extends StatelessWidget {
 }
 ///bottom row of card which contains location, time and view details button
 _buildBottomRow(BuildContext context, String location, String time, Function function) {
+  bool isDark= Theme.of(context).brightness == Brightness.dark;
+
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     spacing: 5,
@@ -128,6 +129,7 @@ _buildBottomRow(BuildContext context, String location, String time, Function fun
       CustomButton(
        // isBorder: false,
         //color: AppThemeClass.primary,
+
         radius: 5,
         onPress: () {
          function();
@@ -177,13 +179,13 @@ buildContainerImage(
   );
 }
 ///row widget wrapped in a container with a app secondary color which contains icon and text
-buildIconTextRow(BuildContext context,IconData icon, String text,bool isExpend, ) {
+buildIconTextRow(BuildContext context,IconData icon, String text,bool isExpend,) {
   final isDark = Theme.of(context).brightness == Brightness.dark;
   return Container(
    // width: double.infinity,
     padding: EdgeInsets.all(5),
     decoration: BoxDecoration(
-      color: isDark?AppThemeClass.primaryOptional:AppThemeClass.secondary,
+      color: isDark ?AppThemeClass.primaryOptional:AppThemeClass.secondary,
       //color: AppThemeClass.primary,
       borderRadius: BorderRadius.circular(3),
     ),
@@ -201,7 +203,6 @@ buildIconTextRow(BuildContext context,IconData icon, String text,bool isExpend, 
           child: CustomText(
             text: text,
             maxLines:isExpend? 4:1,
-            color: isDark?Colors.white70:AppThemeClass.darkText,
             fontSize: 12,
           ),
         ),

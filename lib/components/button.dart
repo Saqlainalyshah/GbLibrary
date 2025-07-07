@@ -7,6 +7,7 @@ import '../utils/app_theme/theme.dart';
 
 ///Button widget
 class CustomButton extends StatelessWidget {
+
   const CustomButton({
     super.key,
     this.isLoading = false,
@@ -19,7 +20,7 @@ class CustomButton extends StatelessWidget {
     this.width = double.infinity,
     this.height = 50.0,
     this.loadingColor,
-    this.color,
+    this.color=const Color(0xff00a67e),
     this.titleColor,
     required this.onPress,
   });
@@ -47,9 +48,12 @@ class CustomButton extends StatelessWidget {
       child: Container(
         width: width,
         height: height,
+        constraints: BoxConstraints(
+          maxWidth: 400
+        ),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(radius),
-            color:isDark && color==null?AppThemeClass.primaryOptional:color,
+            color:isDark?AppThemeClass.primaryOptional: color,
             border: isBorder?Border.all(
                 color: AppThemeClass.primary
             ):null),

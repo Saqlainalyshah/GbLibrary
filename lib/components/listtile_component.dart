@@ -27,6 +27,7 @@ class CustomListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return ListTile(
       onTap:(){
         onTap();
@@ -38,7 +39,7 @@ class CustomListTile extends StatelessWidget {
           ? Container(
         padding: EdgeInsets.all(5),
         decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: isDark? Colors.white12:Colors.blue.shade50,
             shape: BoxShape.circle
         ),
         child: Icon(

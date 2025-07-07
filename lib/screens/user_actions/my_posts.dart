@@ -39,10 +39,7 @@ class _MyPostsState extends ConsumerState<MyPosts> {
       child: DefaultTabController(
         length: 2,
         child: Scaffold(
-          backgroundColor: AppThemeClass.whiteText,
           appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            surfaceTintColor: Colors.transparent,
             leading: buildCustomBackButton(context),
             title: const CustomText(
               text: "My Posts",
@@ -50,8 +47,8 @@ class _MyPostsState extends ConsumerState<MyPosts> {
               fontSize: 20,
             ),
             bottom: const TabBar(
-              labelColor: Colors.black,
-              indicatorColor: AppThemeClass.primary,
+              //labelColor: Colors.black,
+              //indicatorColor: AppThemeClass.primary,
               labelStyle: TextStyle(fontWeight: FontWeight.bold),
               tabs: [
                 Tab(text: "Books"),

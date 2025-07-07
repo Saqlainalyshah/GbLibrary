@@ -217,8 +217,8 @@ outside(){
                               }
                             },
                             child: ListTileCard(
-                              isIcon: true,
-                              newMessage: newMessage,
+                              isBorder: false,
+                              isRead: data[index].isRead,
                               isMe: isMe,
                               time: data[index].createdAt.toString(),
                               title: user.name,

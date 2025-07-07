@@ -36,10 +36,7 @@ class TermsServices extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Scaffold(
-        backgroundColor: AppThemeClass.whiteText,
         appBar: AppBar(
-          surfaceTintColor: AppThemeClass.whiteText,
-          backgroundColor: AppThemeClass.whiteText,
           leading: buildCustomBackButton(context),
           title: CustomText(text: "Terms of Services",isBold: true,fontSize: 20,),
           centerTitle: true,

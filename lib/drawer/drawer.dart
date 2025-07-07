@@ -208,6 +208,7 @@ class _AccountSectionState extends State<AccountSection> {
                     Padding(
                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   child: ListTileCard(
+                    isMessage:  false,
                  // backgroundColor: AppThemeClass.primary,
                   title: user.name,
                   subTitle: 'Member Since ${TimeFormater.formatIsoDate(user.createdAt.toString())}',
