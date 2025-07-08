@@ -143,7 +143,7 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 5,
                 children: [
-                  CustomText(text: "Do you want to Exchange or Donate?",isGoogleFont: true,color: AppThemeClass.primary,),
+                  CustomText(text: "Do you want to Exchange or Donate?",color: AppThemeClass.primary,),
                   Row(
                     children: List.generate(2, (index) {
                       List<String> list = ["Exchange", "Donate"];
@@ -166,12 +166,12 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                     }),
                   ),
 
-                  CustomText(text: "Location",isGoogleFont: true,color: AppThemeClass.primary,),
+                  CustomText(text: "Location",color: AppThemeClass.primary,),
                   CustomTextField(controller: location,hintText: "Noor Colony,Jutial Gilgit", validator: (value) {
                     if (value!.isEmpty) return "Address is required";
                     return null;
                   },),
-                  CustomText(text: "Description",isGoogleFont: true,color: AppThemeClass.primary,),
+                  CustomText(text: "Description",color: AppThemeClass.primary,),
                   CustomTextField(controller: description,hintText:  "I want to exchange my books.....",maxLines:  6,
                     validator: (value) {
                       if (value!.isEmpty) return "Description is required";
@@ -180,7 +180,7 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                     },
                   ),
 
-                  CustomText(text: "Select Class",isGoogleFont: true,color: AppThemeClass.primary,),
+                  CustomText(text: "Select Class",color: AppThemeClass.primary,),
                   Consumer(
                     builder:(context,ref,child)=> CustomDropDown(value:  ref.watch(bookGrade),hintText: "Class",list: nameOfClassList, onChanged: (String? val ) {
                       ref.read(bookGrade.notifier).state=val;
@@ -190,7 +190,7 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                     },
                     ),
                   ),
-                  CustomText(text: "Select Institutional Board",isGoogleFont: true,color: AppThemeClass.primary,),
+                  CustomText(text: "Select Institutional Board",color: AppThemeClass.primary,),
                   Consumer(
                     builder:(context,ref,child)=> CustomDropDown( value: ref.watch(bookBoard),hintText: "Board",list: list, onChanged: (String? val ) {
                       ref.read(bookBoard.notifier).state=val!;
@@ -201,20 +201,29 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                       },
                     ),
                   ),
-                  CustomText(text: "Select Subjects",isGoogleFont: true,color: AppThemeClass.primary,),
-                  Wrap(
-                    spacing: 5.0,
-                    children: List.generate(subjects.length, (index){
-                      return ProviderScope(
-                        overrides: [_item.overrideWith((it)=>subjects[index])],
-                        child: const ButtonSubjects(),
-                      );
-                    }),
+                  CustomText(text: "Select Subjects",color: AppThemeClass.primary,),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(
+                        color:    Theme.of(context).brightness == Brightness.dark? AppThemeClass.primaryOptional:AppThemeClass.primary
+                      )
+                    ),
+                    child: Wrap(
+                      spacing: 5.0,
+                      children: List.generate(subjects.length, (index){
+                        return ProviderScope(
+                          overrides: [_item.overrideWith((it)=>subjects[index])],
+                          child: const ButtonSubjects(),
+                        );
+                      }),
+                    ),
                   ),
                   SizedBox(height: 10,),
-                  if(!widget.isEdit)   CustomText(text: "Select Picture",isGoogleFont: true,color: AppThemeClass.primary,),
+                  if(!widget.isEdit)   CustomText(text: "Select Picture",color: AppThemeClass.primary,),
                  if(!widget.isEdit) Consumer(
                     builder:(context,ref,child){
+                      bool isDark= Theme.of(context).brightness == Brightness.dark;
                       final selectedImage=ref.watch(selectedImageProvider);
                       return GestureDetector(
                         onTap: () => _pickImageAndCompress(ref),
@@ -225,7 +234,7 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(5),
                               border:Border.all(
-                                  color: AppThemeClass.primaryOptional,
+                                  color: isDark?AppThemeClass.primaryOptional:AppThemeClass.primary,
                                   width: 1.0
                               ),
                             image:selectedImage!=null? DecorationImage(image: FileImage(selectedImage,),fit: BoxFit.cover):null
@@ -235,7 +244,7 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                       );
                     },
                   ),
-                  if(!widget.isEdit)   CustomText(text: "Only one image can be upload. The image should be clear because our Book detection model is not 100% accurate",isGoogleFont: true,fontSize: 9,color: AppThemeClass.primary,),
+                  if(!widget.isEdit)   CustomText(text: "Only one image can be upload. The image should be clear because our Book detection model is not 100% accurate",fontSize: 9,color: AppThemeClass.primary,),
                   RichText(
                     text: TextSpan(
                       children: [
@@ -382,7 +391,6 @@ class ButtonSubjects extends ConsumerWidget {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
         backgroundColor: isSelected ? AppThemeClass.primary : null,
-
       ),
       onPressed: () {
         final list = [...ref.read(bookSubjectsList)];
@@ -395,6 +403,7 @@ class ButtonSubjects extends ConsumerWidget {
       },
       child: CustomText(
         text: item,
+        color: isSelected?AppThemeClass.whiteText:null,
       ),
     );
   }

@@ -118,14 +118,17 @@ class AuthRepository {
     if (user == null) return false;
 
     try {
-      // Delete Firestore user profile
-      await _fireStore.collection('users').doc(user.uid).delete();
-      // Delete Firebase account
+      final res=await signInWithGoogle();
+      if(res){
+        await _fireStore.collection('users').doc(user.uid).delete();
+        // Delete Firebase account
 
-      await user.delete();
-      await signOut();
+        await user.delete();
+        await signOut();
 
+      }
       return true;
+      // Delete Firestore user profile
     } on FirebaseAuthException catch (e) {
       if (e.code == 'requires-recent-login') {
         debugPrint("Re-authentication required.");

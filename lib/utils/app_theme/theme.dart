@@ -1,5 +1,3 @@
-
-import 'package:booksexchange/utils/fontsize/responsive_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,6 +10,7 @@ class AppThemeClass{
   static const Color darkText= Colors.black;
   static const Color darkTextOptional=Colors.black54;
   static const Color whiteText= Colors.white;
+  static const Color black=Color(0xFF1C1D1F);
 }
 
 class GlobalThemeData {
@@ -28,6 +27,7 @@ class GlobalThemeData {
           fontWeight: FontWeight.w600,
         ),
       ),
+
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
          // backgroundColor: colorScheme.surface
@@ -37,7 +37,11 @@ class GlobalThemeData {
         style: OutlinedButton.styleFrom(
          // backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onSurface,
-          side: BorderSide.none
+          side: BorderSide.none,
+            textStyle:  GoogleFonts.poppins(
+          // fontSize: 12,
+          letterSpacing: -0.2,
+        ),
         )
       ),
       dialogTheme: DialogThemeData(
@@ -56,83 +60,72 @@ class GlobalThemeData {
         contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
         filled: true,
         fillColor: colorScheme.surface,
-        hintStyle: GoogleFonts.robotoSerif(
+        hintStyle: GoogleFonts.poppins(
           color: colorScheme.onSurface,
           //fontSize: 10,
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: colorScheme.primary),
-          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide( color: colorScheme == lightColorScheme ?colorScheme.primary:colorScheme.secondary),
+          borderRadius: BorderRadius.circular(5),
         ),
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(
-            color: colorScheme.primary,
+            color: colorScheme == lightColorScheme ?colorScheme.primary:colorScheme.secondary,
             width: 2.0,
           ),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(5),
         ),
         errorBorder: OutlineInputBorder(
           borderSide: BorderSide(
-            color: colorScheme.error,
+            color: colorScheme == lightColorScheme ?colorScheme.primary:colorScheme.secondary,
             width: 1.0,
           ),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(5),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderSide: BorderSide(
-            color: colorScheme.error,
+            color: colorScheme == lightColorScheme ?colorScheme.primary:colorScheme.secondary,
             width: 1.0,
           ),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(5),
         ),
       ),
 
-      /* inputDecorationTheme: InputDecorationTheme(
-
-        filled: true, // Enables the fill
-        fillColor: colorScheme.surface, // Customize this as needed
-        focusColor: colorScheme.primary, // Optional: color when focused
-        border: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: colorScheme.primary,
-          ),
-          borderRadius: BorderRadius.circular(8), // Optional: rounded corners
-        ),
-      ),*/
-     /* textTheme: TextTheme(
-        displayLarge: GoogleFonts.robotoSerif(
-          fontSize: ResponsiveBox.getSize(context, size),
+      textTheme: TextTheme(
+        displayLarge: GoogleFonts.poppins(
           fontWeight: FontWeight.bold,
           color: colorScheme.onSurface,
         ),
-        titleLarge: GoogleFonts.robotoSerif(
+        titleLarge: GoogleFonts.poppins(
           fontSize: 24,
           fontWeight: FontWeight.w600,
           color: colorScheme.primary,
         ),
-        bodyLarge: GoogleFonts.robotoSerif(
+        bodyLarge: GoogleFonts.poppins(
           fontSize: 16,
           fontWeight: FontWeight.normal,
           color: colorScheme.onSurface,
         ),
-        bodyMedium: GoogleFonts.robotoSerif(
+        bodyMedium: GoogleFonts.poppins(
           fontSize: 14,
           color: colorScheme.onSurface,
         ),
-        labelSmall: GoogleFonts.robotoSerif(
+        labelSmall: GoogleFonts.poppins(
           fontSize: 12,
           fontWeight: FontWeight.w500,
           color: colorScheme.secondary,
         ),
-      ),*/
+      ),
 
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: colorScheme.primary, // Set button background color
         foregroundColor: colorScheme.onPrimary, // Set text/icon color
       ),
       textSelectionTheme: TextSelectionThemeData(
-        cursorColor: colorScheme.primary
+        cursorColor: colorScheme.primary,
+
       ),
+
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: colorScheme.surface, // Adapts to light/dark mode
         modalBackgroundColor: colorScheme.surface, // Ensures consistency
@@ -140,23 +133,10 @@ class GlobalThemeData {
       colorScheme: colorScheme,
       dividerColor: colorScheme.primary,
       scaffoldBackgroundColor: colorScheme.surface,
-      /*popupMenuTheme: PopupMenuThemeData(
-        color: colorScheme == lightColorScheme ?Colors.white:Colors.black38,
-       // shadowColor: colorScheme == lightColorScheme ?Colors.black:Colors.white,
-        //surfaceTintColor: colorScheme.surface
-      ),*/
-     /* dropdownMenuTheme: DropdownMenuThemeData(
-        textStyle: TextStyle(
-          color: colorScheme.onSurface
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: colorScheme.surface
-        )
-      ),*/
+
 
       dividerTheme: DividerThemeData(
-        color: colorScheme.primary
+        color: colorScheme == lightColorScheme ?colorScheme.primary:colorScheme.secondary
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: colorScheme.primary
@@ -166,7 +146,11 @@ class GlobalThemeData {
           foregroundColor: colorScheme.onSurface, // Text color adapts to theme
           padding: EdgeInsets.zero, // Removes default padding
           visualDensity: VisualDensity.compact, // Reduces space
+          textStyle:  GoogleFonts.poppins(
+    // fontSize: 12,
+    letterSpacing: -0.2,
         ),
+        )
       ),
 
 
@@ -179,12 +163,13 @@ class GlobalThemeData {
     secondary: Color(0xff004036),
     onSecondary: Colors.black,
     surface: Colors.white,
-    onSurface: Colors.black,
+    onSurface: Color(0XFF515357),
     primaryContainer:Color(0xff00a67e) ,
     error: Colors.redAccent,
     onError: Colors.red,
     brightness: Brightness.light,
     surfaceTint: Colors.white,
+
 
   );
 
@@ -194,10 +179,8 @@ class GlobalThemeData {
       onPrimary:Color(0xffd9f1eb),
       secondary: Color(0xff004036),
     onSecondary: Colors.black54,
-    /* background: Color(0xFF241E30),
-    onBackground: Colors.white, */// Adjusted color for better contrast
-    surface:Colors.black,// Color(0xFF1F1929),
-    onSurface: Colors.white,
+    surface:Color(0xFF1C1D1F),// Color(0xFF1F1929),
+      onSurface: Color(0XFFC5C6C9),
     error: Colors.redAccent,
     primaryContainer:Color(0xffd9f1eb) ,
     onError: Colors.redAccent,

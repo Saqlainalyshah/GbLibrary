@@ -65,11 +65,11 @@ class CustomTextField extends StatelessWidget {
       onChanged: onChanged,
       maxLines: maxLines,
       minLines: 1,
-     // focusNode: focusNode,
+     cursorErrorColor: AppThemeClass.primary,
       textCapitalization: TextCapitalization.sentences,
 
-      style: GoogleFonts.robotoSerif(
-        letterSpacing: -0.4
+      style: GoogleFonts.poppins(
+        letterSpacing: -0.2
        // color: color,
         //fontSize: ResponsiveText.getSize(context, fontSize),
         //fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
@@ -79,46 +79,21 @@ class CustomTextField extends StatelessWidget {
       decoration: InputDecoration(
         contentPadding: EdgeInsets.symmetric(horizontal: 5),
         counterText: counterText,
-       // labelText: labelText,
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: AppThemeClass.primary,
-          ),
-          borderRadius: BorderRadius.circular(radius),
-        ),
-
-        focusedBorder: OutlineInputBorder(
-        //  borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(
-            color: AppThemeClass.primary,
-                width: 2.0
-          )
-        ),
-        errorBorder: OutlineInputBorder( // Add error border
-          borderSide: BorderSide(color: AppThemeClass.primary, width: 1.0),
-          borderRadius: BorderRadius.circular(radius),
-        ),
-        focusedErrorBorder: OutlineInputBorder( // Add focused error border
-          borderSide: BorderSide(color: AppThemeClass.primary, width: 1.0),
-          borderRadius: BorderRadius.circular(radius),
-        ),
-
         filled: true,
-       // fillColor: isDark?AppThemeClass.darkText:fillColor,
         prefixIcon: leadingIcon == null
             ? null
             : Icon(leadingIcon, color: AppThemeClass.primary, size: 25.0),
         suffixIcon: trailingIcon != null
-            ? GestureDetector(
-          onTap: () {
+            ? IconButton(
+          onPressed: () {
             if (trailingFn != null) {
               trailingFn!(); // Invoke the function when the trailing icon is tapped
             }
           },
-          child: Icon(trailingIcon, color: AppThemeClass.primary, size: 25.0),
+          icon: Icon(trailingIcon, color: AppThemeClass.primary, size: 25.0),
         ) : null,
         hintText: hintText,
-        hintStyle:GoogleFonts.robotoSerif(color:isDark?Colors.white70: AppThemeClass.darkText,fontSize: 13),
+        hintStyle:GoogleFonts.poppins(color:isDark?Colors.white70: AppThemeClass.darkText,fontSize: 13),
       ),
     );
   }

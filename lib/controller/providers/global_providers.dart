@@ -29,7 +29,7 @@ final mapDataProvider = StateNotifierProvider<MapDataNotifier, Map<String, dynam
 
 final currentUserAuthStatus = StreamProvider<User?>((ref) async* {
   // Delay the stream for 2 seconds
-  await Future.delayed(Duration(seconds: 2));
+  await Future.delayed(Duration(seconds: 3));
   AuthRepository authRepository=AuthRepository();
   yield* authRepository.authStateChange;
 });

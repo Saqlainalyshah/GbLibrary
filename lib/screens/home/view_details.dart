@@ -1,5 +1,4 @@
 import 'package:booksexchange/components/button.dart';
-import 'package:booksexchange/components/cards/post_card.dart';
 import 'package:booksexchange/components/layout_components/alert_dialogue.dart';
 import 'package:booksexchange/components/layout_components/small_components.dart';
 import 'package:booksexchange/components/text_widget.dart';
@@ -226,7 +225,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                         spacing: 50,
                         children: [
                           Expanded(
-                            child:CustomButton(isBorder: isDark,onPress: (){
+                            child:CustomButton(isBorder: isDark, color: isDark?AppThemeClass.primaryOptional:AppThemeClass.primary,onPress: (){
                               Navigator.push(context, MaterialPageRoute(builder: (builder)=>MessageRoom(userProfile:tempData ,)));
                             },widget: Row(
                               spacing: 5,
@@ -247,7 +246,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                             ),),
                           ),
                           Expanded(
-                            child: CustomButton(isBorder: true,color: isDark?AppThemeClass.darkText:AppThemeClass.whiteText,onPress: (){
+                            child: CustomButton(isBorder: true,color: isDark?AppThemeClass.black:AppThemeClass.whiteText,onPress: (){
                               if(tempData.number.length==11){
                                 launchPhoneCall(tempData.number);
                               }else{

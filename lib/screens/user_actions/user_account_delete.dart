@@ -6,7 +6,6 @@ import 'package:booksexchange/controller/firebase_crud_operations/firestore_crud
 import 'package:booksexchange/controller/providers/global_providers.dart';
 import 'package:booksexchange/model/chat_model.dart';
 import 'package:booksexchange/model/message_model.dart';
-import 'package:booksexchange/model/post_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -52,7 +51,7 @@ class AccountSecurity extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                       side: BorderSide(
-                          color: AppThemeClass.secondary
+                          color: ref.watch(themeNotifierProvider)==ThemeMode.dark? AppThemeClass.primaryOptional:AppThemeClass.primary
                       )
                   ),
                   onTap: () {
@@ -63,11 +62,14 @@ class AccountSecurity extends StatelessWidget {
                           FirebaseFirestore db=FirebaseFirestore.instance;
                           FirebaseStorageService storageService=FirebaseStorageService();
                           final user=ref.watch(userProfileProvider);
-                          final myChats=ref.watch(filterChatProvider);
-                          final myBooks=ref.watch(myBooksPosts);
+                          final myChats=ref.watch(filterChatProvider.select((state)=>state.allChats));
+                          final myBooks = await ref.read(myBooksPosts.future);
+
+                          final myClothes= await ref.read(myClothesPosts.future);
                           if(user!=null){
                             UiEventHandler.customAlertDialog(context, "Wait a few minutes we're deleting...", '', "", "", (){}, true);
-                            for(var item in myChats.allChats){
+
+                            for(var item in myChats){
                               final List<MessageModel> snapshot = await db
                                   .collection('chats/${item.chatDocId}/messages') // Replace with your actual collection name
                                   .where('userId', isEqualTo: user.uid)
@@ -84,61 +86,32 @@ class AccountSecurity extends StatelessWidget {
                               }
                               ChatRoomModel chat=item;
                               List<String> temp=List.from(chat.participants);
-                              print("Before================>$temp");
                               temp.remove(user.uid);
-                              print(" After================>$temp");
                               final model=chat.copyWith(chatDocId: '',participants: temp);
-                              print(model);
                               await instance.updateDocument('chats', item.chatDocId, model.toJson());
                             }
-                            final QuerySnapshot query1 = await db
-                                .collection('books') // Replace with your actual collection name
-                                .where('userID', isEqualTo: user.uid)
-                                .get();
-                            List<BooksModel> list1=query1.docs.map((document){
-                              final decoded=document.data();
-                              final parse=BooksModel.fromJson(decoded as Map<String,dynamic>);
-                              final model=  parse.copyWith(bookDocId: document.id);
-                              return model;
-                            }).toList();
-                            // Delete each matching document
-                            print("======================Books $list1");
-                            for(var item in list1){
-                              //  final path=storageService.extractFirebasePath(item.imageUrl);
-                              //  print("======================outsider: $path");
-                              final onValue= await storageService.deleteFile(item.imageUrl);
-                              if(onValue){
-                                instance.deleteDocument('book', item.bookDocId);
-                              }else{
-                                print("======================outsider: $onValue");
+
+                            if(myBooks.isNotEmpty){
+                              for(var item in myBooks){
+                                final onValue= await storageService.deleteFile(item.imageUrl);
+                                if(onValue){
+                                  await instance.deleteDocument('books', item.bookDocId);
+                                }
                               }
                             }
-                            final QuerySnapshot query2 = await db
-                                .collection('outfits') // Replace with your actual collection name
-                                .where('userID', isEqualTo: user.uid)
-                                .get();
-                            List<ClothesModel> list2=query2.docs.map((document){
-                              final decoded=document.data();
-                              final parse=ClothesModel.fromJson(decoded as Map<String,dynamic>);
-                              final model=  parse.copyWith(clothesDocId: document.id);
-                              return model;
-                            }).toList();
-                            // Delete each matching document
-                            for(var item in list2){
-
-                              await storageService.deleteFile(item.imageUrl).then((onValue){
+                            if(myClothes.isNotEmpty){
+                              for(var item in myClothes){
+                                final onValue= await storageService.deleteFile(item.imageUrl);
                                 if(onValue){
-                                  instance.deleteDocument('outfits', item.clothesDocId);
-                                }else{
+                                  await   instance.deleteDocument('outfits', item.clothesDocId);
                                 }
-                              });
-
+                              }
                             }
                             if(context.mounted){
                               Navigator.of(context).pop();
                             }
                             AuthRepository auth=AuthRepository();
-                            //  auth.deleteAccount();
+                              await auth.deleteAccount();
                             Navigator.of(context).pop();
                           }
                         }, false);

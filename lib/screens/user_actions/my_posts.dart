@@ -67,8 +67,9 @@ class _MyPostsState extends ConsumerState<MyPosts> {
                       return const Center(
                           child: CustomText(
                               text: "No Book Posts",
-                              isGoogleFont: true,
-                              isBold: true));
+                              isBold: true,
+                          fontSize: 18,
+                          ));
                     }
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -97,7 +98,6 @@ class _MyPostsState extends ConsumerState<MyPosts> {
                   error: (error, _) => Center(
                       child: CustomText(
                           text: "Error: $error",
-                          isGoogleFont: true,
                           isBold: true)),
                   loading: () => const Center(
                       child: CircularProgressIndicator(
@@ -114,8 +114,9 @@ class _MyPostsState extends ConsumerState<MyPosts> {
                       return const Center(
                           child: CustomText(
                               text: "No Clothes Posts",
-                              isGoogleFont: true,
-                              isBold: true));
+                              isBold: true,
+                          fontSize: 18,
+                          ));
                     }
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -143,7 +144,6 @@ class _MyPostsState extends ConsumerState<MyPosts> {
                   error: (error, _) => Center(
                       child: CustomText(
                           text: "Error: $error",
-                          isGoogleFont: true,
                           isBold: true)),
                   loading: () => const Center(
                       child: CircularProgressIndicator(
@@ -212,13 +212,12 @@ final Function function;
            crossAxisAlignment: CrossAxisAlignment.start,
            mainAxisSize: MainAxisSize.min,
            children: [
-             CustomText(text: title, isGoogleFont: true,isBold: true,fontSize: 13,maxLines: 2,),
+             CustomText(text: title,isBold: true,fontSize: 13,maxLines: 2,),
              Flexible(
                child: CustomText(
                  text: description,
-                 fontSize: 10,
+                 fontSize: 12,
                  maxLines: 2,
-                 isGoogleFont: true,
                ),
              ),
              Consumer(
@@ -236,6 +235,7 @@ final Function function;
                  child: CustomText(
                    text: "Edit",
                    isBold: true,
+                   fontSize: 16,
                    color: AppThemeClass.whiteText,
                  ),
                ),

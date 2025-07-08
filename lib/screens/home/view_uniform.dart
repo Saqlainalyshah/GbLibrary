@@ -1,5 +1,4 @@
 import 'package:booksexchange/components/button.dart';
-import 'package:booksexchange/components/cards/post_card.dart';
 import 'package:booksexchange/components/layout_components/small_components.dart';
 import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/controller/time_format/time_format.dart';
@@ -189,7 +188,7 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
                         spacing: 50,
                         children: [
                           Expanded(
-                            child:CustomButton(onPress: (){
+                            child:CustomButton( isBorder: isDark,color: isDark?AppThemeClass.primaryOptional:AppThemeClass.primary,onPress: (){
                               Navigator.push(context, MaterialPageRoute(builder: (builder)=>MessageRoom(userProfile:tempData ,)));
                             },widget: Row(
                               spacing: 5,
@@ -210,7 +209,7 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
                             ),),
                           ),
                           Expanded(
-                            child: CustomButton(color: isDark?AppThemeClass.darkText:AppThemeClass.whiteText,isBorder: true,onPress: (){
+                            child: CustomButton(color: isDark?AppThemeClass.black:AppThemeClass.whiteText,isBorder: true,onPress: (){
                               if(tempData.number.length==11){
                                 launchPhoneCall(tempData.number);
                               }else{
@@ -264,7 +263,7 @@ buildIconTextRowWithoutBackground(IconData icon, String text,) {
       Flexible(
         child: CustomText(
           text: text,
-          fontSize: 15,
+          fontSize: 14,
         ),
       ),
     ],

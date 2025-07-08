@@ -16,14 +16,6 @@ import '../../model/chat_model.dart';
 import '../../model/message_model.dart';
 import '../../utils/app_theme/theme.dart';
 
-
-
-
-
-import 'package:flutter/services.dart';
-
-import 'chat.dart';
-
 class NetworkChecker {
   static const platform = MethodChannel('com.example.network/check');
 

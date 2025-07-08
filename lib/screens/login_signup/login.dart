@@ -1,24 +1,19 @@
 import 'package:booksexchange/screens/user_actions/profile.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../components/button.dart';
 import '../../components/layout_components/alert_dialogue.dart';
 import '../../components/text_widget.dart';
-import '../../components/textfield.dart';
 import '../../controller/authentication/auth_repository.dart';
 import '../../utils/app_theme/theme.dart';
 import '../../utils/fontsize/responsive_text.dart';
-import 'otp_screen.dart';
 
 class Login extends ConsumerWidget {
   Login({super.key});
   final TextEditingController email=TextEditingController();
   final TextEditingController password=TextEditingController();
   final TextEditingController phone=TextEditingController();
-  final _checkLength=StateProvider.autoDispose<bool>((ref)=>false);
   final List<String> socialMediaNetworkImages=[
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdtpg4IsItbaNk0GxMyoz8f0fpVMIsFeNYCQ&s",
     "https://1000logos.net/wp-content/uploads/2017/02/Facebook-Logosu.png",
@@ -60,7 +55,7 @@ class Login extends ConsumerWidget {
                   ),
                 ),
               //  SizedBox(height: ResponsiveBox.getSize(context, 50),),
-                  CustomText(text: "With",isGoogleFont: true,isBold: true,fontSize: 33,),
+                  CustomText(text: "With",isBold: true,fontSize: 33,),
                 RichText(
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -160,7 +155,12 @@ class Login extends ConsumerWidget {
                         widget: Row(
                           spacing: 60,
                           children: [
-                            Container(
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Icon( index==0?Icons.login_outlined:Icons.facebook_outlined,size: 30,color: Colors.white,),
+                            ),
+
+                           /* Container(
                               margin: EdgeInsets.all(10),
                               height: 50,
                               width: 50,
@@ -170,8 +170,8 @@ class Login extends ConsumerWidget {
                                     fit: BoxFit.cover,
                                     image: NetworkImage(socialMediaNetworkImages[index],),)
                               ),
-                            ),
-                            CustomText(text: list[index],isBold: true,color: AppThemeClass.whiteText,)
+                            ),*/
+                            CustomText(text: list[index],isBold: true,color: AppThemeClass.whiteText,fontSize: 18,)
                           ],
                         ),
                       );

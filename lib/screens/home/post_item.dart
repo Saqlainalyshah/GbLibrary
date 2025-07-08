@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/text_widget.dart';
-import '../../controller/providers/global_providers.dart';
 import '../../model/post_model.dart';
 import '../../utils/app_theme/theme.dart';
 import '../user_actions/post_books.dart';
@@ -12,6 +11,7 @@ class PostItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDark= Theme.of(context).brightness == Brightness.dark;
     print("PostItem Screen Rebuilds");
     return  SingleChildScrollView(
       child: Padding(
@@ -30,7 +30,7 @@ class PostItem extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                       side: BorderSide(
-                          color: AppThemeClass.secondary
+                          color: isDark?AppThemeClass.primaryOptional:AppThemeClass.secondary
                       )
                   ),
                   onTap: (){
@@ -50,7 +50,7 @@ class PostItem extends StatelessWidget {
                       Flexible(flex:3,child: ListTile(
                         //  isThreeLine: true,
                         title: CustomText(text: l[index],isBold: true,fontSize: 16,),
-                        subtitle: CustomText(text: list[index],maxLines: 3,),
+                        subtitle: CustomText(text: list[index],maxLines: 3,fontSize: 13,),
                       )),
                       Icon(Icons.navigate_next),
                     ],

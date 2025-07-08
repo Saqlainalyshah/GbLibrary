@@ -65,7 +65,7 @@ class MessageBubble extends StatelessWidget {
                       CustomText(text:
                       TimeFormater.timeAgo(messageModel.createdAt.toString()), // Example timestamp
                         fontSize: 10, color: isMe ?AppThemeClass.primary:AppThemeClass.whiteText,
-                        isGoogleFont: true,
+
                       ),
                       if(isMe) Icon(
                         Icons.done_all,

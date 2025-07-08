@@ -15,7 +15,7 @@ class CustomButton extends StatelessWidget {
     this.title,
     this.isBold=true,
     this.widget,
-    this.fontSize = 14.0,
+    this.fontSize = 15.0,
     this.radius = 10.0,
     this.width = double.infinity,
     this.height = 50.0,
@@ -40,7 +40,6 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   bool isDark= Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
         onPress();

@@ -12,7 +12,6 @@ import '../../components/textfield.dart';
 import '../../controller/firebase_crud_operations/firestore_crud_operations.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../model/chat_model.dart';
-import '../../utils/app_theme/theme.dart';
 
 
 class FilterChats {
@@ -147,8 +146,6 @@ outside(){
 
   @override
   Widget build(BuildContext context) {
-    print("ChatScreen build called at: ${DateTime.now()}");
-
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -199,9 +196,6 @@ outside(){
 
                           bool isMe = data[index].lastMessageFrom ==
                               FirebaseAuth.instance.currentUser!.uid;
-
-                          bool newMessage = data[index].isRead;
-
                           return GestureDetector(
                             onLongPress: (){
                               if(data[index].participants.length==1){
@@ -217,7 +211,7 @@ outside(){
                               }
                             },
                             child: ListTileCard(
-                              isBorder: false,
+                            //  isBorder: true,
                               isRead: data[index].isRead,
                               isMe: isMe,
                               time: data[index].createdAt.toString(),

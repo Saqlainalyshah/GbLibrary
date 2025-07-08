@@ -1,7 +1,4 @@
 import 'dart:async';
-
-import 'package:booksexchange/components/button.dart';
-import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/controller/time_format/time_format.dart';
 import 'package:booksexchange/screens/home/view_details.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/cards/post_card.dart';
 import '../../components/textfield.dart';
-import '../../controller/ads/banner_ad.dart';
 import '../../controller/providers/global_providers.dart';
 import '../../model/post_model.dart';
 import '../../utils/app_theme/theme.dart';
@@ -86,12 +82,24 @@ final filterFeedProvider = StateNotifierProvider<FilterFeedNotifier, FilterFeed>
 });
 
 
-class FeedPortion extends ConsumerWidget {
-  FeedPortion({super.key,});
+class FeedPortion extends ConsumerStatefulWidget {
+ const FeedPortion({super.key,});
+
+  @override
+  ConsumerState<FeedPortion> createState() => _FeedPortionState();
+}
+
+class _FeedPortionState extends ConsumerState<FeedPortion> {
   final TextEditingController controller=TextEditingController();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    controller.text;
+  }
+  @override
+  Widget build(BuildContext context) {
     print("Feed Portion Screen Rebuilds");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 0),

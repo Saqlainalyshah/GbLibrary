@@ -1,21 +1,16 @@
-import 'package:booksexchange/components/layout_components/alert_dialogue.dart';
 import 'package:booksexchange/components/layout_components/small_components.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../components/button.dart';
 import '../../components/text_widget.dart';
 import '../../utils/app_theme/theme.dart';
-import '../main_screen/main_screen.dart';
 
 class OTPScreen extends StatelessWidget {
   OTPScreen({super.key});
   final TextEditingController otp=TextEditingController();
-  final _checkLength=StateProvider.autoDispose<bool>((ref)=>false);
 
   @override
   Widget build(BuildContext context) {
-    print("rebuilds");
     return SafeArea(
         top: false,
         child: Scaffold(
@@ -54,11 +49,6 @@ class OTPScreen extends StatelessWidget {
                   ),
                 ),
                 CustomButton( title: 'Verify Number', onPress: (){
-                 /* UiEventHandler.customAlertDialog(context, "Please wait! We're verifying your number", CircularProgressIndicator(color: AppThemeClass.primary,));
-                  Future.delayed(Duration(seconds: 2),(){
-                    Navigator.pop(context);
-                   // Navigator.push(context, MaterialPageRoute(builder: (builder)=>MainScreen()));
-                  });*/
                 },),
 
               ],

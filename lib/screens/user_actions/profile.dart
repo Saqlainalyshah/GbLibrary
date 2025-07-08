@@ -110,7 +110,6 @@ class _ProfileState extends ConsumerState<Profile> {
                 spacing: 10,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                 // CachedNetworkImage(height: 100,width: 100,imageUrl: userProfile.profilePicUrl.toString()),
                   Center(
                     child:   Consumer(
                       builder:(context,ref,child)=> CircleAvatar(
@@ -120,9 +119,9 @@ class _ProfileState extends ConsumerState<Profile> {
                       ),
                     ),
                   ),
-                  CustomText(text: "Name", isGoogleFont: true),
+                  CustomText(text: "Name", ),
                   nameField,
-                  CustomText(text: "Gender", isGoogleFont: true),
+                  CustomText(text: "Gender", ),
                   Row(
                     children: List.generate(2, (index) {
                       final List<String> list = ["Male", "Female"];
@@ -147,9 +146,9 @@ class _ProfileState extends ConsumerState<Profile> {
                       );
                     }),
                   ),
-                  CustomText(text: "Address", isGoogleFont: true),
+                  CustomText(text: "Address", ),
                   addressField,
-                  CustomText(text: "Phone Number", isGoogleFont: true),
+                  CustomText(text: "Phone Number", ),
                   whatsappField,
                   Consumer(
                     builder:(context,ref,child)=>ref.watch(_isReadOnly)!?SizedBox.shrink(): CustomButton(

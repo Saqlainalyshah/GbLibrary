@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:booksexchange/components/layout_components/small_components.dart';
-import 'package:booksexchange/screens/user_actions/clothes_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -81,11 +80,8 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
     ref.invalidate(isSchoolUniform);
     ref.invalidate(uniformSize);
   }
-  //final List<String> type = ["Exchange", "Sell", "Donate"];
   @override
   Widget build(BuildContext context) {
-
-    print("build");
     return SafeArea(
         top: false,
         child: Scaffold(
@@ -102,7 +98,7 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 5,
               children: [
-                CustomText(text: "Select size",isGoogleFont: true,color: AppThemeClass.primary,),
+                CustomText(text: "Select size",color: AppThemeClass.primary,),
                 Consumer(
                     builder:(context,ref,child)=>  buildRadioButtons(
                       options: ["S", "M","L","XL"],
@@ -112,13 +108,13 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                       },
                     )
                 ),
-                CustomText(text: "Location",isGoogleFont: true,color: AppThemeClass.primary,),
+                CustomText(text: "Location",color: AppThemeClass.primary,),
                 CustomTextField(controller: location,hintText: "Noor Colony,Jutial Gilgit",
                   validator: (value) {
                     if (value!.isEmpty) return "Address is required";
                     return null;
                   },),
-                CustomText(text: "Description",isGoogleFont: true,color: AppThemeClass.primary,),
+                CustomText(text: "Description",color: AppThemeClass.primary,),
                 CustomTextField(controller: description,hintText:  "I want to exchange my books.....",maxLines:  4,
                   validator: (value) {
                     if (value!.isEmpty) return "Description is required";
@@ -126,7 +122,7 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                     return null;
                   },
                 ),
-                CustomText(text: "Is this school uniform?",isGoogleFont: true,color: AppThemeClass.primary,),
+                CustomText(text: "Is this school uniform?",color: AppThemeClass.primary,),
                 Consumer(
                   builder:(context,ref,child)=> buildRadioButtons(
                     options: ["Yes","No"],
@@ -137,7 +133,7 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                   ),
                 ),
 
-             if(!widget.isEdit)   CustomText(text: "Select Picture",isGoogleFont: true,color: AppThemeClass.primary,),
+             if(!widget.isEdit)   CustomText(text: "Select Picture",color: AppThemeClass.primary,),
                 if(!widget.isEdit)    Consumer(
                   builder:(context,ref,child){
                     final selectedImage=ref.watch(selectedUniformImageProvider);
@@ -160,7 +156,7 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                     );
                   },
                 ),
-                if(!widget.isEdit)   CustomText(text: "Only one image can be upload",isGoogleFont: true,fontSize: 9,color: AppThemeClass.primary,),
+                if(!widget.isEdit)   CustomText(text: "Only one image can be upload",fontSize: 9,color: AppThemeClass.primary,),
                 RichText(
                   text: TextSpan(
                     children: [
@@ -268,7 +264,6 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                          ref.read(uniformSize.notifier).state='';
                          ref.read(isSchoolUniform.notifier).state='';
                          ref.read(selectedUniformImageProvider.notifier).state=null;
-                         //  Navigator.pop(context);
                          if(context.mounted){
                            UiEventHandler.snackBarWidget(context, "Successfully updated");
                          }

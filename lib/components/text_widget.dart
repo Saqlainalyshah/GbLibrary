@@ -11,11 +11,10 @@ class CustomText extends StatelessWidget {
   final bool isBold;
   final int? maxLines;
   final TextAlign? textAlign;
-  final bool isGoogleFont;
+
   const CustomText({
     super.key,
     required this.text,
-    this.isGoogleFont = false,
     this.textAlign = TextAlign.start,
     this.maxLines = 300,
     this.fontSize,
@@ -31,19 +30,12 @@ class CustomText extends StatelessWidget {
       softWrap: true,
       maxLines: maxLines,
       textAlign: textAlign,
-      style: isGoogleFont
-          ?GoogleFonts.robotoSerif(
-              color:color,
-            letterSpacing: -0.2,
-              fontSize: ResponsiveText.getSize(context, fontSize??12),
-              fontWeight: isBold ? FontWeight.bold : FontWeight.w300,
-            )
-          : TextStyle(
+      style: GoogleFonts.poppins(
        // fontSize: 12,
                letterSpacing: -0.2,
               color: color,
               fontSize: ResponsiveText.getSize(context, fontSize??12),
-              fontWeight: isBold ? FontWeight.bold : null
+              fontWeight: isBold ? FontWeight.w500 : FontWeight.w400
         //fontStyle: FontStyle.normal
 
             ),

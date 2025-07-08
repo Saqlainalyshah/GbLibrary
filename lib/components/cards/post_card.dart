@@ -130,7 +130,7 @@ _buildBottomRow(BuildContext context, String location, String time, Function fun
       CustomButton(
        // isBorder: false,
         //color: AppThemeClass.primary,
-
+        color: isDark?AppThemeClass.primaryOptional:AppThemeClass.primary,
         radius: 5,
         onPress: () {
          function();

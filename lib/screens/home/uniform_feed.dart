@@ -1,10 +1,6 @@
 import 'dart:async';
-
-import 'package:booksexchange/components/button.dart';
-import 'package:booksexchange/components/text_widget.dart';
 import 'package:booksexchange/controller/time_format/time_format.dart';
 import 'package:booksexchange/model/post_model.dart';
-import 'package:booksexchange/screens/home/view_details.dart';
 import 'package:booksexchange/screens/home/view_uniform.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -56,9 +52,6 @@ class UniformNotifier extends StateNotifier<ClothesData> {
     state = state.copyWith(filteredFeeds: state.allFeeds);
   }
 }
-
-
-
 class ClothesData{
   final List<ClothesModel> allFeeds;
   final List<ClothesModel>  filteredFeeds;
@@ -71,7 +64,6 @@ class ClothesData{
     return ClothesData(allFeeds: allFeeds??this.allFeeds, filteredFeeds: filteredFeeds??this.filteredFeeds);
   }
 }
-
 
 final clothesProvider = StateNotifierProvider<UniformNotifier, ClothesData>((ref) {
   final authAsync = ref.watch(currentUserAuthStatus);
@@ -87,11 +79,24 @@ final clothesProvider = StateNotifierProvider<UniformNotifier, ClothesData>((ref
 
 
 
-class UniformFeed extends ConsumerWidget {
-   UniformFeed({super.key,});
-final TextEditingController controller =TextEditingController();
+class UniformFeed extends ConsumerStatefulWidget {
+   const UniformFeed({super.key,});
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<UniformFeed> createState() => _UniformFeedState();
+}
+
+class _UniformFeedState extends ConsumerState<UniformFeed> {
+final TextEditingController controller =TextEditingController();
+
+@override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    controller.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
     print("Feed Portion Screen Rebuilds");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 0),
@@ -178,23 +183,3 @@ final TextEditingController controller =TextEditingController();
     );
   }
 }
-
-/*return PostCard(
-                        title: uniformPosts[index].isSchoolUniform=='Yes'?"Donated School Uniform":"Donated Outfits",
-                        category: '',
-                        grade: '',
-                        isClothes: true,
-                        board: uniformPosts[index].size=='S'?'Small Size':uniformPosts[index].size=='M'?'Medium Size':uniformPosts[index].size=='L'?'Large Size':'Extra Large Size',
-                        time: TimeFormater.timeAgo(uniformPosts[index].createdAt.toString()),
-                        description: uniformPosts[index].description,
-                        location: uniformPosts[index].location,
-                        type:'',
-                        imageUrl: uniformPosts[index].imageUrl,
-                        function: (){
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (builder) =>  SchoolUniformScreen(clothesModel: uniformPosts[index],)),
-                          );
-                        },
-                      );
-* */

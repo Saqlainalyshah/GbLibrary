@@ -42,8 +42,9 @@ final bool isMessage;
       child: Container(
         //height: 80,
         decoration:BoxDecoration(
+
           borderRadius: BorderRadius.circular(5), // Rounded corners
-        border: Border.all(color:isBorder?AppThemeClass.primary:Colors.transparent, width: 1.0), // Border properties
+        border: Border.all(color:isBorder &&isDark?AppThemeClass.primaryOptional:AppThemeClass.secondary, width: 1.0), // Border properties
         ),
        // margin:  EdgeInsets.only(bottom: 5),
         padding:  EdgeInsets.all(5),
@@ -114,7 +115,7 @@ final bool isMessage;
                           //isGoogleFont: true,
                         ),
                       ),
-                   if(time!=null)   CustomText(text: TimeFormater.timeAgo(time!.toString()), maxLines: 1,fontSize: 10,isGoogleFont: true,color: AppThemeClass.primary,),
+                   if(time!=null)   CustomText(text: TimeFormater.timeAgo(time!.toString()), maxLines: 1,fontSize: 10,color: AppThemeClass.primary,),
                     ],
                   ),
                   Row(
@@ -122,14 +123,14 @@ final bool isMessage;
                    // mainAxisSize: MainAxisSize.min,
                     spacing: 5,
                     children: [
-                      Flexible(child: CustomText(text: isMe?'$hint: $subTitle':subTitle,maxLines: 1,isGoogleFont: true,)),
+                      Flexible(child: CustomText(text: isMe?'$hint: $subTitle':subTitle,maxLines: 1,fontSize: 13,)),
                       if(isMe &&isMessage)Icon(Icons.done_all,size: 20,color:  isRead?Colors.blueAccent:Theme.of(context).colorScheme.onSurface,),
                       if (!isMe && !isRead && isMessage)Material(
                         elevation: 4.0, // Adjust the elevation value as needed
                         shape: CircleBorder(), // Ensures the material maintains circular shape
                         color: Colors.transparent, // Keep the container's original color
                         child: Container(
-                          padding: EdgeInsets.all(5),
+                          padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.redAccent,
