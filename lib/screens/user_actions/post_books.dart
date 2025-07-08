@@ -202,25 +202,14 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                     ),
                   ),
                   CustomText(text: "Select Subjects",isGoogleFont: true,color: AppThemeClass.primary,),
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        border:Border.all(
-                            color: AppThemeClass.primary,
-                            width: 1.0
-                        )
-                    ),
-                    child: Wrap(
-                      spacing: 5.0,
-                      children: List.generate(subjects.length, (index){
-                        return ProviderScope(
-                          overrides: [_item.overrideWith((it)=>subjects[index])],
-                          child: const ButtonSubjects(),
-                        );
-                      }),
-                    ),
+                  Wrap(
+                    spacing: 5.0,
+                    children: List.generate(subjects.length, (index){
+                      return ProviderScope(
+                        overrides: [_item.overrideWith((it)=>subjects[index])],
+                        child: const ButtonSubjects(),
+                      );
+                    }),
                   ),
                   SizedBox(height: 10,),
                   if(!widget.isEdit)   CustomText(text: "Select Picture",isGoogleFont: true,color: AppThemeClass.primary,),
@@ -236,7 +225,7 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(5),
                               border:Border.all(
-                                  color: AppThemeClass.primary,
+                                  color: AppThemeClass.primaryOptional,
                                   width: 1.0
                               ),
                             image:selectedImage!=null? DecorationImage(image: FileImage(selectedImage,),fit: BoxFit.cover):null
@@ -337,9 +326,10 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                       },title: "Delete",fontSize: 15,isBold: true,))
                     ],
                   ):Consumer(
-                    builder:(context,ref,child)=> CustomButton(onPress: () {
+                    builder:(context,ref,child)=> CustomButton(onPress: () async{
+                      final result = await NetworkChecker.hasInternetConnection();
                       if (_formKey.currentState!.validate() && ref.watch(bookCategory)!=null
-                          && ref.watch(bookSubjectsList).isNotEmpty && ref.watch(selectedImageProvider)!=null) {
+                          && ref.watch(bookSubjectsList).isNotEmpty && ref.watch(selectedImageProvider)!=null &&result) {
                         UiEventHandler.customAlertDialog(context, "Please wait few seconds! Uploading...",'','','',(){} ,true);
                         FirebaseFireStoreServices instance=FirebaseFireStoreServices();
                         uploadPost(ref).then((val){
@@ -366,7 +356,9 @@ class _PostBooksState extends ConsumerState<PostBooks> {
                           }
                         });
                       } else {
-                        UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
+                       if(context.mounted){
+                         UiEventHandler.snackBarWidget(context, "Please fill all the required fields");
+                       }
                       }
                     },title: "Post",fontSize: 18,isBold: true,),
                   ),

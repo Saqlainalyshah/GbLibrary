@@ -175,21 +175,20 @@ class _ProfileState extends ConsumerState<Profile> {
                             ref.read(_isReadOnly.notifier).state=true;
                             return;
                           }else{
-                             await instance.updateDocument('users',userProfile.uid.toString(), user.toJson());
-                          /* if(result){
-                           final count = ref.read(userActionsTracker.select((state)=>state.numberOfProfileUpdate))+1;
-                             ref.read(userProfileProvider.notifier)
-                                 .state = user;
-                             ref.read(userActionsTracker.notifier).updateNumberOfProfileUpdate(count);
-
+                            final result= await instance.updateDocument('users',userProfile.uid.toString(), user.toJson());
+                           if(result){
+                          // final count = ref.read(userActionsTracker.select((state)=>state.numberOfProfileUpdate))+1;
+                             ref.read(userProfileProvider.notifier).setState(user);
+                            // ref.read(userActionsTracker.notifier).updateNumberOfProfileUpdate(count);
+/*
                              if(ref.watch(userActionsTracker.select((state)=>state.numberOfProfileUpdate))==5 ){
                                adInstance.showInterstitialAd((){
                                  ref.read(userActionsTracker.notifier).clearNumberOfProfileUpdate();
                                });
                              }else{
                                print("${ref.watch(userActionsTracker.select((state)=>state.numberOfProfileUpdate))}===================>");
-                             }
-                           }*/
+                             }*/
+                           }
                             ref.read(_isReadOnly.notifier).state=true;
                           }
                         } else {

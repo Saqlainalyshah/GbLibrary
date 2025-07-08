@@ -10,6 +10,7 @@ import '../../components/text_widget.dart';
 import '../../components/textfield.dart';
 import '../../controller/authentication/auth_repository.dart';
 import '../../utils/app_theme/theme.dart';
+import '../../utils/fontsize/responsive_text.dart';
 import 'otp_screen.dart';
 
 class Login extends ConsumerWidget {
@@ -34,7 +35,7 @@ class Login extends ConsumerWidget {
             padding: const EdgeInsets.all(8.0),
             child: Column(
               spacing: 10,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 RichText(
                   textAlign: TextAlign.center,
@@ -44,19 +45,46 @@ class Login extends ConsumerWidget {
                       TextSpan(
                           text: "Let's Educate ",
                           style:GoogleFonts.asapCondensed(
-                            fontSize: 33,fontWeight: FontWeight.bold
+                            fontSize: 33,fontWeight: FontWeight.bold,
+                            color:  Theme.of(context).colorScheme.onSurface
                           )
                       ),
                       TextSpan(
                           text: "Gilgit Baltistan",
                           style:GoogleFonts.asapCondensed(
-                            fontSize: 33,fontWeight: FontWeight.bold,color: Color(0xff00a67e),
+                            fontSize: 33,fontWeight: FontWeight.bold,color: Theme.of(context).colorScheme.primary,
                           )
                         // style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold,color: Color(0xff00a67e),fontFamily: GoogleFonts.roboto),
                       ),
                     ],
                   ),
                 ),
+              //  SizedBox(height: ResponsiveBox.getSize(context, 50),),
+                  CustomText(text: "With",isGoogleFont: true,isBold: true,fontSize: 33,),
+                RichText(
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+
+                    text: TextSpan(
+                        style: TextStyle(
+                            fontSize: ResponsiveBox.getSize(context, 50)
+                        ),
+                        children: [
+                          TextSpan(
+                              text: "Gilgit",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              )
+                          ),
+                          TextSpan(text: "Swap",style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+
+                          )
+                        ]
+                    )),
                 /*SizedBox(height:10,),
                 Text("Phone Number",style: GoogleFonts.robotoSerif(color: AppThemeClass.darkText),),
                 Consumer(
@@ -90,14 +118,14 @@ class Login extends ConsumerWidget {
                     Expanded(child: Divider()),
                   ],
                 ),*/
-                SizedBox(height: MediaQuery.sizeOf(context).height*0.3,),
+                SizedBox(height: MediaQuery.sizeOf(context).height*0.2,),
                 ...List.generate(2, (index){
                   List<String> list=["Continue with Google","Continue with Facebook"];
                   return   Consumer(
                     builder:(context,ref,child){
                       print("rebuilds $index");
                       return CustomButton(
-                        loadingColor: AppThemeClass.primary,
+                       // color: AppThemeClass.primary,
                         isLoading: index==0?ref.watch(isLoading):ref.watch(isFacebookLogin),
                       onPress: ()async{
                         AuthRepository auth=AuthRepository();
@@ -143,7 +171,7 @@ class Login extends ConsumerWidget {
                                     image: NetworkImage(socialMediaNetworkImages[index],),)
                               ),
                             ),
-                            CustomText(text: list[index],isBold: true,)
+                            CustomText(text: list[index],isBold: true,color: AppThemeClass.whiteText,)
                           ],
                         ),
                       );

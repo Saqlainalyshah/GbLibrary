@@ -49,7 +49,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
          // surfaceTintColor: Colors.transparent,
           //backgroundColor: Colors.transparent,
           leading: buildCustomBackButton(context),
-          title: CustomText(text: "Details"),
+          title: Text( "Details"),
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -103,7 +103,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                       ),
                       CustomText(
                         text: widget.booksModel.category=="Exchange"? "I want to ${widget.booksModel.category} ${widget.booksModel.grade} $bookTitle":'I am donating ${widget.booksModel.grade} $bookTitle',
-                        fontSize: ResponsiveText.getSize(context, 18),
+                        fontSize:18,
                         isBold: true,
                       ),
                       CustomText(
@@ -119,7 +119,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                       ),
                       CustomText(
                         text: widget.booksModel.description,
-                        fontSize: 14,
+                        fontSize: 15,
                       ),
                       CustomText(
                         text: "Total Subjects:",
@@ -247,7 +247,7 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                             ),),
                           ),
                           Expanded(
-                            child: CustomButton(isBorder: true,onPress: (){
+                            child: CustomButton(isBorder: true,color: isDark?AppThemeClass.darkText:AppThemeClass.whiteText,onPress: (){
                               if(tempData.number.length==11){
                                 launchPhoneCall(tempData.number);
                               }else{
@@ -259,12 +259,12 @@ class _ViewDetailsState extends ConsumerState<ViewDetails> {
                               children: [
                                 Icon(
                                   Icons.call,
-                                  color: AppThemeClass.whiteText,
+                                 // color: AppThemeClass.whiteText,
                                   size: 25,
                                 ),
                                 CustomText(
                                   text: "Call",
-                                  color: AppThemeClass.whiteText,
+                                //  color: AppThemeClass.whiteText,
                                   isBold: true,
                                   fontSize: 18,
                                 ),

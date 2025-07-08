@@ -57,9 +57,9 @@ class _BannerAdWidgetState extends ConsumerState<BannerAdWidget> {
                 text: TextSpan(
               children: [
                 TextSpan(
-                  text: "Hello👋! ",
+                  text: "Welcome👋! ",
                   style: TextStyle(
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.bold,
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: ResponsiveText.getSize(context, 18)
                   )

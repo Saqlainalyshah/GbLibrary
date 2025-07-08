@@ -13,6 +13,7 @@ import '../../controller/firebase_crud_operations/firestore_crud_operations.dart
 import '../../controller/providers/global_providers.dart';
 import '../../model/post_model.dart';
 import '../../utils/app_theme/theme.dart';
+import '../chat/message_room.dart';
 
 
 final uniformSize = StateProvider<String?>((ref)=>null);
@@ -244,7 +245,8 @@ class _UniformClothesScreenState extends ConsumerState<UniformClothesScreen> {
                   ],
                 ):Consumer(
                   builder:(context,ref,child)=> CustomButton(onPress: () async{
-                    if (_formKey.currentState!.validate() && ref.watch(isSchoolUniform)!=null && ref.watch(uniformSize)!=null && ref.watch(selectedUniformImageProvider)!=null) {
+                    final result = await NetworkChecker.hasInternetConnection();
+                    if (_formKey.currentState!.validate() && ref.watch(isSchoolUniform)!=null && ref.watch(uniformSize)!=null && ref.watch(selectedUniformImageProvider)!=null &&result) {
                       UiEventHandler.customAlertDialog(context, "Please wait few seconds! Uploading...",'','','',(){} ,true);
                       final result= await _upload(ref);
                       if(result!=null){

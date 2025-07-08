@@ -58,7 +58,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         //backgroundColor: Colors.black,
        // drawerScrimColor: AppThemeClass.primary,
         appBar: AppBar(
-
+          centerTitle: true,
           title: BannerAdWidget()
         ),
        // drawer: const DrawerWidget(),
@@ -104,6 +104,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                    children: [
                      _buildNavItem(Icons.message, 'Messages', 3),
                      Consumer(builder: (context,ref,child){
+
                       final messages= ref.watch(filterChatProvider.select((state)=>state.unreadMessageCount));
                       if(messages>0){
                         return Positioned(
@@ -140,7 +141,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
      final isDark = Theme.of(context).brightness == Brightness.dark;
 
      print("Rebuilds $index");
-     final isSelected = ref.watch(_bottomNavigationIndex) == index;
+     final isSelected = ref.watch(_bottomNavigationIndex.select((state)=>state))==index;
      if(index==2){
        return  GestureDetector(
          onTap: () =>ref
@@ -154,9 +155,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
              shape: BoxShape.circle,
              color:  AppThemeClass.primary,
            ),
-           child: Consumer(
-               builder:(context,ref,child)=>Icon(Icons.add,size: ResponsiveBox.getSize(context, 50),color: AppThemeClass.whiteText,)
-           ),
+           child:Icon(Icons.add,size: ResponsiveBox.getSize(context, 50),color: AppThemeClass.whiteText,),
          ),
        );
      }else {
@@ -174,9 +173,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                  .darkTextOptional,
                size: ResponsiveBox.getSize(context, 30),
              ),
-             CustomText(text: label,
-               color: isSelected ? AppThemeClass.primary : isDark? AppThemeClass.whiteText:Colors.black54,
-             ),
+             Text( label,style: TextStyle(
+               color: isSelected ? AppThemeClass.primary : isDark? AppThemeClass.whiteText:Colors.black,
+               fontWeight: isSelected?FontWeight.bold:null,
+             ) ),
            ],
          ),
        );

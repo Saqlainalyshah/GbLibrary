@@ -43,6 +43,9 @@ class UserNotifier extends StateNotifier<UserProfile?> {
     final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
     state = UserProfile.fromJson(doc.data()!);
   }
+  setState( UserProfile user){
+    state=user;
+  }
 }
 
 final userProfileProvider = StateNotifierProvider<UserNotifier, UserProfile?>((ref) => UserNotifier());
@@ -85,7 +88,6 @@ final myBooksPosts = StreamProvider<List<BooksModel>>((ref) {
     return FirebaseFirestore.instance
         .collection('books')
         .where('userID', isEqualTo:user.uid)
-
         .snapshots()
         .map(
           (snapshot) => snapshot.docs.map(

@@ -37,9 +37,7 @@ class GlobalThemeData {
         style: OutlinedButton.styleFrom(
          // backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onSurface,
-          side: BorderSide(
-            color: colorScheme.primary
-          )
+          side: BorderSide.none
         )
       ),
       dialogTheme: DialogThemeData(

@@ -47,7 +47,7 @@ dependencies {
     implementation("org.tensorflow:tensorflow-lite:2.13.0") // Or your TFLite version
     implementation("org.tensorflow:tensorflow-lite-support:0.3.1") // For FileUtil
     implementation("com.facebook.android:facebook-android-sdk:latest.release")
-
+    implementation("com.google.android.material:material:1.14.0-alpha02")
 // or latest stable version
 }
 

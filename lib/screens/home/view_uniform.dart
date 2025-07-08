@@ -45,7 +45,7 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
         appBar: AppBar(
 
           leading: buildCustomBackButton(context),
-          title: CustomText(text: "Details"),
+          title: Text( "Details"),
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -181,6 +181,7 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Consumer(
                   builder:(context,ref,child){
+                    bool isDark= Theme.of(context).brightness == Brightness.dark;
                     final data=ref.watch(mapDataProvider);
                     if(data!=null){
                       final tempData=UserProfile.fromJson(data);
@@ -209,7 +210,7 @@ class _SchoolUniformScreenState extends ConsumerState<SchoolUniformScreen> {
                             ),),
                           ),
                           Expanded(
-                            child: CustomButton(color: AppThemeClass.whiteText,isBorder: true,onPress: (){
+                            child: CustomButton(color: isDark?AppThemeClass.darkText:AppThemeClass.whiteText,isBorder: true,onPress: (){
                               if(tempData.number.length==11){
                                 launchPhoneCall(tempData.number);
                               }else{
@@ -258,12 +259,12 @@ buildIconTextRowWithoutBackground(IconData icon, String text,) {
       Icon(
         icon,
         color: AppThemeClass.primary,
-        size: 20,
+       // size: 20,
       ),
       Flexible(
         child: CustomText(
           text: text,
-          fontSize: 12,
+          fontSize: 15,
         ),
       ),
     ],

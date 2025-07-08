@@ -51,7 +51,7 @@ class PostCard extends StatelessWidget {
              onTap: (){
                Navigator.push(context, MaterialPageRoute(builder: (builder)=>ImageView(url: imageUrl)));
              },
-             child:  buildContainerImage(context, imageUrl, 150,100,true),),
+             child:  buildContainerImage(context, imageUrl, 170,100,true),),
             Flexible(
               flex: 3,
               child: BuildPostColumn(
@@ -108,8 +108,9 @@ class BuildPostColumn extends StatelessWidget {
         CustomText(
           text: description,
           //overflow: TextOverflow.ellipsis,s
-          fontSize: 13,
+          fontSize: 15,
           maxLines: 5,
+
         ),
       ],
     );

@@ -19,7 +19,7 @@ class CustomButton extends StatelessWidget {
     this.radius = 10.0,
     this.width = double.infinity,
     this.height = 50.0,
-    this.loadingColor,
+
     this.color=const Color(0xff00a67e),
     this.titleColor,
     required this.onPress,
@@ -33,7 +33,7 @@ class CustomButton extends StatelessWidget {
   final double height;
   final double width;
   final Color? titleColor;
-  final Color? loadingColor;
+
   final double radius;
   final Color? color;
   final Function onPress;
@@ -53,19 +53,19 @@ class CustomButton extends StatelessWidget {
         ),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(radius),
-            color:isDark?AppThemeClass.primaryOptional: color,
+            color: color,
             border: isBorder?Border.all(
                 color: AppThemeClass.primary
             ):null),
         child: Center(
             child: isLoading
                 ? CircularProgressIndicator(
-              color: loadingColor,
+              color: AppThemeClass.whiteText,
             )
                 : title != null? Text(
                title.toString(),
               style: TextStyle(
-              color: !isDark? AppThemeClass.whiteText:titleColor,
+              color:  AppThemeClass.whiteText,
               fontSize: fontSize,
               fontWeight: FontWeight.bold
              )

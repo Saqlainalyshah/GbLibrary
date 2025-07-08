@@ -98,20 +98,6 @@ class FeedPortion extends ConsumerWidget {
       child: CustomScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         slivers: [
-          /*  SliverAppBar(
-
-            surfaceTintColor: AppThemeClass.whiteText,
-            backgroundColor: AppThemeClass.whiteText,
-            floating: true,
-            pinned: true,
-            expandedHeight: 10,
-            automaticallyImplyLeading: false,
-            flexibleSpace: FlexibleSpaceBar(
-             // padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              background: BannerAdWidget(),
-            ),
-          ),*/
-
           SliverAppBar(
             expandedHeight: 60,
             automaticallyImplyLeading: false,
@@ -121,7 +107,6 @@ class FeedPortion extends ConsumerWidget {
                 builder: (context, ref, child) {
                   return CustomTextField(
                     controller: controller,
-
                     hintText: "Search by location",
                     leadingIcon: Icons.search,
                     trailingIcon: Icons.close,
@@ -175,7 +160,7 @@ class FeedPortion extends ConsumerWidget {
                               );
                             },
                           ),
-                          Divider(color: AppThemeClass.primary),
+                          Divider(),
                         ],
                       );
                     },
@@ -186,12 +171,8 @@ class FeedPortion extends ConsumerWidget {
               }
               else{
                 return SliverToBoxAdapter(
-                  child:Column(
-                    children: [
-                      Center(
-                        child:CircularProgressIndicator(color: AppThemeClass.primary,),
-                      ),
-                    ],
+                  child:Center(
+                    child:CircularProgressIndicator(color: AppThemeClass.primary,),
                   ),
                 );
               }
