@@ -166,16 +166,14 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                       : AppThemeClass.darkTextOptional,
                   size: ResponsiveBox.getSize(context, 30),
                 ),
-                Text(
+                CustomText(text:
                   label,
-                  style: TextStyle(
                     color: isSelected
                         ? AppThemeClass.primary
                         : isDark
                         ? AppThemeClass.whiteText
                         : null,
-                    fontWeight: isSelected ? FontWeight.bold : null,
-                  ),
+                   isBold:true
                 ),
               ],
             ),

@@ -63,6 +63,7 @@ dependencies:
   # help to launch calls
   url_launcher: ^6.3.1
   flutter_facebook_auth: ^6.1.1
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:

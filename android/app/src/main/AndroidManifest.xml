@@ -16,9 +16,9 @@
     </queries>
 
     <application
-        android:label="booksexchange"
+        android:label="GilgitSwap"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
 
         <!-- ✅ Facebook SDK Meta-data (must be inside <application>) -->
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>

@@ -130,7 +130,7 @@ final bool isMessage;
                         shape: CircleBorder(), // Ensures the material maintains circular shape
                         color: Colors.transparent, // Keep the container's original color
                         child: Container(
-                          padding: EdgeInsets.all(8),
+                          padding: EdgeInsets.all(5),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.redAccent,
