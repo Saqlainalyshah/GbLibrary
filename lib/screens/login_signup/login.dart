@@ -32,7 +32,7 @@ class Login extends ConsumerWidget {
               spacing: 10,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                RichText(
+                /*RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
                     //style: context.heading2,  // ✅ Ensures text inherits proper styling
@@ -55,7 +55,7 @@ class Login extends ConsumerWidget {
                   ),
                 ),
               //  SizedBox(height: ResponsiveBox.getSize(context, 50),),
-                  CustomText(text: "With",isBold: true,fontSize: 33,),
+                  CustomText(text: "With",isBold: true,fontSize: 33,),*/
                 RichText(
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
