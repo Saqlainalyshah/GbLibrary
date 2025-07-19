@@ -68,8 +68,7 @@ class _PostBooksState extends ConsumerState<PostBooks> {
            final XFile? file = await storage.pickImageAndCompress(pickedFile);
            if (file != null) {
              final fileData = File(file.path);
-             ref
-                 .read(selectedImageProvider.notifier)
+             ref.read(selectedImageProvider.notifier)
                  .state = fileData;
            }
          }else{

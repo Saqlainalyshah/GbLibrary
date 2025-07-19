@@ -129,6 +129,7 @@ class _MessageRoomState extends ConsumerState<MessageRoom> {
               text: widget.userProfile.name,
               isBold: true,
               maxLines: 1,
+              fontSize: 15,
             ),
             subtitle: CustomText(text: "Offline"),
           ),
